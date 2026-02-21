@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Athlete Data Company – AI-Powered Athlete Marketplace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- LANDING PAGE -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <main id="screen-landing" class="screen active">
+    <header class="landing-header">
+      <a href="#" class="logo" data-nav="landing">Athlete Data Co.</a>
+      <nav class="landing-nav">
+        <a href="#vision">Vision</a>
+        <a href="#personas">Personas</a>
+      </nav>
+    </header>
+    <section class="hero">
+      <p class="hero-tag">India’s largest AI-powered</p>
+      <h1 class="hero-title">Athlete Discovery &<br />Intelligence Marketplace</h1>
+      <p class="hero-sub">Verified identity · AI insights · Sponsorship workflows</p>
+      <div class="persona-buttons" id="persona-buttons">
+        <button type="button" class="persona-btn athlete" data-persona="athlete">
+          <span class="persona-icon">⚡</span>
+          <span class="persona-label">I'm an Athlete</span>
+          <span class="persona-desc">Create verified identity & attract sponsorship</span>
+        </button>
+        <button type="button" class="persona-btn brand" data-persona="brand">
+          <span class="persona-icon">🎯</span>
+          <span class="persona-label">I'm a Brand / Agency</span>
+          <span class="persona-desc">Discover, evaluate & partner with AI insights</span>
+        </button>
+        <button type="button" class="persona-btn admin" data-persona="admin">
+          <span class="persona-icon">🛡️</span>
+          <span class="persona-label">Admin</span>
+          <span class="persona-desc">Govern data, verification & monetization</span>
+        </button>
+      </div>
+    </section>
+    <section class="vision" id="vision">
+      <h2>Product Vision</h2>
+      <div class="vision-cards">
+        <div class="vision-card">
+          <h3>Athletes</h3>
+          <p>Create verified digital identity and attract sponsorship.</p>
+        </div>
+        <div class="vision-card">
+          <h3>Brands / Agencies</h3>
+          <p>Discover, evaluate and partner using AI insights.</p>
+        </div>
+        <div class="vision-card">
+          <h3>Fans (Phase 2)</h3>
+          <p>Engage via SportsTrade ecosystem.</p>
+        </div>
+        <div class="vision-card">
+          <h3>Admin</h3>
+          <p>Govern data authenticity, monetization and IP.</p>
+        </div>
+      </div>
+    </section>
+    <section class="personas-preview" id="personas">
+      <h2>Choose your journey</h2>
+      <p class="personas-sub">Click a persona to explore the full flow (clickable prototype)</p>
+      <div class="persona-cards">
+        <button type="button" class="persona-card" data-persona="athlete">
+          <span class="card-icon">⚡</span>
+          <span class="card-title">Athlete</span>
+          <span class="card-route">Onboarding → Profile → Dashboard</span>
+        </button>
+        <button type="button" class="persona-card" data-persona="brand">
+          <span class="card-icon">🎯</span>
+          <span class="card-title">Brand / Agency</span>
+          <span class="card-route">Register → Discovery → Shortlist → Proposal</span>
+        </button>
+        <button type="button" class="persona-card" data-persona="admin">
+          <span class="card-icon">🛡️</span>
+          <span class="card-title">Admin</span>
+          <span class="card-route">Governance → Revenue Dashboard</span>
+        </button>
+      </div>
+    </section>
+    <footer class="landing-footer">
+      <p>Athlete Data Company · SaaS + AI + Marketplace · Phase 1 MVP</p>
+    </footer>
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- GLOBAL TOP BAR (for journey screens) -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <header class="journey-header" id="journey-header">
+    <button type="button" class="back-to-landing" data-nav="landing" aria-label="Back to home">
+      ← Home
+    </button>
+    <span class="journey-persona" id="journey-persona-label"></span>
+    <div class="journey-breadcrumb" id="journey-breadcrumb"></div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- ATHLETE JOURNEY -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="screen-athlete-register" class="screen journey-screen">
+    <div class="screen-inner form-screen">
+      <h1>Athlete Registration</h1>
+      <p class="screen-desc">Create your verified digital identity. All fields are part of the prototype flow.</p>
+      <form class="proto-form" id="form-athlete-register">
+        <div class="form-row">
+          <label>Email</label>
+          <input type="email" placeholder="athlete@example.com" />
+        </div>
+        <div class="form-row">
+          <label>Login method</label>
+          <div class="button-group">
+            <button type="button" class="btn-secondary">Email / OTP</button>
+            <button type="button" class="btn-secondary">Google</button>
+            <button type="button" class="btn-secondary">LinkedIn</button>
+          </div>
+        </div>
+        <div class="form-row two-cols">
+          <div>
+            <label>Sport</label>
+            <select>
+              <option>Cricket</option>
+              <option>Football</option>
+              <option>Badminton</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label>Role</label>
+            <select>
+              <option>Batsman</option>
+              <option>Bowler</option>
+              <option>All-rounder</option>
+              <option>Player</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Identity proof (KYC)</label>
+          <div class="upload-zone">
+            <span>Drag & drop or click to upload</span>
+            <input type="file" accept="image/*,.pdf" />
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Profile image</label>
+          <div class="upload-zone small">
+            <span>Upload photo</span>
+            <input type="file" accept="image/*" />
+          </div>
+        </div>
+        <div class="form-row checkbox-row">
+          <label class="checkbox-label">
+            <input type="checkbox" />
+            I accept the Terms & Conditions
+          </label>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-primary" data-next="athlete-profile">Continue →</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section id="screen-athlete-profile" class="screen journey-screen">
+    <div class="screen-inner form-screen">
+      <h1>Athlete Profile</h1>
+      <p class="screen-desc">Complete your portfolio. Performance metrics and media improve your discoverability.</p>
+      <form class="proto-form">
+        <fieldset class="form-section">
+          <legend>Basic info</legend>
+          <div class="form-row two-cols">
+            <div><label>Name</label><input type="text" placeholder="Full name" /></div>
+            <div><label>Age</label><input type="number" placeholder="Age" /></div>
+          </div>
+          <div class="form-row two-cols">
+            <div><label>Location</label><input type="text" placeholder="City, State" /></div>
+            <div><label>Current team</label><input type="text" placeholder="Team / Academy" /></div>
+          </div>
+          <div class="form-row">
+            <label>Bio</label>
+            <textarea placeholder="Short bio"></textarea>
+          </div>
+        </fieldset>
+        <fieldset class="form-section">
+          <legend>Performance metrics</legend>
+          <div class="form-row two-cols">
+            <div><label>Total matches</label><input type="number" placeholder="e.g. 45" /></div>
+            <div><label>Sport-specific stats</label><input type="text" placeholder="Runs, wickets, etc." /></div>
+          </div>
+          <div class="form-row">
+            <label>Awards</label>
+            <input type="text" placeholder="List key awards" />
+          </div>
+          <div class="form-row">
+            <label>Career summary</label>
+            <textarea placeholder="Brief career summary"></textarea>
+          </div>
+        </fieldset>
+        <fieldset class="form-section">
+          <legend>Media</legend>
+          <div class="form-row">
+            <label>Highlight video URL</label>
+            <input type="url" placeholder="https://..." />
+          </div>
+          <div class="form-row">
+            <label>Certificates / press mentions</label>
+            <div class="upload-zone"><span>Upload files</span><input type="file" multiple /></div>
+          </div>
+        </fieldset>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" data-next="athlete-register">← Back</button>
+          <button type="button" class="btn-primary" data-next="athlete-dashboard">Save & go to Dashboard →</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section id="screen-athlete-dashboard" class="screen journey-screen">
+    <div class="screen-inner dashboard-screen">
+      <h1>Athlete Dashboard</h1>
+      <p class="screen-desc">Your visibility and sponsorship metrics at a glance.</p>
+      <div class="dashboard-grid">
+        <div class="stat-card completeness">
+          <span class="stat-value">78%</span>
+          <span class="stat-label">Profile completeness</span>
+          <button type="button" class="btn-link" data-next="athlete-profile">Complete profile →</button>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">82</span>
+          <span class="stat-label">AI Performance Score</span>
+          <span class="stat-meta">Tier A</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">76</span>
+          <span class="stat-label">AI Social Score</span>
+          <span class="stat-meta">↑ 12% trend</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">124</span>
+          <span class="stat-label">Profile views</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">7</span>
+          <span class="stat-label">Brand shortlists</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">3</span>
+          <span class="stat-label">Inquiries</span>
+        </div>
+      </div>
+      <div class="dashboard-section">
+        <h2>Recent inquiries</h2>
+        <ul class="inquiry-list">
+          <li>
+            <strong>Brand A</strong> – Campaign inquiry
+            <span class="badge">Under review</span>
+          </li>
+          <li>
+            <strong>Brand B</strong> – Sponsorship proposal
+            <span class="badge success">Accepted</span>
+          </li>
+          <li>
+            <strong>Agency C</strong> – NDA requested
+            <span class="badge">Pending</span>
+          </li>
+        </ul>
+        <button type="button" class="btn-secondary">View all inquiries</button>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" data-next="athlete-profile">← Edit profile</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- BRAND JOURNEY -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="screen-brand-register" class="screen journey-screen">
+    <div class="screen-inner form-screen">
+      <h1>Brand / Agency Registration</h1>
+      <p class="screen-desc">Company verification and subscription. Max 3 users per account in MVP.</p>
+      <form class="proto-form">
+        <div class="form-row">
+          <label>Company email (mandatory)</label>
+          <input type="email" placeholder="brand@company.com" />
+        </div>
+        <div class="form-row">
+          <label>Business verification (GST optional)</label>
+          <div class="upload-zone"><span>Upload GST / business proof</span><input type="file" /></div>
+        </div>
+        <div class="form-row">
+          <label>Subscription plan</label>
+          <div class="plan-cards">
+            <label class="plan-card">
+              <input type="radio" name="plan" value="starter" />
+              <span class="plan-name">Starter</span>
+              <span class="plan-price">₹X/month</span>
+              <span class="plan-desc">Up to 50 searches</span>
+            </label>
+            <label class="plan-card">
+              <input type="radio" name="plan" value="pro" checked />
+              <span class="plan-name">Pro</span>
+              <span class="plan-price">₹Y/month</span>
+              <span class="plan-desc">Unlimited + AI insights</span>
+            </label>
+            <label class="plan-card">
+              <input type="radio" name="plan" value="enterprise" />
+              <span class="plan-name">Enterprise</span>
+              <span class="plan-price">Custom</span>
+              <span class="plan-desc">Multi-user, API</span>
+            </label>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Role-based access (max 3 users)</label>
+          <input type="text" placeholder="Add team members by email" />
+          <p class="form-hint">Scout, Manager, Admin roles available.</p>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-primary" data-next="brand-discovery">Continue to Discovery →</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section id="screen-brand-discovery" class="screen journey-screen">
+    <div class="screen-inner discovery-screen">
+      <h1>Athlete Discovery</h1>
+      <p class="screen-desc">Search and filter by sport, role, AI scores, budget, and verified status.</p>
+      <div class="discovery-layout">
+        <aside class="filters-panel">
+          <h3>Filters</h3>
+          <div class="filter-group">
+            <label>Sport</label>
+            <select><option>All</option><option>Cricket</option><option>Football</option></select>
+          </div>
+          <div class="filter-group">
+            <label>Role</label>
+            <select><option>All</option><option>Batsman</option><option>Bowler</option></select>
+          </div>
+          <div class="filter-group">
+            <label>Age range</label>
+            <input type="text" placeholder="18 – 28" />
+          </div>
+          <div class="filter-group">
+            <label>Location</label>
+            <input type="text" placeholder="Any" />
+          </div>
+          <div class="filter-group">
+            <label>AI Performance Score</label>
+            <input type="text" placeholder="70 – 100" />
+          </div>
+          <div class="filter-group">
+            <label>AI Social Score</label>
+            <input type="text" placeholder="60 – 100" />
+          </div>
+          <div class="filter-group">
+            <label>Growth trend</label>
+            <select><option>Any</option><option>Rising</option><option>Stable</option></select>
+          </div>
+          <div class="filter-group">
+            <label>Budget bracket</label>
+            <select><option>Any</option><option>₹1–5L</option><option>₹5–20L</option></select>
+          </div>
+          <div class="filter-group">
+            <label class="checkbox-label"><input type="checkbox" checked /> Verified only</label>
+          </div>
+          <button type="button" class="btn-primary full-width">Apply filters</button>
+        </aside>
+        <div class="results-area">
+          <div class="results-toolbar">
+            <input type="search" placeholder="Search athletes..." class="search-input" />
+            <span class="results-count">24 athletes found</span>
+          </div>
+          <div class="athlete-cards">
+            <article class="athlete-card" data-next="brand-athlete-profile">
+              <div class="athlete-card-avatar">RK</div>
+              <div class="athlete-card-info">
+                <strong>Rahul K.</strong>
+                <span>Cricket · Batsman</span>
+                <div class="athlete-card-scores">
+                  <span>Perf: 82</span>
+                  <span>Social: 76</span>
+                  <span class="verified">✓ Verified</span>
+                </div>
+              </div>
+              <button type="button" class="btn-secondary btn-sm" data-next="brand-athlete-profile">View profile</button>
+            </article>
+            <article class="athlete-card" data-next="brand-athlete-profile">
+              <div class="athlete-card-avatar">PS</div>
+              <div class="athlete-card-info">
+                <strong>Priya S.</strong>
+                <span>Badminton · Singles</span>
+                <div class="athlete-card-scores">
+                  <span>Perf: 88</span>
+                  <span>Social: 81</span>
+                  <span class="verified">✓ Verified</span>
+                </div>
+              </div>
+              <button type="button" class="btn-secondary btn-sm" data-next="brand-athlete-profile">View profile</button>
+            </article>
+            <article class="athlete-card" data-next="brand-athlete-profile">
+              <div class="athlete-card-avatar">AM</div>
+              <div class="athlete-card-info">
+                <strong>Aarav M.</strong>
+                <span>Football · Midfielder</span>
+                <div class="athlete-card-scores">
+                  <span>Perf: 75</span>
+                  <span>Social: 69</span>
+                </div>
+              </div>
+              <button type="button" class="btn-secondary btn-sm" data-next="brand-athlete-profile">View profile</button>
+            </article>
+          </div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" data-next="brand-register">← Back</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-brand-athlete-profile" class="screen journey-screen">
+    <div class="screen-inner profile-view-screen">
+      <div class="profile-view-header">
+        <div class="profile-view-avatar">RK</div>
+        <div class="profile-view-meta">
+          <h1>Rahul K.</h1>
+          <p>Cricket · Batsman · Verified</p>
+          <div class="profile-view-actions">
+            <button type="button" class="btn-secondary" data-next="brand-discovery">← Back to search</button>
+            <button type="button" class="btn-outline">Add to shortlist</button>
+            <button type="button" class="btn-primary" data-next="brand-inquiry">Send inquiry</button>
+          </div>
+        </div>
+      </div>
+      <div class="profile-view-stats">
+        <div class="pv-stat">
+          <span class="pv-value">82</span>
+          <span class="pv-label">AI Performance Score</span>
+          <span class="pv-meta">Tier A</span>
+        </div>
+        <div class="pv-stat">
+          <span class="pv-value">76</span>
+          <span class="pv-label">AI Social Score</span>
+          <span class="pv-meta">↑ 12%</span>
+        </div>
+        <div class="pv-stat">
+          <span class="pv-value">8.2</span>
+          <span class="pv-label">Brand Fit Score</span>
+        </div>
+        <div class="pv-stat">
+          <span class="pv-value">High</span>
+          <span class="pv-label">Est. ROI indicator</span>
+        </div>
+        <div class="pv-stat">
+          <span class="pv-value">Low</span>
+          <span class="pv-label">Injury risk index</span>
+        </div>
+      </div>
+      <div class="profile-view-section">
+        <h2>Performance stats</h2>
+        <p>Matches: 45 · Runs: 1,240 · Avg: 38.2 · Tournament level weightage applied.</p>
+      </div>
+      <div class="profile-view-section">
+        <h2>Historical growth</h2>
+        <div class="chart-placeholder">
+          <span>📈 Growth graph (Performance & Social over time)</span>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-primary" data-next="brand-inquiry">Send inquiry & continue →</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-brand-inquiry" class="screen journey-screen">
+    <div class="screen-inner form-screen">
+      <h1>Send inquiry</h1>
+      <p class="screen-desc">Optional: request NDA, add message. Track status in your dashboard.</p>
+      <form class="proto-form">
+        <div class="form-row">
+          <label>To</label>
+          <input type="text" value="Rahul K. (Cricket · Batsman)" readonly class="readonly" />
+        </div>
+        <div class="form-row">
+          <label>Message</label>
+          <textarea placeholder="Introduce your brand and campaign intent..."></textarea>
+        </div>
+        <div class="form-row checkbox-row">
+          <label class="checkbox-label"><input type="checkbox" /> Request NDA</label>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" data-next="brand-athlete-profile">← Back</button>
+          <button type="button" class="btn-primary" data-next="brand-proposal">Send & create proposal →</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section id="screen-brand-proposal" class="screen journey-screen">
+    <div class="screen-inner form-screen">
+      <h1>Create sponsorship proposal</h1>
+      <p class="screen-desc">Define campaign duration, deliverables, and budget. Athlete can Accept / Negotiate / Reject.</p>
+      <form class="proto-form">
+        <div class="form-row">
+          <label>Athlete</label>
+          <input type="text" value="Rahul K." readonly class="readonly" />
+        </div>
+        <div class="form-row">
+          <label>Campaign duration</label>
+          <input type="text" placeholder="e.g. 6 months" />
+        </div>
+        <div class="form-row">
+          <label>Deliverables</label>
+          <textarea placeholder="Social posts, events, jersey branding, etc."></textarea>
+        </div>
+        <div class="form-row">
+          <label>Budget</label>
+          <input type="text" placeholder="Amount (₹)" />
+        </div>
+        <div class="form-row">
+          <label>Attach documents</label>
+          <div class="upload-zone"><span>Upload contract / brief</span><input type="file" /></div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" data-next="brand-inquiry">← Back</button>
+          <button type="button" class="btn-primary" data-next="brand-discovery">Submit proposal →</button>
+        </div>
+      </form>
+      <div class="status-timeline">
+        <h3>Proposal status flow</h3>
+        <ul>
+          <li><span class="dot done"></span> Proposal sent</li>
+          <li><span class="dot active"></span> Under review</li>
+          <li><span class="dot"></span> Negotiation</li>
+          <li><span class="dot"></span> Approved</li>
+          <li><span class="dot"></span> Closed</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- ADMIN JOURNEY -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="screen-admin-login" class="screen journey-screen">
+    <div class="screen-inner form-screen narrow">
+      <h1>Admin login</h1>
+      <p class="screen-desc">Internal access only. RBAC & audit logging.</p>
+      <form class="proto-form">
+        <div class="form-row">
+          <label>Email</label>
+          <input type="email" placeholder="admin@athletedataco.com" />
+        </div>
+        <div class="form-row">
+          <label>Password</label>
+          <input type="password" placeholder="••••••••" />
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-primary" data-next="admin-athlete-governance">Login →</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section id="screen-admin-athlete-governance" class="screen journey-screen">
+    <div class="screen-inner dashboard-screen">
+      <h1>Athlete governance</h1>
+      <p class="screen-desc">Approve KYC, assign verified badge, flag stats, suspend accounts.</p>
+      <div class="admin-tabs">
+        <button type="button" class="tab active">Pending KYC</button>
+        <button type="button" class="tab">Verified</button>
+        <button type="button" class="tab">Flagged</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Athlete</th>
+              <th>Sport</th>
+              <th>KYC status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Rahul K.</td>
+              <td>Cricket</td>
+              <td><span class="badge">Pending</span></td>
+              <td>
+                <button type="button" class="btn-sm btn-primary">Approve</button>
+                <button type="button" class="btn-sm btn-secondary">Reject</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Priya S.</td>
+              <td>Badminton</td>
+              <td><span class="badge success">Verified</span></td>
+              <td>
+                <button type="button" class="btn-sm btn-outline">Revoke badge</button>
+                <button type="button" class="btn-sm btn-secondary">Flag stats</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Aarav M.</td>
+              <td>Football</td>
+              <td><span class="badge">Pending</span></td>
+              <td>
+                <button type="button" class="btn-sm btn-primary">Approve</button>
+                <button type="button" class="btn-sm btn-secondary">Suspend</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" data-next="admin-login">← Back</button>
+        <button type="button" class="btn-primary" data-next="admin-brand-governance">Brand governance →</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-admin-brand-governance" class="screen journey-screen">
+    <div class="screen-inner dashboard-screen">
+      <h1>Brand governance</h1>
+      <p class="screen-desc">Verify companies, monitor spam, manage subscription plans.</p>
+      <div class="admin-tabs">
+        <button type="button" class="tab active">Companies</button>
+        <button type="button" class="tab">Spam reports</button>
+        <button type="button" class="tab">Plans</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Plan</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Brand A</td>
+              <td>Pro</td>
+              <td><span class="badge success">Active</span></td>
+              <td><button type="button" class="btn-sm btn-outline">Manage</button></td>
+            </tr>
+            <tr>
+              <td>Agency B</td>
+              <td>Starter</td>
+              <td><span class="badge">Pending verification</span></td>
+              <td><button type="button" class="btn-sm btn-primary">Verify</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" data-next="admin-athlete-governance">← Athlete gov</button>
+        <button type="button" class="btn-primary" data-next="admin-revenue">Revenue dashboard →</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-admin-revenue" class="screen journey-screen">
+    <div class="screen-inner dashboard-screen">
+      <h1>Revenue dashboard</h1>
+      <p class="screen-desc">Subscription revenue, commission, conversion metrics.</p>
+      <div class="dashboard-grid">
+        <div class="stat-card">
+          <span class="stat-value">₹4.2L</span>
+          <span class="stat-label">Subscription revenue (MTD)</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">8%</span>
+          <span class="stat-label">Commission rate</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">142</span>
+          <span class="stat-label">Active brands</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">1,840</span>
+          <span class="stat-label">Active athletes</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">23%</span>
+          <span class="stat-label">Shortlist → deal conversion</span>
+        </div>
+      </div>
+      <div class="chart-placeholder large">
+        <span>📊 Revenue & conversion charts</span>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" data-next="admin-brand-governance">← Brand gov</button>
+        <button type="button" class="btn-primary" data-nav="landing">Exit to home</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
