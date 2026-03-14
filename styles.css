@@ -266,6 +266,18 @@ body {
 .persona-card .card-title { font-weight: 600; }
 .persona-card .card-route { font-size: 0.75rem; color: var(--text-muted); }
 
+.persona-cards-fan {
+  margin-top: 1rem;
+}
+
+.persona-card.fan-card {
+  cursor: default;
+}
+
+.persona-card .card-route-underline {
+  text-decoration: underline;
+}
+
 .landing-footer {
   text-align: center;
   padding: 2rem;
