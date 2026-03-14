@@ -85,6 +85,23 @@ body {
   color: var(--text);
 }
 
+.nav-btn-admin {
+  margin-left: 1.5rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+}
+
+.nav-btn-admin:hover {
+  color: var(--text);
+}
+
 .hero {
   max-width: 960px;
   margin: 0 auto;
