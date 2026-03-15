@@ -317,56 +317,49 @@
       <div class="discovery-header">
         <div>
           <h1>Athlete Discovery</h1>
-          <p class="screen-desc">Find athletes by filters, search, or describe your needs to the AI assistant.</p>
+          <p class="screen-desc">Find athletes by filters, search, or the Discovery Assistant.</p>
         </div>
       </div>
-      <div class="discovery-onboarding">
-        <span class="discovery-onboarding-label">What you can do here:</span>
-        <ul>
-          <li><strong>Use filters</strong> (left) — Sport, role, location, AI scores, budget, verified only.</li>
-          <li><strong>Search</strong> — Type names or keywords in the search bar above the results.</li>
-          <li><strong>Chat with the assistant</strong> (right) — Describe your brief: e.g. sport, geolocation, or PAN India known faces; get tailored player suggestions.</li>
-        </ul>
-      </div>
       <div class="discovery-layout">
-        <aside class="filters-panel">
-          <h3>Filters</h3>
-          <div class="filter-group">
-            <label>Sport</label>
-            <select><option>All</option><option>Cricket</option><option>Football</option><option>Badminton</option></select>
+        <aside class="filters-menu">
+          <div class="filters-menu-inner">
+            <div class="filter-menu-item">
+              <label>Sport</label>
+              <select><option>All</option><option>Cricket</option><option>Football</option><option>Badminton</option></select>
+            </div>
+            <div class="filter-menu-item">
+              <label>Role</label>
+              <select><option>All</option><option>Batsman</option><option>Bowler</option></select>
+            </div>
+            <div class="filter-menu-item">
+              <label>Age</label>
+              <input type="text" placeholder="18–28" />
+            </div>
+            <div class="filter-menu-item">
+              <label>Location</label>
+              <input type="text" placeholder="Region / PAN India" />
+            </div>
+            <div class="filter-menu-item">
+              <label>Perf score</label>
+              <input type="text" placeholder="70–100" />
+            </div>
+            <div class="filter-menu-item">
+              <label>Social score</label>
+              <input type="text" placeholder="60–100" />
+            </div>
+            <div class="filter-menu-item">
+              <label>Growth</label>
+              <select><option>Any</option><option>Rising</option><option>Stable</option></select>
+            </div>
+            <div class="filter-menu-item">
+              <label>Budget</label>
+              <select><option>Any</option><option>₹1–5L</option><option>₹5–20L</option></select>
+            </div>
+            <div class="filter-menu-item filter-menu-item--checkbox">
+              <label class="checkbox-label"><input type="checkbox" checked /> Verified only</label>
+            </div>
+            <button type="button" class="btn-primary full-width btn-apply-filters">Apply filters</button>
           </div>
-          <div class="filter-group">
-            <label>Role</label>
-            <select><option>All</option><option>Batsman</option><option>Bowler</option></select>
-          </div>
-          <div class="filter-group">
-            <label>Age range</label>
-            <input type="text" placeholder="18 – 28" />
-          </div>
-          <div class="filter-group">
-            <label>Location / Region</label>
-            <input type="text" placeholder="e.g. North India, PAN India" />
-          </div>
-          <div class="filter-group">
-            <label>AI Performance Score</label>
-            <input type="text" placeholder="70 – 100" />
-          </div>
-          <div class="filter-group">
-            <label>AI Social Score</label>
-            <input type="text" placeholder="60 – 100" />
-          </div>
-          <div class="filter-group">
-            <label>Growth trend</label>
-            <select><option>Any</option><option>Rising</option><option>Stable</option></select>
-          </div>
-          <div class="filter-group">
-            <label>Budget bracket</label>
-            <select><option>Any</option><option>₹1–5L</option><option>₹5–20L</option></select>
-          </div>
-          <div class="filter-group">
-            <label class="checkbox-label"><input type="checkbox" checked /> Verified only</label>
-          </div>
-          <button type="button" class="btn-primary full-width">Apply filters</button>
         </aside>
         <div class="results-area">
           <div class="results-toolbar">
@@ -414,22 +407,32 @@
             </article>
           </div>
         </div>
-        <aside class="discovery-chat-panel">
+        <div class="discovery-chat-wrap">
+          <button type="button" class="discovery-assistant-toggle" id="discovery-assistant-toggle" title="Open Discovery Assistant" aria-label="Open Discovery Assistant">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </button>
+          <aside class="discovery-chat-panel discovery-chat-panel--open" id="discovery-chat-panel" aria-hidden="false">
           <div class="discovery-chat-header">
-            <span class="discovery-chat-icon" aria-hidden="true">◆</span>
-            <h3>Discovery Assistant</h3>
-            <p class="discovery-chat-sub">Get player suggestions by sport, region, or PAN India known faces</p>
-          </div>
-          <div class="discovery-chat-messages">
-            <div class="chat-msg chat-msg-bot">
-              <p>Hi! Share your brief and I’ll suggest athletes. You can ask for:</p>
-              <ul>
-                <li>By <strong>sport</strong> (e.g. Cricket, Football)</li>
-                <li>By <strong>geolocation</strong> (e.g. North India, Maharashtra)</li>
-                <li><strong>PAN India known faces</strong> for wider reach</li>
-              </ul>
-              <p>Or type your own requirements in your own words.</p>
+            <div class="discovery-chat-header-title">
+              <span class="discovery-chat-icon" aria-hidden="true">◆</span>
+              <h3>Discovery Assistant</h3>
             </div>
+            <button type="button" class="discovery-chat-close" id="discovery-chat-close" title="Close" aria-label="Close Discovery Assistant">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="discovery-chat-messages" id="discovery-chat-messages">
+            <div class="chat-msg chat-msg-bot" id="discovery-welcome-msg">
+              <p>Describe your brief and click <strong>AI suggestion</strong> to get tailored athlete recommendations.</p>
+            </div>
+            <div class="discovery-thinking" id="discovery-thinking" hidden>
+              <div class="thinking-dots"><span></span><span></span><span></span></div>
+              <p class="thinking-step" id="thinking-step-1">Analyzing your criteria...</p>
+              <p class="thinking-step" id="thinking-step-2">Pulling from performance database...</p>
+              <p class="thinking-step" id="thinking-step-3">Checking social presence & reach...</p>
+              <p class="thinking-step" id="thinking-step-4">Matching athletes to your brief...</p>
+            </div>
+            <div class="ai-suggestion-cards" id="ai-suggestion-cards" hidden></div>
           </div>
           <div class="discovery-chat-suggestions">
             <button type="button" class="chat-suggestion-chip">Cricket, North India</button>
@@ -437,10 +440,17 @@
             <button type="button" class="chat-suggestion-chip">Football, 18–25, verified</button>
           </div>
           <div class="discovery-chat-input-wrap">
-            <input type="text" class="discovery-chat-input" placeholder="Describe your brief or ask for player suggestions..." />
-            <button type="button" class="discovery-chat-send" title="Send">Send</button>
+            <input type="text" class="discovery-chat-input" id="discovery-chat-input" placeholder="Describe your brief..." />
+            <button type="button" class="discovery-chat-ai-btn" id="discovery-ai-suggestion-btn" title="Get AI suggestions">AI suggestion</button>
           </div>
         </aside>
+        </div>
+        <div class="ai-card-expanded-overlay" id="ai-card-expanded-overlay" hidden>
+          <div class="ai-card-expanded" id="ai-card-expanded">
+            <button type="button" class="ai-card-expanded-close" id="ai-card-expanded-close" aria-label="Close">×</button>
+            <div class="ai-card-expanded-content" id="ai-card-expanded-content"></div>
+          </div>
+        </div>
       </div>
       <div class="form-actions">
         <button type="button" class="btn-secondary" data-next="brand-register">← Back</button>
@@ -728,5 +738,96 @@
   </section>
 
   <script src="app.js"></script>
+  <script>
+  (function () {
+    var panel = document.getElementById('discovery-chat-panel');
+    var toggleBtn = document.getElementById('discovery-assistant-toggle');
+    var closeBtn = document.getElementById('discovery-chat-close');
+    var aiBtn = document.getElementById('discovery-ai-suggestion-btn');
+    var messagesEl = document.getElementById('discovery-chat-messages');
+    var welcomeMsg = document.getElementById('discovery-welcome-msg');
+    var thinkingEl = document.getElementById('discovery-thinking');
+    var cardsContainer = document.getElementById('ai-suggestion-cards');
+    var overlay = document.getElementById('ai-card-expanded-overlay');
+    var expandedContent = document.getElementById('ai-card-expanded-content');
+    var expandedClose = document.getElementById('ai-card-expanded-close');
+
+    function setPanelOpen(open) {
+      if (panel) {
+        panel.classList.toggle('discovery-chat-panel--open', open);
+        panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+      }
+      if (toggleBtn) {
+        toggleBtn.classList.toggle('discovery-assistant-toggle--visible', !open);
+        toggleBtn.setAttribute('aria-label', open ? 'Close Discovery Assistant' : 'Open Discovery Assistant');
+      }
+    }
+
+    if (toggleBtn) toggleBtn.addEventListener('click', function () { setPanelOpen(true); });
+    if (closeBtn) closeBtn.addEventListener('click', function () { setPanelOpen(false); });
+    if (toggleBtn) setPanelOpen(panel && panel.classList.contains('discovery-chat-panel--open'));
+
+    var MOCK_ATHLETES = [
+      { id: 1, name: 'Rahul K.', initials: 'RK', sport: 'Cricket', role: 'Batsman', perf: 82, social: 76, verified: true, region: 'North India' },
+      { id: 2, name: 'Priya S.', initials: 'PS', sport: 'Badminton', role: 'Singles', perf: 88, social: 81, verified: true, region: 'South India' },
+      { id: 3, name: 'Aarav M.', initials: 'AM', sport: 'Football', role: 'Midfielder', perf: 75, social: 69, verified: false, region: 'West India' }
+    ];
+
+    function showThinking() {
+      if (welcomeMsg) welcomeMsg.style.display = 'none';
+      if (thinkingEl) { thinkingEl.hidden = false; thinkingEl.classList.add('discovery-thinking--active'); }
+      if (cardsContainer) { cardsContainer.hidden = true; cardsContainer.innerHTML = ''; }
+      var steps = [1,2,3,4].map(function(i) { return document.getElementById('thinking-step-' + i); });
+      steps.forEach(function(s) { if(s) s.classList.remove('thinking-step--active'); });
+      var step = 0;
+      var iv = setInterval(function() {
+        if (step > 0 && steps[step-1]) steps[step-1].classList.remove('thinking-step--active');
+        if (steps[step]) steps[step].classList.add('thinking-step--active');
+        step++;
+        if (step > 4) { clearInterval(iv); showSuggestions(); }
+      }, 700);
+    }
+
+    function showSuggestions() {
+      if (thinkingEl) { thinkingEl.hidden = true; thinkingEl.classList.remove('discovery-thinking--active'); }
+      if (!cardsContainer) return;
+      cardsContainer.hidden = false;
+      cardsContainer.innerHTML = MOCK_ATHLETES.map(function(a) {
+        return '<article class="ai-suggestion-card" data-athlete-id="' + a.id + '">' +
+          '<div class="ai-suggestion-card-avatar">' + a.initials + '</div>' +
+          '<div class="ai-suggestion-card-info">' +
+            '<strong>' + a.name + '</strong>' +
+            '<span>' + a.sport + ' · ' + a.role + '</span>' +
+            '<div class="ai-suggestion-card-scores">Perf: ' + a.perf + ' · Social: ' + a.social + (a.verified ? ' <span class="verified">✓</span>' : '') + '</div>' +
+          '</div>' +
+          '</article>';
+      }).join('');
+      cardsContainer.querySelectorAll('.ai-suggestion-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          var id = parseInt(card.getAttribute('data-athlete-id'), 10);
+          var a = MOCK_ATHLETES.filter(function(x) { return x.id === id; })[0];
+          if (a && expandedContent) {
+            expandedContent.innerHTML =
+              '<div class="ai-expanded-header">' +
+                '<div class="ai-expanded-avatar">' + a.initials + '</div>' +
+                '<div><h4>' + a.name + '</h4><p>' + a.sport + ' · ' + a.role + (a.verified ? ' · Verified' : '') + '</p></div>' +
+              '</div>' +
+              '<div class="ai-expanded-section"><h5>AI Performance insights</h5><p>Strong consistency in recent matches; injury risk low. Performance trend +12% over last 6 months. Tier A recommendation for brand fit.</p></div>' +
+              '<div class="ai-expanded-section"><h5>AI Presence & reach</h5><p>Growing social following; engagement rate above category average. PAN India visibility potential; good fit for regional and national campaigns.</p></div>' +
+              '<button type="button" class="btn-primary btn-view-full-profile" data-next="brand-athlete-profile">View full profile</button>';
+            overlay.hidden = false;
+            document.body.classList.add('ai-overlay-open');
+            var viewBtn = expandedContent.querySelector('.btn-view-full-profile');
+            if (viewBtn) viewBtn.addEventListener('click', function () { overlay.hidden = true; document.body.classList.remove('ai-overlay-open'); });
+          }
+        });
+      });
+    }
+
+    if (aiBtn) aiBtn.addEventListener('click', showThinking);
+    if (overlay && expandedClose) expandedClose.addEventListener('click', function() { overlay.hidden = true; document.body.classList.remove('ai-overlay-open'); });
+    if (overlay) overlay.addEventListener('click', function(e) { if (e.target === overlay) { overlay.hidden = true; document.body.classList.remove('ai-overlay-open'); } });
+  })();
+  </script>
 </body>
 </html>
