@@ -58,17 +58,19 @@
     var list = window.ADC_DATA.getAthletes(filters);
     container.innerHTML = list.map(function (a) {
       return '<article class="athlete-card" data-athlete-id="' + a.id + '">' +
-        '<div class="athlete-card-avatar">' + (a.initials || '') + '</div>' +
-        '<div class="athlete-card-info">' +
-          '<strong>' + (a.name || '') + '</strong>' +
-          '<span>' + (a.sport || '') + ' · ' + (a.role || '') + '</span>' +
-          '<div class="athlete-card-scores">' +
-            '<span>Perf: ' + (a.perf != null ? a.perf : '—') + '</span>' +
-            '<span>Social: ' + (a.social != null ? a.social : '—') + '</span>' +
-            (a.verified ? ' <span class="verified">✓ Verified</span>' : '') +
+        '<div class="athlete-card-top">' +
+          '<div class="athlete-card-avatar">' + (a.initials || '') + '</div>' +
+          '<div class="athlete-card-info">' +
+            '<strong>' + (a.name || '') + '</strong>' +
+            '<span>' + (a.sport || '') + ' · ' + (a.role || '') + '</span>' +
+            '<div class="athlete-card-scores">' +
+              '<span>Perf: ' + (a.perf != null ? a.perf : '—') + '</span>' +
+              '<span>Social: ' + (a.social != null ? a.social : '—') + '</span>' +
+              (a.verified ? ' <span class="verified">✓ Verified</span>' : '') +
+            '</div>' +
           '</div>' +
         '</div>' +
-        '<button type="button" class="btn-secondary btn-sm btn-view-athlete">View profile</button>' +
+        '<button type="button" class="btn-secondary btn-sm btn-view-athlete">Show profile</button>' +
         '</article>';
     }).join('');
     if (countEl) countEl.textContent = list.length + ' athlete' + (list.length !== 1 ? 's' : '') + ' found';
