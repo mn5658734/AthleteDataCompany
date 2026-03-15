@@ -623,7 +623,13 @@ body {
 }
 
 /* ─── Discovery ─── */
-.discovery-screen .screen-inner { max-width: 1400px; }
+.discovery-screen .screen-inner {
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
 
 /* Filter bar below ← Home Brand/Agency */
 .discovery-filters-bar {
@@ -690,10 +696,11 @@ body {
 .discovery-layout {
   display: grid;
   grid-template-columns: 1fr 340px;
-  gap: 1.25rem;
-  margin-bottom: 1.5rem;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
   align-items: start;
   position: relative;
+  min-height: 0;
 }
 
 @media (max-width: 1200px) {
@@ -713,8 +720,7 @@ body {
 
 .results-area {
   min-width: 0;
-  /* Same width as 4 cards in one row so search bar matches */
-  max-width: calc(4 * 260px + 3 * 0.75rem);
+  width: 100%;
 }
 
 .results-toolbar {
@@ -743,17 +749,17 @@ body {
 
 .athlete-cards {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.75rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: minmax(120px, auto);
+  gap: 1rem;
+  padding-bottom: 1rem;
 }
 
 @media (max-width: 1100px) {
-  .results-area { max-width: calc(2 * 260px + 1 * 0.75rem); }
-  .athlete-cards { grid-template-columns: repeat(2, 1fr); }
+  .athlete-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 560px) {
-  .results-area { max-width: 100%; }
   .athlete-cards { grid-template-columns: 1fr; }
 }
 
@@ -761,13 +767,17 @@ body {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  padding: 0.875rem;
+  padding: 1rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   cursor: pointer;
   transition: border-color var(--transition), box-shadow var(--transition);
   min-width: 0;
+  min-height: 0;
+  overflow: visible;
+  position: relative;
+  z-index: 0;
 }
 
 .athlete-card:hover {
@@ -799,16 +809,29 @@ body {
 .athlete-card-info {
   flex: 1;
   min-width: 0;
+  overflow: visible;
 }
 
-.athlete-card-info strong { display: block; font-size: 0.9375rem; }
-.athlete-card-info span { font-size: 0.8125rem; color: var(--text-muted); }
+.athlete-card-info strong {
+  display: block;
+  font-size: 0.9375rem;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.athlete-card-info span {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  display: block;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
 
 .athlete-card-scores {
   font-size: 0.75rem;
   color: var(--text-muted);
-  margin-top: 0.2rem;
+  margin-top: 0.35rem;
   margin-bottom: 0.75rem;
+  line-height: 1.4;
 }
 
 .athlete-card-scores .verified {
@@ -818,6 +841,7 @@ body {
 .athlete-card .btn-view-athlete {
   width: 100%;
   margin-top: auto;
+  flex-shrink: 0;
 }
 
 /* ─── Discovery Assistant toggle (open/close) ─── */
