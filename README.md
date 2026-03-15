@@ -1,6 +1,6 @@
-# Athlete Data Company – Clickable Prototype
+# Athlete Data Company – Web Application
 
-India’s largest **AI-powered Athlete Discovery & Intelligence Marketplace** – UI/UX clickable prototype with persona-based journeys.
+India’s largest **AI-powered Athlete Discovery & Intelligence Marketplace** – full web application with routing, live data, and working discovery flows.
 
 ## How to run
 
@@ -15,39 +15,26 @@ python3 -m http.server 8000
 
 Then open **http://localhost:8000** (or open `index.html` directly).
 
+## Features
+
+- **URL routing** – Hash-based routes (e.g. `#/`, `#/brand/discovery`, `#/brand/athlete/1`) so you can bookmark and refresh any screen.
+- **Data layer** – Mock athlete database (`data.js`) with 12+ athletes; filter by sport, role, age, region, AI scores, budget, verified. Shortlist persisted in `localStorage`.
+- **Discovery** – Filters and search update results in real time. “Apply filters” and search-as-you-type. Athlete cards are generated from data; clicking a card opens that athlete’s profile.
+- **Discovery Assistant** – AI suggestion button runs a “thinking” animation and shows suggested athletes from the same data; suggestion chips (e.g. “Cricket, North India”) apply filters and show suggestions. Click a suggestion card to expand details or “View full profile.”
+- **Brand athlete profile** – Dynamic content for the selected athlete (name, sport, scores, AI insights). Add/remove from shortlist (saved in `localStorage`). “Send inquiry” pre-fills the athlete in the inquiry form.
+- **Persona journeys** – Athlete (Registration → Profile → Dashboard), Brand (Register → Discovery → Athlete profile → Inquiry → Proposal), Admin (Login → Governance → Revenue).
+
 ## Landing page
 
 - **Hero** with vision and value proposition  
 - **Persona buttons**: Athlete · Brand / Agency · Admin  
-- **Vision** and **Choose your journey** sections with the same persona entry points  
-
-## Persona journeys (clickable flows)
-
-### 1. Athlete
-
-- **Registration** → Email/OTP/social, sport/role, KYC upload, profile image, T&C  
-- **Profile** → Basic info, performance metrics, media (highlight URL, certificates)  
-- **Dashboard** → Profile %, AI Performance Score, AI Social Score, profile views, shortlists, inquiries, recent inquiries list  
-
-### 2. Brand / Agency
-
-- **Registration** → Company email, business verification, subscription plan (Starter/Pro/Enterprise), role-based access  
-- **Discovery** → Filters (sport, role, age, location, AI scores, growth trend, budget, verified), search, athlete cards  
-- **Athlete profile (brand view)** → Full stats, AI Performance/Social/Brand Fit scores, ROI, injury risk, growth graph placeholder  
-- **Send inquiry** → Message, NDA request  
-- **Create proposal** → Duration, deliverables, budget, documents; status flow (Sent → Under review → Negotiation → Approved → Closed)  
-
-### 3. Admin
-
-- **Login** → Email/password (internal access)  
-- **Athlete governance** → Pending KYC, Approve/Reject, verified badge, flag stats, suspend  
-- **Brand governance** → Companies, verification, spam, subscription plans  
-- **Revenue dashboard** → Subscription revenue, commission %, active brands/athletes, conversion rate, chart placeholder  
+- **Choose your journey** with persona cards and Fan card (SportsTrade link)  
 
 ## Navigation
 
-- **Landing**: Click any “I’m an Athlete” / “I’m a Brand / Agency” / “Admin” (hero or cards) to start that persona’s first screen.  
-- **Journey screens**: Use **← Home** in the top bar to return to the landing page.  
-- **In-flow**: Use **Continue →**, **Back**, **View profile**, **Send inquiry**, etc. to move through the prototype.  
+- **Landing**: Click any persona to start that journey.  
+- **Journey screens**: **← Home** returns to landing.  
+- **Discovery**: Use filters, search, or the Discovery Assistant; click an athlete card or AI suggestion to view profile.  
+- **Profile**: “Add to shortlist” / “Remove from shortlist,” “Send inquiry,” “View full profile” from AI overlay.  
 
-No backend or data persistence; all flows are UI-only for demo and stakeholder review.
+No backend required; all state is in-memory with shortlist in `localStorage`. Ready for demo, stakeholder review, or wiring to a real API later.

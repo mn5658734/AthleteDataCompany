@@ -325,87 +325,48 @@
           <div class="filters-menu-inner">
             <div class="filter-menu-item">
               <label>Sport</label>
-              <select><option>All</option><option>Cricket</option><option>Football</option><option>Badminton</option></select>
+              <select id="filter-sport"><option>All</option><option>Cricket</option><option>Football</option><option>Badminton</option></select>
             </div>
             <div class="filter-menu-item">
               <label>Role</label>
-              <select><option>All</option><option>Batsman</option><option>Bowler</option></select>
+              <select id="filter-role"><option>All</option><option>Batsman</option><option>Bowler</option><option>All-rounder</option><option>Forward</option><option>Midfielder</option><option>Defender</option><option>Singles</option><option>Doubles</option><option>Player</option></select>
             </div>
             <div class="filter-menu-item">
               <label>Age</label>
-              <input type="text" placeholder="18–28" />
+              <input type="text" id="filter-age" placeholder="18–28" value="18-28" />
             </div>
             <div class="filter-menu-item">
               <label>Location</label>
-              <input type="text" placeholder="Region / PAN India" />
+              <input type="text" id="filter-location" placeholder="Region / PAN India" />
             </div>
             <div class="filter-menu-item">
               <label>Perf score</label>
-              <input type="text" placeholder="70–100" />
+              <input type="text" id="filter-perf" placeholder="70–100" value="70-100" />
             </div>
             <div class="filter-menu-item">
               <label>Social score</label>
-              <input type="text" placeholder="60–100" />
+              <input type="text" id="filter-social" placeholder="60–100" value="60-100" />
             </div>
             <div class="filter-menu-item">
               <label>Growth</label>
-              <select><option>Any</option><option>Rising</option><option>Stable</option></select>
+              <select id="filter-growth"><option>Any</option><option>Rising</option><option>Stable</option></select>
             </div>
             <div class="filter-menu-item">
               <label>Budget</label>
-              <select><option>Any</option><option>₹1–5L</option><option>₹5–20L</option></select>
+              <select id="filter-budget"><option>Any</option><option>₹1–5L</option><option>₹5–20L</option></select>
             </div>
             <div class="filter-menu-item filter-menu-item--checkbox">
-              <label class="checkbox-label"><input type="checkbox" checked /> Verified only</label>
+              <label class="checkbox-label"><input type="checkbox" id="filter-verified" checked /> Verified only</label>
             </div>
-            <button type="button" class="btn-primary full-width btn-apply-filters">Apply filters</button>
+            <button type="button" class="btn-primary full-width btn-apply-filters" id="btn-apply-filters">Apply filters</button>
           </div>
         </aside>
         <div class="results-area">
           <div class="results-toolbar">
-            <input type="search" placeholder="Search athletes by name or keyword..." class="search-input" />
-            <span class="results-count">24 athletes found</span>
+            <input type="search" id="discovery-search" placeholder="Search athletes by name or keyword..." class="search-input" />
+            <span class="results-count" id="discovery-results-count">0 athletes found</span>
           </div>
-          <div class="athlete-cards">
-            <article class="athlete-card" data-next="brand-athlete-profile">
-              <div class="athlete-card-avatar">RK</div>
-              <div class="athlete-card-info">
-                <strong>Rahul K.</strong>
-                <span>Cricket · Batsman</span>
-                <div class="athlete-card-scores">
-                  <span>Perf: 82</span>
-                  <span>Social: 76</span>
-                  <span class="verified">✓ Verified</span>
-                </div>
-              </div>
-              <button type="button" class="btn-secondary btn-sm" data-next="brand-athlete-profile">View profile</button>
-            </article>
-            <article class="athlete-card" data-next="brand-athlete-profile">
-              <div class="athlete-card-avatar">PS</div>
-              <div class="athlete-card-info">
-                <strong>Priya S.</strong>
-                <span>Badminton · Singles</span>
-                <div class="athlete-card-scores">
-                  <span>Perf: 88</span>
-                  <span>Social: 81</span>
-                  <span class="verified">✓ Verified</span>
-                </div>
-              </div>
-              <button type="button" class="btn-secondary btn-sm" data-next="brand-athlete-profile">View profile</button>
-            </article>
-            <article class="athlete-card" data-next="brand-athlete-profile">
-              <div class="athlete-card-avatar">AM</div>
-              <div class="athlete-card-info">
-                <strong>Aarav M.</strong>
-                <span>Football · Midfielder</span>
-                <div class="athlete-card-scores">
-                  <span>Perf: 75</span>
-                  <span>Social: 69</span>
-                </div>
-              </div>
-              <button type="button" class="btn-secondary btn-sm" data-next="brand-athlete-profile">View profile</button>
-            </article>
-          </div>
+          <div class="athlete-cards" id="discovery-athlete-cards"></div>
         </div>
         <div class="discovery-chat-wrap">
           <button type="button" class="discovery-assistant-toggle" id="discovery-assistant-toggle" title="Open Discovery Assistant" aria-label="Open Discovery Assistant">
@@ -435,9 +396,9 @@
             <div class="ai-suggestion-cards" id="ai-suggestion-cards" hidden></div>
           </div>
           <div class="discovery-chat-suggestions">
-            <button type="button" class="chat-suggestion-chip">Cricket, North India</button>
-            <button type="button" class="chat-suggestion-chip">PAN India known faces</button>
-            <button type="button" class="chat-suggestion-chip">Football, 18–25, verified</button>
+            <button type="button" class="chat-suggestion-chip" data-chip="cricket-north">Cricket, North India</button>
+            <button type="button" class="chat-suggestion-chip" data-chip="pan-india">PAN India known faces</button>
+            <button type="button" class="chat-suggestion-chip" data-chip="football-verified">Football, 18–25, verified</button>
           </div>
           <div class="discovery-chat-input-wrap">
             <input type="text" class="discovery-chat-input" id="discovery-chat-input" placeholder="Describe your brief..." />
@@ -460,41 +421,24 @@
 
   <section id="screen-brand-athlete-profile" class="screen journey-screen">
     <div class="screen-inner profile-view-screen">
-      <div class="profile-view-header">
-        <div class="profile-view-avatar">RK</div>
+      <div class="profile-view-header" id="brand-profile-header">
+        <div class="profile-view-avatar" id="brand-profile-avatar">--</div>
         <div class="profile-view-meta">
-          <h1>Rahul K.</h1>
-          <p>Cricket · Batsman · Verified</p>
+          <h1 id="brand-profile-name">—</h1>
+          <p id="brand-profile-subtitle">—</p>
           <div class="profile-view-actions">
             <button type="button" class="btn-secondary" data-next="brand-discovery">← Back to search</button>
-            <button type="button" class="btn-outline">Add to shortlist</button>
+            <button type="button" class="btn-outline" id="btn-shortlist-toggle">Add to shortlist</button>
             <button type="button" class="btn-primary" data-next="brand-inquiry">Send inquiry</button>
           </div>
         </div>
       </div>
-      <div class="profile-view-stats">
-        <div class="pv-stat">
-          <span class="pv-value">82</span>
-          <span class="pv-label">AI Performance Score</span>
-          <span class="pv-meta">Tier A</span>
-        </div>
-        <div class="pv-stat">
-          <span class="pv-value">76</span>
-          <span class="pv-label">AI Social Score</span>
-          <span class="pv-meta">↑ 12%</span>
-        </div>
-        <div class="pv-stat">
-          <span class="pv-value">8.2</span>
-          <span class="pv-label">Brand Fit Score</span>
-        </div>
-        <div class="pv-stat">
-          <span class="pv-value">High</span>
-          <span class="pv-label">Est. ROI indicator</span>
-        </div>
-        <div class="pv-stat">
-          <span class="pv-value">Low</span>
-          <span class="pv-label">Injury risk index</span>
-        </div>
+      <div class="profile-view-stats" id="brand-profile-stats">
+        <div class="pv-stat"><span class="pv-value" id="pv-perf">—</span><span class="pv-label">AI Performance Score</span><span class="pv-meta" id="pv-perf-meta">—</span></div>
+        <div class="pv-stat"><span class="pv-value" id="pv-social">—</span><span class="pv-label">AI Social Score</span><span class="pv-meta" id="pv-social-meta">—</span></div>
+        <div class="pv-stat"><span class="pv-value" id="pv-fit">—</span><span class="pv-label">Brand Fit Score</span></div>
+        <div class="pv-stat"><span class="pv-value" id="pv-roi">—</span><span class="pv-label">Est. ROI indicator</span></div>
+        <div class="pv-stat"><span class="pv-value" id="pv-injury">—</span><span class="pv-label">Injury risk index</span></div>
       </div>
       <div class="profile-view-section">
         <h2>Performance stats</h2>
@@ -519,7 +463,7 @@
       <form class="proto-form">
         <div class="form-row">
           <label>To</label>
-          <input type="text" value="Rahul K. (Cricket · Batsman)" readonly class="readonly" />
+          <input type="text" id="inquiry-to-athlete" value="" readonly class="readonly" placeholder="Select an athlete from Discovery" />
         </div>
         <div class="form-row">
           <label>Message</label>
@@ -737,6 +681,7 @@
     </div>
   </section>
 
+  <script src="data.js"></script>
   <script src="app.js"></script>
   <script>
   (function () {
@@ -744,7 +689,6 @@
     var toggleBtn = document.getElementById('discovery-assistant-toggle');
     var closeBtn = document.getElementById('discovery-chat-close');
     var aiBtn = document.getElementById('discovery-ai-suggestion-btn');
-    var messagesEl = document.getElementById('discovery-chat-messages');
     var welcomeMsg = document.getElementById('discovery-welcome-msg');
     var thinkingEl = document.getElementById('discovery-thinking');
     var cardsContainer = document.getElementById('ai-suggestion-cards');
@@ -757,31 +701,32 @@
         panel.classList.toggle('discovery-chat-panel--open', open);
         panel.setAttribute('aria-hidden', open ? 'false' : 'true');
       }
-      if (toggleBtn) {
-        toggleBtn.classList.toggle('discovery-assistant-toggle--visible', !open);
-        toggleBtn.setAttribute('aria-label', open ? 'Close Discovery Assistant' : 'Open Discovery Assistant');
-      }
+      if (toggleBtn) toggleBtn.classList.toggle('discovery-assistant-toggle--visible', !open);
     }
 
     if (toggleBtn) toggleBtn.addEventListener('click', function () { setPanelOpen(true); });
     if (closeBtn) closeBtn.addEventListener('click', function () { setPanelOpen(false); });
-    if (toggleBtn) setPanelOpen(panel && panel.classList.contains('discovery-chat-panel--open'));
+    if (panel) setPanelOpen(panel.classList.contains('discovery-chat-panel--open'));
 
-    var MOCK_ATHLETES = [
-      { id: 1, name: 'Rahul K.', initials: 'RK', sport: 'Cricket', role: 'Batsman', perf: 82, social: 76, verified: true, region: 'North India' },
-      { id: 2, name: 'Priya S.', initials: 'PS', sport: 'Badminton', role: 'Singles', perf: 88, social: 81, verified: true, region: 'South India' },
-      { id: 3, name: 'Aarav M.', initials: 'AM', sport: 'Football', role: 'Midfielder', perf: 75, social: 69, verified: false, region: 'West India' }
-    ];
+    function getAiSuggestions() {
+      if (!window.ADC_DATA) return [];
+      var filters = window.ADC_APP && window.ADC_APP.renderDiscovery ? (function(){
+        var f = document.getElementById('filter-sport');
+        var r = document.getElementById('filter-role');
+        var v = document.getElementById('filter-verified');
+        return { sport: f && f.value !== 'All' ? f.value : null, role: r && r.value !== 'All' ? r.value : null, verifiedOnly: v ? v.checked : false };
+      }()) : {};
+      return window.ADC_DATA.getAthletes(filters).slice(0, 6);
+    }
 
     function showThinking() {
       if (welcomeMsg) welcomeMsg.style.display = 'none';
       if (thinkingEl) { thinkingEl.hidden = false; thinkingEl.classList.add('discovery-thinking--active'); }
       if (cardsContainer) { cardsContainer.hidden = true; cardsContainer.innerHTML = ''; }
       var steps = [1,2,3,4].map(function(i) { return document.getElementById('thinking-step-' + i); });
-      steps.forEach(function(s) { if(s) s.classList.remove('thinking-step--active'); });
       var step = 0;
       var iv = setInterval(function() {
-        if (step > 0 && steps[step-1]) steps[step-1].classList.remove('thinking-step--active');
+        steps.forEach(function(s) { if(s) s.classList.remove('thinking-step--active'); });
         if (steps[step]) steps[step].classList.add('thinking-step--active');
         step++;
         if (step > 4) { clearInterval(iv); showSuggestions(); }
@@ -791,41 +736,59 @@
     function showSuggestions() {
       if (thinkingEl) { thinkingEl.hidden = true; thinkingEl.classList.remove('discovery-thinking--active'); }
       if (!cardsContainer) return;
+      var list = getAiSuggestions();
       cardsContainer.hidden = false;
-      cardsContainer.innerHTML = MOCK_ATHLETES.map(function(a) {
+      cardsContainer.innerHTML = list.map(function(a) {
         return '<article class="ai-suggestion-card" data-athlete-id="' + a.id + '">' +
-          '<div class="ai-suggestion-card-avatar">' + a.initials + '</div>' +
+          '<div class="ai-suggestion-card-avatar">' + (a.initials || '') + '</div>' +
           '<div class="ai-suggestion-card-info">' +
             '<strong>' + a.name + '</strong>' +
             '<span>' + a.sport + ' · ' + a.role + '</span>' +
             '<div class="ai-suggestion-card-scores">Perf: ' + a.perf + ' · Social: ' + a.social + (a.verified ? ' <span class="verified">✓</span>' : '') + '</div>' +
-          '</div>' +
-          '</article>';
+          '</div></article>';
       }).join('');
       cardsContainer.querySelectorAll('.ai-suggestion-card').forEach(function(card) {
         card.addEventListener('click', function() {
           var id = parseInt(card.getAttribute('data-athlete-id'), 10);
-          var a = MOCK_ATHLETES.filter(function(x) { return x.id === id; })[0];
+          var a = window.ADC_DATA && window.ADC_DATA.getAthleteById(id);
           if (a && expandedContent) {
             expandedContent.innerHTML =
               '<div class="ai-expanded-header">' +
-                '<div class="ai-expanded-avatar">' + a.initials + '</div>' +
+                '<div class="ai-expanded-avatar">' + (a.initials || '') + '</div>' +
                 '<div><h4>' + a.name + '</h4><p>' + a.sport + ' · ' + a.role + (a.verified ? ' · Verified' : '') + '</p></div>' +
               '</div>' +
-              '<div class="ai-expanded-section"><h5>AI Performance insights</h5><p>Strong consistency in recent matches; injury risk low. Performance trend +12% over last 6 months. Tier A recommendation for brand fit.</p></div>' +
-              '<div class="ai-expanded-section"><h5>AI Presence & reach</h5><p>Growing social following; engagement rate above category average. PAN India visibility potential; good fit for regional and national campaigns.</p></div>' +
-              '<button type="button" class="btn-primary btn-view-full-profile" data-next="brand-athlete-profile">View full profile</button>';
+              '<div class="ai-expanded-section"><h5>AI Performance insights</h5><p>Strong consistency in recent matches; injury risk low. Performance trend +12% over last 6 months. Tier recommendation for brand fit.</p></div>' +
+              '<div class="ai-expanded-section"><h5>AI Presence & reach</h5><p>Growing social following; engagement rate above category average. ' + (a.region || 'PAN India') + ' visibility potential; good fit for regional and national campaigns.</p></div>' +
+              '<button type="button" class="btn-primary btn-view-full-profile">View full profile</button>';
             overlay.hidden = false;
             document.body.classList.add('ai-overlay-open');
             var viewBtn = expandedContent.querySelector('.btn-view-full-profile');
-            if (viewBtn) viewBtn.addEventListener('click', function () { overlay.hidden = true; document.body.classList.remove('ai-overlay-open'); });
+            if (viewBtn) viewBtn.addEventListener('click', function () {
+              overlay.hidden = true;
+              document.body.classList.remove('ai-overlay-open');
+              if (window.ADC_APP) { window.ADC_APP.state.selectedAthleteId = id; window.ADC_APP.showScreen('brand-athlete-profile'); }
+            });
           }
         });
       });
     }
 
     if (aiBtn) aiBtn.addEventListener('click', showThinking);
-    if (overlay && expandedClose) expandedClose.addEventListener('click', function() { overlay.hidden = true; document.body.classList.remove('ai-overlay-open'); });
+    document.querySelectorAll('.chat-suggestion-chip').forEach(function(chip) {
+      chip.addEventListener('click', function() {
+        var sport = document.getElementById('filter-sport');
+        var location = document.getElementById('filter-location');
+        var verified = document.getElementById('filter-verified');
+        var growth = document.getElementById('filter-growth');
+        var d = chip.getAttribute('data-chip');
+        if (d === 'cricket-north' && sport && location) { sport.value = 'Cricket'; location.value = 'North India'; if (verified) verified.checked = false; }
+        else if (d === 'pan-india' && location) { location.value = 'PAN India'; if (sport) sport.value = 'All'; if (verified) verified.checked = false; }
+        else if (d === 'football-verified' && sport && verified) { sport.value = 'Football'; verified.checked = true; if (location) location.value = ''; }
+        if (window.ADC_APP && window.ADC_APP.renderDiscovery) window.ADC_APP.renderDiscovery();
+        showThinking();
+      });
+    });
+    if (expandedClose) expandedClose.addEventListener('click', function() { overlay.hidden = true; document.body.classList.remove('ai-overlay-open'); });
     if (overlay) overlay.addEventListener('click', function(e) { if (e.target === overlay) { overlay.hidden = true; document.body.classList.remove('ai-overlay-open'); } });
   })();
   </script>
