@@ -623,17 +623,67 @@ body {
 }
 
 /* ─── Discovery ─── */
-.discovery-screen .screen-inner { max-width: 1200px; }
+.discovery-screen .screen-inner { max-width: 1400px; }
+
+.discovery-header {
+  margin-bottom: 0.75rem;
+}
+
+.discovery-header h1 { margin: 0 0 0.25rem; }
+.discovery-header .screen-desc { margin: 0; color: var(--text-muted); font-size: 0.9375rem; }
+
+.discovery-onboarding {
+  background: linear-gradient(135deg, rgba(108, 159, 255, 0.08) 0%, rgba(0, 212, 170, 0.06) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.discovery-onboarding-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-brand);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.discovery-onboarding ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.discovery-onboarding li { margin-bottom: 0.25rem; }
+.discovery-onboarding li:last-child { margin-bottom: 0; }
+.discovery-onboarding strong { color: var(--text); }
 
 .discovery-layout {
   display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 1.5rem;
+  grid-template-columns: 260px 1fr 340px;
+  gap: 1.25rem;
   margin-bottom: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 1200px) {
+  .discovery-layout { grid-template-columns: 240px 1fr 300px; }
+}
+
+@media (max-width: 992px) {
+  .discovery-layout { grid-template-columns: 1fr 300px; }
+  .discovery-layout .filters-panel { order: 1; grid-column: 1 / -1; }
+  .discovery-layout .results-area { order: 2; }
+  .discovery-layout .discovery-chat-panel { order: 3; }
 }
 
 @media (max-width: 768px) {
   .discovery-layout { grid-template-columns: 1fr; }
+  .discovery-chat-panel { max-height: 320px; }
 }
 
 .filters-panel {
@@ -671,6 +721,10 @@ body {
   background: var(--bg);
   color: var(--text);
   font-size: 0.875rem;
+}
+
+.results-area {
+  min-width: 0;
 }
 
 .results-toolbar {
@@ -748,6 +802,142 @@ body {
 
 .athlete-card-scores .verified {
   color: var(--accent);
+}
+
+/* ─── Discovery chat panel (right) ─── */
+.discovery-chat-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: sticky;
+  top: 72px;
+  max-height: calc(100vh - 100px);
+}
+
+.discovery-chat-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.discovery-chat-header h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.discovery-chat-icon {
+  color: var(--accent-brand);
+  font-size: 0.75rem;
+}
+
+.discovery-chat-sub {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.discovery-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.25rem;
+  min-height: 140px;
+}
+
+.chat-msg {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.chat-msg:last-child { margin-bottom: 0; }
+
+.chat-msg-bot {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.chat-msg-bot p { margin: 0 0 0.5rem; }
+.chat-msg-bot p:last-of-type { margin-bottom: 0; }
+.chat-msg-bot ul { margin: 0.5rem 0 0; padding-left: 1.25rem; }
+.chat-msg-bot li { margin-bottom: 0.2rem; }
+
+.discovery-chat-suggestions {
+  padding: 0 1.25rem 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.chat-suggestion-chip {
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+}
+
+.chat-suggestion-chip:hover {
+  border-color: var(--accent-brand);
+  color: var(--text);
+  background: rgba(108, 159, 255, 0.08);
+}
+
+.discovery-chat-input-wrap {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg-elevated);
+  flex-shrink: 0;
+}
+
+.discovery-chat-input {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+  font-family: var(--font);
+}
+
+.discovery-chat-input::placeholder { color: var(--text-muted); }
+.discovery-chat-input:focus {
+  outline: none;
+  border-color: var(--accent-brand);
+}
+
+.discovery-chat-send {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent-brand);
+  color: var(--bg);
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background var(--transition), opacity var(--transition);
+}
+
+.discovery-chat-send:hover {
+  background: #5a8aef;
 }
 
 /* ─── Brand athlete profile view ─── */

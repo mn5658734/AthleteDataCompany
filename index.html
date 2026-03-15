@@ -29,7 +29,7 @@
         <button type="button" class="persona-btn athlete" data-persona="athlete">
           <span class="persona-icon">⚡</span>
           <span class="persona-label">I'm an Athlete</span>
-          <span class="persona-desc">Create verified identity & attract sponsorship</span>
+          <span class="persona-desc">Create verified portfolio for brand sponsorship</span>
         </button>
         <button type="button" class="persona-btn brand" data-persona="brand">
           <span class="persona-icon">🎯</span>
@@ -305,6 +305,7 @@
           <p class="form-hint">Scout, Manager, Admin roles available.</p>
         </div>
         <div class="form-actions">
+          <button type="button" class="btn-secondary">Apply for verification</button>
           <button type="button" class="btn-primary" data-next="brand-discovery">Continue to Discovery →</button>
         </div>
       </form>
@@ -313,14 +314,26 @@
 
   <section id="screen-brand-discovery" class="screen journey-screen">
     <div class="screen-inner discovery-screen">
-      <h1>Athlete Discovery</h1>
-      <p class="screen-desc">Search and filter by sport, role, AI scores, budget, and verified status.</p>
+      <div class="discovery-header">
+        <div>
+          <h1>Athlete Discovery</h1>
+          <p class="screen-desc">Find athletes by filters, search, or describe your needs to the AI assistant.</p>
+        </div>
+      </div>
+      <div class="discovery-onboarding">
+        <span class="discovery-onboarding-label">What you can do here:</span>
+        <ul>
+          <li><strong>Use filters</strong> (left) — Sport, role, location, AI scores, budget, verified only.</li>
+          <li><strong>Search</strong> — Type names or keywords in the search bar above the results.</li>
+          <li><strong>Chat with the assistant</strong> (right) — Describe your brief: e.g. sport, geolocation, or PAN India known faces; get tailored player suggestions.</li>
+        </ul>
+      </div>
       <div class="discovery-layout">
         <aside class="filters-panel">
           <h3>Filters</h3>
           <div class="filter-group">
             <label>Sport</label>
-            <select><option>All</option><option>Cricket</option><option>Football</option></select>
+            <select><option>All</option><option>Cricket</option><option>Football</option><option>Badminton</option></select>
           </div>
           <div class="filter-group">
             <label>Role</label>
@@ -331,8 +344,8 @@
             <input type="text" placeholder="18 – 28" />
           </div>
           <div class="filter-group">
-            <label>Location</label>
-            <input type="text" placeholder="Any" />
+            <label>Location / Region</label>
+            <input type="text" placeholder="e.g. North India, PAN India" />
           </div>
           <div class="filter-group">
             <label>AI Performance Score</label>
@@ -357,7 +370,7 @@
         </aside>
         <div class="results-area">
           <div class="results-toolbar">
-            <input type="search" placeholder="Search athletes..." class="search-input" />
+            <input type="search" placeholder="Search athletes by name or keyword..." class="search-input" />
             <span class="results-count">24 athletes found</span>
           </div>
           <div class="athlete-cards">
@@ -401,6 +414,33 @@
             </article>
           </div>
         </div>
+        <aside class="discovery-chat-panel">
+          <div class="discovery-chat-header">
+            <span class="discovery-chat-icon" aria-hidden="true">◆</span>
+            <h3>Discovery Assistant</h3>
+            <p class="discovery-chat-sub">Get player suggestions by sport, region, or PAN India known faces</p>
+          </div>
+          <div class="discovery-chat-messages">
+            <div class="chat-msg chat-msg-bot">
+              <p>Hi! Share your brief and I’ll suggest athletes. You can ask for:</p>
+              <ul>
+                <li>By <strong>sport</strong> (e.g. Cricket, Football)</li>
+                <li>By <strong>geolocation</strong> (e.g. North India, Maharashtra)</li>
+                <li><strong>PAN India known faces</strong> for wider reach</li>
+              </ul>
+              <p>Or type your own requirements in your own words.</p>
+            </div>
+          </div>
+          <div class="discovery-chat-suggestions">
+            <button type="button" class="chat-suggestion-chip">Cricket, North India</button>
+            <button type="button" class="chat-suggestion-chip">PAN India known faces</button>
+            <button type="button" class="chat-suggestion-chip">Football, 18–25, verified</button>
+          </div>
+          <div class="discovery-chat-input-wrap">
+            <input type="text" class="discovery-chat-input" placeholder="Describe your brief or ask for player suggestions..." />
+            <button type="button" class="discovery-chat-send" title="Send">Send</button>
+          </div>
+        </aside>
       </div>
       <div class="form-actions">
         <button type="button" class="btn-secondary" data-next="brand-register">← Back</button>
