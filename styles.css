@@ -625,69 +625,37 @@ body {
 /* ─── Discovery ─── */
 .discovery-screen .screen-inner { max-width: 1400px; }
 
-.discovery-header {
-  margin-bottom: 0.75rem;
-}
-
-.discovery-header h1 { margin: 0 0 0.25rem; }
-.discovery-header .screen-desc { margin: 0; color: var(--text-muted); font-size: 0.9375rem; }
-
-.discovery-layout {
-  display: grid;
-  grid-template-columns: 200px 1fr 340px;
-  gap: 0;
-  margin-bottom: 1.5rem;
-  align-items: start;
-  position: relative;
-}
-
-@media (max-width: 1200px) {
-  .discovery-layout { grid-template-columns: 180px 1fr 300px; }
-}
-
-@media (max-width: 992px) {
-  .discovery-layout { grid-template-columns: 1fr 300px; }
-  .discovery-layout .filters-menu { order: 1; grid-column: 1 / -1; }
-  .discovery-layout .results-area { order: 2; }
-  .discovery-layout .discovery-chat-panel { order: 3; }
-}
-
-@media (max-width: 768px) {
-  .discovery-layout { grid-template-columns: 1fr; }
-  .discovery-chat-panel { max-height: 320px; }
-}
-
-/* ─── Filters as left menu bar ─── */
-.filters-menu {
+/* Filter bar below ← Home Brand/Agency */
+.discovery-filters-bar {
   background: var(--bg-card);
-  border-right: 1px solid var(--border);
-  position: sticky;
-  top: 72px;
-  min-height: 400px;
+  border-bottom: 1px solid var(--border);
+  margin: 0 -1.5rem 1rem;
+  padding: 0.75rem 1.5rem;
 }
 
-.filters-menu-inner {
-  padding: 1rem 0.75rem;
+.filter-bar-inner {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
 }
 
-.filter-menu-item {
+.filter-bar-item {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
 }
 
-.filter-menu-item label {
-  font-size: 0.7rem;
+.filter-bar-item label {
+  font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
 }
 
-.filter-menu-item input,
-.filter-menu-item select {
+.filter-bar-item input,
+.filter-bar-item select {
+  min-width: 0;
   width: 100%;
   padding: 0.35rem 0.5rem;
   border: 1px solid var(--border);
@@ -697,7 +665,10 @@ body {
   font-size: 0.8125rem;
 }
 
-.filter-menu-item--checkbox label {
+.filter-bar-item input { min-width: 70px; }
+.filter-bar-item select { min-width: 80px; }
+
+.filter-bar-item--checkbox label {
   text-transform: none;
   font-size: 0.8125rem;
   display: flex;
@@ -705,10 +676,45 @@ body {
   gap: 0.5rem;
 }
 
-.btn-apply-filters { margin-top: 0.5rem; }
+.discovery-filters-bar .btn-apply-filters {
+  flex-shrink: 0;
+}
+
+.discovery-header {
+  margin-bottom: 0.75rem;
+}
+
+.discovery-header h1 { margin: 0 0 0.25rem; }
+.discovery-header .screen-desc { margin: 0; color: var(--text-muted); font-size: 0.9375rem; }
+
+.discovery-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  align-items: start;
+  position: relative;
+}
+
+@media (max-width: 1200px) {
+  .discovery-layout { grid-template-columns: 1fr 300px; }
+}
+
+@media (max-width: 992px) {
+  .discovery-layout { grid-template-columns: 1fr; }
+  .discovery-layout .results-area { order: 1; }
+  .discovery-layout .discovery-chat-wrap { order: 2; }
+}
+
+@media (max-width: 768px) {
+  .discovery-layout { grid-template-columns: 1fr; }
+  .discovery-chat-panel { max-height: 320px; }
+}
 
 .results-area {
   min-width: 0;
+  /* Same width as 4 cards in one row so search bar matches */
+  max-width: calc(4 * 260px + 3 * 0.75rem);
 }
 
 .results-toolbar {
@@ -720,7 +726,7 @@ body {
 
 .search-input {
   flex: 1;
-  max-width: 320px;
+  min-width: 0;
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -732,12 +738,23 @@ body {
 .results-count {
   font-size: 0.875rem;
   color: var(--text-muted);
+  flex-shrink: 0;
 }
 
 .athlete-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.75rem;
+}
+
+@media (max-width: 1100px) {
+  .results-area { max-width: calc(2 * 260px + 1 * 0.75rem); }
+  .athlete-cards { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 560px) {
+  .results-area { max-width: 100%; }
+  .athlete-cards { grid-template-columns: 1fr; }
 }
 
 .athlete-card {
@@ -750,6 +767,7 @@ body {
   border-radius: var(--radius);
   cursor: pointer;
   transition: border-color var(--transition), box-shadow var(--transition);
+  min-width: 0;
 }
 
 .athlete-card:hover {
@@ -910,10 +928,13 @@ body {
   background: var(--bg-elevated);
 }
 
-.discovery-chat-icon {
+.discovery-chat-icon,
+.discovery-assistant-icon {
   color: var(--accent-brand);
-  font-size: 0.75rem;
+  flex-shrink: 0;
 }
+
+.discovery-chat-icon { font-size: 0.75rem; }
 
 .discovery-chat-messages {
   flex: 1;

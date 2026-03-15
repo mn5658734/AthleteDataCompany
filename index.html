@@ -314,6 +314,54 @@
 
   <section id="screen-brand-discovery" class="screen journey-screen">
     <div class="screen-inner discovery-screen">
+      <div class="discovery-filters-bar">
+        <div class="filter-bar-inner">
+          <div class="filter-bar-item">
+            <label>Sport</label>
+            <select id="filter-sport"><option>All</option><option>Cricket</option><option>Football</option><option>Badminton</option></select>
+          </div>
+          <div class="filter-bar-item">
+            <label>Role</label>
+            <select id="filter-role"><option>All</option><option>Batsman</option><option>Bowler</option><option>All-rounder</option><option>Forward</option><option>Midfielder</option><option>Defender</option><option>Singles</option><option>Doubles</option><option>Player</option></select>
+          </div>
+          <div class="filter-bar-item">
+            <label>Age</label>
+            <input type="text" id="filter-age" placeholder="18–28" value="18-28" />
+          </div>
+          <div class="filter-bar-item">
+            <label>Gender</label>
+            <select id="filter-gender">
+              <option value="All">All</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div class="filter-bar-item">
+            <label>Location</label>
+            <input type="text" id="filter-location" placeholder="Region / PAN India" />
+          </div>
+          <div class="filter-bar-item">
+            <label>Perf</label>
+            <input type="text" id="filter-perf" placeholder="70–100" value="70-100" />
+          </div>
+          <div class="filter-bar-item">
+            <label>Social</label>
+            <input type="text" id="filter-social" placeholder="60–100" value="60-100" />
+          </div>
+          <div class="filter-bar-item">
+            <label>Growth</label>
+            <select id="filter-growth"><option>Any</option><option>Rising</option><option>Stable</option></select>
+          </div>
+          <div class="filter-bar-item">
+            <label>Budget</label>
+            <select id="filter-budget"><option>Any</option><option>₹1–5L</option><option>₹5–20L</option></select>
+          </div>
+          <div class="filter-bar-item filter-bar-item--checkbox">
+            <label class="checkbox-label"><input type="checkbox" id="filter-verified" checked /> Verified</label>
+          </div>
+          <button type="button" class="btn-primary btn-apply-filters" id="btn-apply-filters">Apply filters</button>
+        </div>
+      </div>
       <div class="discovery-header">
         <div>
           <h1>Athlete Discovery</h1>
@@ -321,46 +369,6 @@
         </div>
       </div>
       <div class="discovery-layout">
-        <aside class="filters-menu">
-          <div class="filters-menu-inner">
-            <div class="filter-menu-item">
-              <label>Sport</label>
-              <select id="filter-sport"><option>All</option><option>Cricket</option><option>Football</option><option>Badminton</option></select>
-            </div>
-            <div class="filter-menu-item">
-              <label>Role</label>
-              <select id="filter-role"><option>All</option><option>Batsman</option><option>Bowler</option><option>All-rounder</option><option>Forward</option><option>Midfielder</option><option>Defender</option><option>Singles</option><option>Doubles</option><option>Player</option></select>
-            </div>
-            <div class="filter-menu-item">
-              <label>Age</label>
-              <input type="text" id="filter-age" placeholder="18–28" value="18-28" />
-            </div>
-            <div class="filter-menu-item">
-              <label>Location</label>
-              <input type="text" id="filter-location" placeholder="Region / PAN India" />
-            </div>
-            <div class="filter-menu-item">
-              <label>Perf score</label>
-              <input type="text" id="filter-perf" placeholder="70–100" value="70-100" />
-            </div>
-            <div class="filter-menu-item">
-              <label>Social score</label>
-              <input type="text" id="filter-social" placeholder="60–100" value="60-100" />
-            </div>
-            <div class="filter-menu-item">
-              <label>Growth</label>
-              <select id="filter-growth"><option>Any</option><option>Rising</option><option>Stable</option></select>
-            </div>
-            <div class="filter-menu-item">
-              <label>Budget</label>
-              <select id="filter-budget"><option>Any</option><option>₹1–5L</option><option>₹5–20L</option></select>
-            </div>
-            <div class="filter-menu-item filter-menu-item--checkbox">
-              <label class="checkbox-label"><input type="checkbox" id="filter-verified" checked /> Verified only</label>
-            </div>
-            <button type="button" class="btn-primary full-width btn-apply-filters" id="btn-apply-filters">Apply filters</button>
-          </div>
-        </aside>
         <div class="results-area">
           <div class="results-toolbar">
             <input type="search" id="discovery-search" placeholder="Search athletes by name or keyword..." class="search-input" />
@@ -370,12 +378,12 @@
         </div>
         <div class="discovery-chat-wrap">
           <button type="button" class="discovery-assistant-toggle" id="discovery-assistant-toggle" title="Open Discovery Assistant" aria-label="Open Discovery Assistant">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <svg class="discovery-assistant-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M8 14c.5.8 1.5 1.5 2.5 1.5s2-.7 2.5-1.5"/></svg>
           </button>
           <aside class="discovery-chat-panel discovery-chat-panel--open" id="discovery-chat-panel" aria-hidden="false">
           <div class="discovery-chat-header">
             <div class="discovery-chat-header-title">
-              <span class="discovery-chat-icon" aria-hidden="true">◆</span>
+              <svg class="discovery-chat-icon discovery-assistant-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M8 14c.5.8 1.5 1.5 2.5 1.5s2-.7 2.5-1.5"/></svg>
               <h3>Discovery Assistant</h3>
             </div>
             <button type="button" class="discovery-chat-close" id="discovery-chat-close" title="Close" aria-label="Close Discovery Assistant">

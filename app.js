@@ -43,6 +43,7 @@
       perfMax: perf[1] ? parseInt(perf[1], 10) : null,
       socialMin: social[0] ? parseInt(social[0], 10) : null,
       socialMax: social[1] ? parseInt(social[1], 10) : null,
+      gender: document.getElementById('filter-gender') && document.getElementById('filter-gender').value,
       growth: document.getElementById('filter-growth') && document.getElementById('filter-growth').value,
       budget: document.getElementById('filter-budget') && document.getElementById('filter-budget').value,
       verifiedOnly: document.getElementById('filter-verified') ? document.getElementById('filter-verified').checked : false,
