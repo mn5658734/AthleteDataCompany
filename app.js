@@ -13,11 +13,41 @@
     'admin-login': 'Login', 'admin-athlete-governance': 'Athlete governance', 'admin-brand-governance': 'Brand governance', 'admin-revenue': 'Revenue dashboard'
   };
 
+  var ATHLETE_SPORT_ROLES = {
+    Cricket: ['Batsman', 'Bowler', 'All-rounder', 'Wicketkeeper'],
+    Football: ['Goalkeeper', 'Defender', 'Midfielder', 'Forward', 'Winger'],
+    Basketball: ['Point Guard', 'Shooting Guard', 'Small Forward', 'Power Forward', 'Center'],
+    Volleyball: ['Setter', 'Outside Hitter', 'Opposite Hitter', 'Middle Blocker', 'Libero'],
+    Tennis: ['NA'],
+    Badminton: ['NA'],
+    Kabaddi: ['Raider', 'Defender', 'All-rounder'],
+    Athletics: ['Sprinter', 'Middle Distance Runner', 'Long Distance Runner', 'Jumper', 'Thrower'],
+    Swimming: ['Freestyle', 'Backstroke', 'Breaststroke', 'Butterfly', 'Medley']
+  };
+
   var journeyHeader = document.getElementById('journey-header');
   var journeyPersonaLabel = document.getElementById('journey-persona-label');
   var journeyBreadcrumb = document.getElementById('journey-breadcrumb');
 
   var state = { selectedAthleteId: null };
+
+  function initAthleteRegistrationSportRole() {
+    var sportSelect = document.getElementById('athlete-sport');
+    var roleSelect = document.getElementById('athlete-role');
+    if (!sportSelect || !roleSelect) return;
+
+    function renderRolesForSport(sport) {
+      var roles = ATHLETE_SPORT_ROLES[sport] || ['NA'];
+      roleSelect.innerHTML = roles.map(function (r) {
+        return '<option>' + r + '</option>';
+      }).join('');
+    }
+
+    renderRolesForSport(sportSelect.value || 'Cricket');
+    sportSelect.addEventListener('change', function () {
+      renderRolesForSport(sportSelect.value);
+    });
+  }
 
   function getPersonaForScreen(screenId) {
     if (screenId.startsWith('athlete-') || screenId === 'athlete-register') return 'athlete';
@@ -199,6 +229,7 @@
   window.addEventListener('hashchange', function () { showScreen(parseRoute()); });
   window.addEventListener('load', function () {
     showScreen(parseRoute());
+    initAthleteRegistrationSportRole();
     var btnApply = document.getElementById('btn-apply-filters');
     var searchEl = document.getElementById('discovery-search');
     if (btnApply) btnApply.addEventListener('click', function () { renderDiscovery(); });
