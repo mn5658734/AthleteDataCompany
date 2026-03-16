@@ -214,9 +214,14 @@
       renderBrandAthleteProfile(state.selectedAthleteId);
     }
 
-    var hash = screenId === 'landing' ? '#/' : '#/' + screenId.replace(/-/g, '/');
-    if (params.athleteId) hash += '/' + params.athleteId;
-    if (window.location.hash !== hash) window.history.replaceState(null, '', hash);
+    var newUrl;
+    if (screenId === 'landing') {
+      newUrl = window.location.pathname || '/';
+    } else {
+      newUrl = (window.location.pathname || '/') + '#/' + screenId.replace(/-/g, '/');
+      if (params.athleteId) newUrl += '/' + params.athleteId;
+    }
+    if (window.location.href !== window.location.origin + newUrl) window.history.replaceState(null, '', newUrl);
   }
 
   function parseRoute() {
