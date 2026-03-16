@@ -1,0 +1,23 @@
+{
+  "name": "primary",
+  "version": "1.0.0",
+  "description": "India’s largest **AI-powered Athlete Discovery & Intelligence Marketplace** – full web application with routing, live data, and working discovery flows.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mn5658734/AthleteDataCompany.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mn5658734/AthleteDataCompany/issues"
+  },
+  "homepage": "https://github.com/mn5658734/AthleteDataCompany#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
