@@ -273,7 +273,7 @@
       return;
     }
 
-    var pdfPath = 'Athlete-Data-Company (2).pdf';
+    var pdfPath = 'Athlete-Data-Company..pdf';
     pdfjsLib.getDocument(pdfPath).promise.then(function (pdf) {
       deckState.pdfDoc = pdf;
       deckState.numPages = pdf.numPages;
