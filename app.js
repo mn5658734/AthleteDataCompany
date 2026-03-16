@@ -10,7 +10,8 @@
     'athlete-register': 'Registration', 'athlete-profile': 'Profile', 'athlete-dashboard': 'Dashboard',
     'brand-register': 'Registration', 'brand-discovery': 'Discovery', 'brand-athlete-profile': 'Athlete profile',
     'brand-inquiry': 'Send inquiry', 'brand-proposal': 'Create proposal',
-    'admin-login': 'Login', 'admin-athlete-governance': 'Athlete governance', 'admin-brand-governance': 'Brand governance', 'admin-revenue': 'Revenue dashboard'
+    'admin-login': 'Login', 'admin-athlete-governance': 'Athlete governance', 'admin-brand-governance': 'Brand governance', 'admin-revenue': 'Revenue dashboard',
+    'deck': 'Deck'
   };
 
   var ATHLETE_SPORT_ROLES = {
@@ -61,6 +62,11 @@
   var journeyBreadcrumb = document.getElementById('journey-breadcrumb');
 
   var state = { selectedAthleteId: null };
+  var deckState = { pdfDoc: null, numPages: 0, currentPage: 1 };
+
+  if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
 
   function initAthleteRegistrationSportRole() {
     var sportSelect = document.getElementById('athlete-sport');
@@ -81,6 +87,7 @@
   }
 
   function getPersonaForScreen(screenId) {
+    if (screenId === 'deck') return null;
     if (screenId.startsWith('athlete-') || screenId === 'athlete-register') return 'athlete';
     if (screenId.startsWith('brand-')) return 'brand';
     if (screenId.startsWith('admin-')) return 'admin';
@@ -196,7 +203,9 @@
     if (journeyPersonaLabel) journeyPersonaLabel.textContent = PERSONA_LABELS[getPersonaForScreen(screenId)] || '';
     if (journeyBreadcrumb) journeyBreadcrumb.textContent = BREADCRUMBS[screenId] || screenId;
 
-    if (screenId === 'brand-discovery') {
+    if (screenId === 'deck') {
+      initDeckViewer();
+    } else if (screenId === 'brand-discovery') {
       renderDiscovery();
     } else if (screenId === 'brand-athlete-profile') {
       var id = params.athleteId != null ? params.athleteId : state.selectedAthleteId;
@@ -214,11 +223,75 @@
     var hash = (window.location.hash || '#/').slice(1).replace(/^\/+|\/+$/g, '');
     var parts = hash ? hash.split('/') : [];
     if (parts.length === 0 || parts[0] === '') return 'landing';
+    if (parts[0] === 'deck') return 'deck';
     if (parts[0] === 'brand' && parts[1] === 'athlete' && parts[2]) {
       state.selectedAthleteId = parseInt(parts[2], 10);
       return 'brand-athlete-profile';
     }
     return parts.join('-');
+  }
+
+  function initDeckViewer() {
+    var canvas = document.getElementById('deck-canvas');
+    var fallback = document.getElementById('deck-fallback');
+    var pageInfo = document.getElementById('deck-page-info');
+    var prevBtn = document.getElementById('deck-prev');
+    var nextBtn = document.getElementById('deck-next');
+    if (!canvas || !pageInfo) return;
+
+    function showFallback(show) {
+      if (fallback) fallback.style.display = show ? 'block' : 'none';
+      canvas.style.display = show ? 'none' : 'block';
+      if (prevBtn) prevBtn.disabled = show;
+      if (nextBtn) nextBtn.disabled = show;
+      if (pageInfo && show) pageInfo.textContent = '—';
+    }
+
+    function renderDeckPage(pageNum) {
+      if (!deckState.pdfDoc || !canvas) return;
+      deckState.currentPage = pageNum;
+      pageInfo.textContent = 'Page ' + pageNum + ' / ' + deckState.numPages;
+      prevBtn.disabled = pageNum <= 1;
+      nextBtn.disabled = pageNum >= deckState.numPages;
+      deckState.pdfDoc.getPage(pageNum).then(function (page) {
+        var scale = 1.5;
+        var viewport = page.getViewport({ scale: scale });
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport });
+      });
+    }
+
+    if (deckState.pdfDoc) {
+      showFallback(false);
+      renderDeckPage(deckState.currentPage);
+      return;
+    }
+
+    if (typeof pdfjsLib === 'undefined') {
+      showFallback(true);
+      return;
+    }
+
+    var pdfPath = 'Athlete-Data-Company (2).pdf';
+    pdfjsLib.getDocument(pdfPath).promise.then(function (pdf) {
+      deckState.pdfDoc = pdf;
+      deckState.numPages = pdf.numPages;
+      deckState.currentPage = 1;
+      showFallback(false);
+      renderDeckPage(1);
+    }).catch(function () {
+      showFallback(true);
+    });
+
+    if (prevBtn) prevBtn.onclick = function () {
+      if (!deckState.pdfDoc || deckState.currentPage <= 1) return;
+      renderDeckPage(deckState.currentPage - 1);
+    };
+    if (nextBtn) nextBtn.onclick = function () {
+      if (!deckState.pdfDoc || deckState.currentPage >= deckState.numPages) return;
+      renderDeckPage(deckState.currentPage + 1);
+    };
   }
 
   function handleNavClick(e) {

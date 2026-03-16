@@ -57,6 +57,72 @@ body {
   padding-top: 56px;
 }
 
+/* ─── Deck viewer ─── */
+.deck-screen .deck-viewer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+.deck-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+.deck-btn {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.deck-btn:hover:not(:disabled) {
+  background: var(--border);
+  color: var(--accent);
+}
+.deck-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.deck-page-info {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  min-width: 6rem;
+  text-align: center;
+}
+.deck-page-wrap {
+  background: var(--bg-soft);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+.deck-page-wrap canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+.deck-fallback {
+  color: var(--text-muted);
+  padding: 2rem;
+  text-align: center;
+}
+.deck-fallback code {
+  background: var(--border);
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
 /* ─── Landing ─── */
 .landing-header {
   display: flex;
