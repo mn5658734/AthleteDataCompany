@@ -217,6 +217,8 @@
     var newUrl;
     if (screenId === 'landing') {
       newUrl = window.location.pathname || '/';
+    } else if (screenId === 'deck') {
+      newUrl = '/deck';
     } else {
       newUrl = (window.location.pathname || '/') + '#/' + screenId.replace(/-/g, '/');
       if (params.athleteId) newUrl += '/' + params.athleteId;
@@ -225,6 +227,8 @@
   }
 
   function parseRoute() {
+    var path = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
+    if (path === '/deck') return 'deck';
     var hash = (window.location.hash || '#/').slice(1).replace(/^\/+|\/+$/g, '');
     var parts = hash ? hash.split('/') : [];
     if (parts.length === 0 || parts[0] === '') return 'landing';
