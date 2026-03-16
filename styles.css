@@ -85,6 +85,7 @@ body {
   color: var(--text);
 }
 
+.nav-btn-deck,
 .nav-btn-admin {
   margin-left: 1.5rem;
   padding: 0;
@@ -96,9 +97,16 @@ body {
   font-weight: 500;
   cursor: pointer;
   letter-spacing: 0.02em;
+  text-decoration: none;
 }
 
+.nav-btn-deck:hover,
 .nav-btn-admin:hover {
+  color: var(--text);
+}
+
+.nav-btn-deck:focus {
+  outline: none;
   color: var(--text);
 }
 
