@@ -4,10 +4,11 @@
  */
 
 (function () {
-  var PERSONA_START = { athlete: 'athlete-register', brand: 'brand-register', admin: 'admin-login' };
-  var PERSONA_LABELS = { athlete: 'Athlete', brand: 'Brand / Agency', admin: 'Admin' };
+  var PERSONA_START = { athlete: 'athlete-register', brand: 'brand-register', admin: 'admin-login', creator: 'creator-register' };
+  var PERSONA_LABELS = { athlete: 'Athlete', brand: 'Brand / Agency', admin: 'Admin', creator: 'Sports Content Creator' };
   var BREADCRUMBS = {
     'athlete-register': 'Registration', 'athlete-profile': 'Profile', 'athlete-dashboard': 'Dashboard',
+    'creator-register': 'Registration', 'creator-profile': 'Profile', 'creator-dashboard': 'Dashboard',
     'brand-register': 'Registration', 'brand-discovery': 'Discovery', 'brand-athlete-profile': 'Athlete profile',
     'brand-inquiry': 'Send inquiry', 'brand-proposal': 'Create proposal',
     'admin-login': 'Login', 'admin-athlete-governance': 'Athlete governance', 'admin-brand-governance': 'Brand governance', 'admin-revenue': 'Revenue dashboard',
@@ -89,6 +90,7 @@
   function getPersonaForScreen(screenId) {
     if (screenId === 'deck') return null;
     if (screenId.startsWith('athlete-') || screenId === 'athlete-register') return 'athlete';
+    if (screenId.startsWith('creator-')) return 'creator';
     if (screenId.startsWith('brand-')) return 'brand';
     if (screenId.startsWith('admin-')) return 'admin';
     return null;

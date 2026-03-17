@@ -37,6 +37,11 @@
           <span class="persona-label">I'm a Brand / Agency</span>
           <span class="persona-desc">Get AI Insights, Discover, Evaluate & Partner with Athletes</span>
         </button>
+        <button type="button" class="persona-btn creator" data-persona="creator">
+          <span class="persona-icon">🎬</span>
+          <span class="persona-label">I'm a Sports Content Creator</span>
+          <span class="persona-desc">Get verified, showcase your channels & attract brand partnerships</span>
+        </button>
       </div>
     </section>
     <section class="personas-preview" id="personas">
@@ -57,6 +62,11 @@
           <span class="card-icon">🎯</span>
           <span class="card-title">Brand / Agency</span>
           <span class="card-route">Register → Discovery → Shortlist → Proposal</span>
+        </button>
+        <button type="button" class="persona-card" data-persona="creator">
+          <span class="card-icon">🎬</span>
+          <span class="card-title">Sports Content Creator</span>
+          <span class="card-route">Register → Profile → Verification & Brand engagement</span>
         </button>
       </div>
       <div class="persona-cards persona-cards-fan">
@@ -310,6 +320,214 @@
       </div>
       <div class="form-actions">
         <button type="button" class="btn-secondary" data-next="athlete-profile">← Edit profile</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- SPORTS CONTENT CREATOR JOURNEY -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="screen-creator-register" class="screen journey-screen">
+    <div class="screen-inner form-screen">
+      <h1>Sports Content Creator – Registration</h1>
+      <p class="screen-desc">Create your verified profile for brand verification and engagement. All fields are part of the prototype flow.</p>
+      <form class="proto-form" id="form-creator-register">
+        <fieldset class="form-section">
+          <legend>Basic details</legend>
+          <div class="form-row">
+            <label>Full name</label>
+            <input type="text" placeholder="Your name" />
+          </div>
+          <div class="form-row two-cols">
+            <div>
+              <label>Email</label>
+              <input type="email" placeholder="creator@example.com" />
+            </div>
+            <div>
+              <label>Phone</label>
+              <input type="tel" placeholder="+91 or with country code" />
+            </div>
+          </div>
+          <div class="form-row two-cols">
+            <div>
+              <label>Age</label>
+              <input type="number" placeholder="Age" min="13" />
+            </div>
+            <div>
+              <label>Location</label>
+              <input type="text" placeholder="City, State / Region" />
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Content type</label>
+            <select id="creator-content-type">
+              <option>Short-form video (Reels / TikTok / Shorts)</option>
+              <option>Long-form video (YouTube)</option>
+              <option>Live streams</option>
+              <option>Podcasts</option>
+              <option>Blogs / Articles</option>
+              <option>Photography</option>
+              <option>Mixed / Multi-format</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Sports / niche focus</label>
+            <input type="text" placeholder="e.g. Cricket, Football, Fitness, Multi-sport" />
+          </div>
+          <div class="form-row">
+            <label>Bio / short description</label>
+            <textarea placeholder="Describe your content and audience in a few lines"></textarea>
+          </div>
+        </fieldset>
+        <fieldset class="form-section">
+          <legend>Social media & channels</legend>
+          <div class="form-row">
+            <label>YouTube</label>
+            <input type="url" placeholder="https://youtube.com/..." />
+          </div>
+          <div class="form-row two-cols">
+            <div>
+              <label>Instagram</label>
+              <input type="url" placeholder="https://instagram.com/..." />
+            </div>
+            <div>
+              <label>TikTok</label>
+              <input type="url" placeholder="https://tiktok.com/..." />
+            </div>
+          </div>
+          <div class="form-row two-cols">
+            <div>
+              <label>Facebook</label>
+              <input type="url" placeholder="https://facebook.com/..." />
+            </div>
+            <div>
+              <label>Twitter / X</label>
+              <input type="url" placeholder="https://x.com/..." />
+            </div>
+          </div>
+          <div class="form-row two-cols">
+            <div>
+              <label>LinkedIn</label>
+              <input type="url" placeholder="https://linkedin.com/..." />
+            </div>
+            <div>
+              <label>Snapchat</label>
+              <input type="url" placeholder="https://snapchat.com/..." />
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Threads / other</label>
+            <input type="url" placeholder="Optional – Threads or other platform URL" />
+          </div>
+        </fieldset>
+        <fieldset class="form-section">
+          <legend>Verification</legend>
+          <div class="form-row">
+            <label>Identity proof (KYC)</label>
+            <div class="upload-zone">
+              <span>Drag & drop or click to upload (ID / passport)</span>
+              <input type="file" accept="image/*,.pdf" />
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Profile photo</label>
+            <div class="upload-zone small">
+              <span>Upload photo</span>
+              <input type="file" accept="image/*" />
+            </div>
+          </div>
+          <div class="form-row checkbox-row">
+            <label class="checkbox-label">
+              <input type="checkbox" />
+              I accept the Terms & Conditions and consent to verification
+            </label>
+          </div>
+        </fieldset>
+        <div class="form-actions">
+          <button type="button" class="btn-primary" data-next="creator-profile">Continue to profile →</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section id="screen-creator-profile" class="screen journey-screen">
+    <div class="screen-inner form-screen">
+      <h1>Creator profile</h1>
+      <p class="screen-desc">Optional details for better discovery and brand engagement.</p>
+      <form class="proto-form">
+        <fieldset class="form-section">
+          <legend>Reach & preferences</legend>
+          <div class="form-row two-cols">
+            <div>
+              <label>Primary language(s)</label>
+              <input type="text" placeholder="e.g. Hindi, English" />
+            </div>
+            <div>
+              <label>Preferred collaboration types</label>
+              <select>
+                <option>Sponsored posts / Reels</option>
+                <option>Product reviews</option>
+                <option>Event coverage</option>
+                <option>Brand ambassadorship</option>
+                <option>All of the above</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Rate card or media kit (optional)</label>
+            <div class="upload-zone">
+              <span>Upload PDF or link</span>
+              <input type="file" accept=".pdf" />
+            </div>
+          </div>
+        </fieldset>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" data-next="creator-register">← Back</button>
+          <button type="button" class="btn-primary" data-next="creator-dashboard">Save & go to Dashboard →</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section id="screen-creator-dashboard" class="screen journey-screen">
+    <div class="screen-inner dashboard-screen">
+      <h1>Creator dashboard</h1>
+      <p class="screen-desc">Verification status and brand engagement at a glance.</p>
+      <div class="dashboard-grid">
+        <div class="stat-card completeness">
+          <span class="stat-value">Verified</span>
+          <span class="stat-label">Account status</span>
+          <span class="stat-meta">KYC approved</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">12</span>
+          <span class="stat-label">Profile views</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">4</span>
+          <span class="stat-label">Brand shortlists</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">2</span>
+          <span class="stat-label">Inquiries</span>
+        </div>
+      </div>
+      <div class="dashboard-section">
+        <h2>Recent brand interest</h2>
+        <ul class="inquiry-list">
+          <li>
+            <strong>Brand A</strong> – Collaboration inquiry
+            <span class="badge">Under review</span>
+          </li>
+          <li>
+            <strong>Agency B</strong> – Sponsored content brief
+            <span class="badge success">Accepted</span>
+          </li>
+        </ul>
+        <button type="button" class="btn-secondary">View all</button>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" data-next="creator-profile">← Edit profile</button>
       </div>
     </div>
   </section>
