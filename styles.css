@@ -214,11 +214,13 @@ body {
 }
 
 .persona-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 1.25rem;
   justify-content: center;
-  margin-top: 2rem;
+  margin: 2rem auto 0;
+  width: 100%;
+  max-width: 960px;
 }
 
 .persona-btn {
@@ -226,8 +228,8 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  padding: 1.75rem 2rem;
-  min-width: 260px;
+  padding: 1.6rem 1.75rem;
+  min-width: 0;
   border-radius: var(--radius);
   border: 2px solid var(--border);
   background: var(--bg-card);
@@ -237,6 +239,10 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.persona-btn {
+  min-height: 190px; /* keeps 2x2 grid consistent */
 }
 
 .persona-btn:hover {
@@ -258,6 +264,14 @@ body {
 .persona-btn.brand:hover   { border-color: var(--accent-brand); }
 .persona-btn.admin:hover   { border-color: var(--accent-admin); }
 .persona-btn.creator:hover { border-color: var(--accent-creator); }
+.persona-btn.fan:hover { border-color: var(--accent-dim); }
+
+@media (max-width: 680px) {
+  .persona-buttons {
+    grid-template-columns: 1fr;
+    max-width: 460px;
+  }
+}
 
 .vision {
   max-width: 1100px;
