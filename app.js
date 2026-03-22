@@ -200,6 +200,10 @@
     if (isLanding) {
       if (journeyPersonaLabel) journeyPersonaLabel.textContent = '';
       if (journeyBreadcrumb) journeyBreadcrumb.textContent = '';
+      var homeUrl = '/';
+      if (window.location.pathname !== homeUrl || window.location.hash || window.location.search) {
+        window.history.replaceState(null, '', homeUrl);
+      }
       return;
     }
     if (journeyPersonaLabel) journeyPersonaLabel.textContent = PERSONA_LABELS[getPersonaForScreen(screenId)] || '';
@@ -341,9 +345,23 @@
     handleCardClick(e);
   });
 
+  function isPageReload() {
+    var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+    if (nav && nav.type) return nav.type === 'reload';
+    if (performance.navigation && typeof performance.navigation.type === 'number') {
+      return performance.navigation.type === 1;
+    }
+    return false;
+  }
+
   window.addEventListener('hashchange', function () { showScreen(parseRoute()); });
   window.addEventListener('load', function () {
-    showScreen(parseRoute());
+    if (isPageReload()) {
+      window.history.replaceState(null, '', '/');
+      showScreen('landing');
+    } else {
+      showScreen(parseRoute());
+    }
     initAthleteRegistrationSportRole();
     var btnApply = document.getElementById('btn-apply-filters');
     var searchEl = document.getElementById('discovery-search');
