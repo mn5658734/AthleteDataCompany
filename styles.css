@@ -299,6 +299,12 @@ a.nav-top-pill {
   border-top: 1px solid var(--border);
 }
 
+.landing-below-cards--follow {
+  border-top: 1px solid var(--border);
+  padding-top: 3rem;
+  margin-top: 0;
+}
+
 .landing-below-inner {
   display: grid;
   grid-template-columns: 1fr minmax(280px, 1fr);
@@ -326,6 +332,15 @@ a.nav-top-pill {
   line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--text);
+}
+
+.landing-below-subhead {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--accent);
 }
 
 .landing-below-highlight {
@@ -360,6 +375,11 @@ a.nav-top-pill {
   .landing-below-inner {
     grid-template-columns: 1fr;
     gap: 2rem;
+  }
+
+  .landing-below-inner--reverse .landing-below-media,
+  .landing-below-inner--reverse .landing-below-copy {
+    order: unset;
   }
 
   .landing-below-copy {
