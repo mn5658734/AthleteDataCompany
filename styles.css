@@ -367,6 +367,10 @@ a.nav-top-pill {
   box-shadow: var(--shadow);
 }
 
+.landing-below-media--brand {
+  margin-top: 1.7rem;
+}
+
 .landing-below-media img {
   display: block;
   width: 100%;
@@ -404,6 +408,10 @@ a.nav-top-pill {
     max-width: 560px;
     margin: 0 auto;
     width: 100%;
+  }
+
+  .landing-below-media--brand {
+    margin-top: 0;
   }
 }
 
