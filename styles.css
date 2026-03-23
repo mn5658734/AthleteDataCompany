@@ -324,6 +324,11 @@ a.nav-top-pill {
   color: var(--text-muted);
 }
 
+.landing-below-kicker--shine {
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 0 18px rgba(255, 255, 255, 0.45);
+}
+
 .landing-below-headline {
   margin: 0 0 1rem;
   font-size: clamp(1.75rem, 3.5vw, 2.5rem);
@@ -368,6 +373,10 @@ a.nav-top-pill {
   height: auto;
   aspect-ratio: 3 / 2;
   object-fit: cover;
+}
+
+.landing-below-media-img--profile {
+  object-position: center 16%;
 }
 
 @media (max-width: 900px) {
