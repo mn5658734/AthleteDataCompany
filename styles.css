@@ -333,13 +333,6 @@ a.nav-top-pill {
   color: var(--text);
 }
 
-.landing-below-headline--brand {
-  color: #ffffff;
-  font-weight: 900;
-  text-transform: uppercase;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.7), 0 0 22px rgba(255, 255, 255, 0.45);
-}
-
 .landing-below-subhead {
   margin: 0 0 0.75rem;
   font-size: clamp(1.35rem, 2.5vw, 1.85rem);
