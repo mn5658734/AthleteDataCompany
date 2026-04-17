@@ -413,6 +413,15 @@ a.nav-top-pill {
   .landing-below-media--brand {
     margin-top: 0;
   }
+
+  .other-projects {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .project-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .vision {
@@ -520,6 +529,78 @@ a.nav-top-pill {
 
 .persona-card .card-route-underline {
   text-decoration: underline;
+}
+
+/* ─── Other projects (GitHub cards) ─── */
+.other-projects {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1rem 2rem 2rem;
+}
+
+.other-projects-inner {
+  border: 1px solid rgba(0, 212, 170, 0.22);
+  background: linear-gradient(165deg, rgba(18, 25, 34, 0.98) 0%, rgba(10, 14, 20, 0.98) 62%);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+}
+
+.other-projects-title {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.35rem, 2.6vw, 2rem);
+  letter-spacing: -0.02em;
+}
+
+.other-projects-subtitle {
+  margin: 0 0 1.2rem;
+  color: var(--text-muted);
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.project-card {
+  display: block;
+  text-decoration: none;
+  color: var(--text);
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(0, 212, 170, 0.2);
+  background: rgba(0, 212, 170, 0.05);
+  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.project-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 212, 170, 0.6);
+  box-shadow: 0 10px 24px rgba(0, 212, 170, 0.16);
+  background: rgba(0, 212, 170, 0.09);
+}
+
+.project-card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.project-card p {
+  margin: 0 0 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.project-meta {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: #b2f7e8;
+  background: rgba(0, 212, 170, 0.14);
 }
 
 .landing-footer {
