@@ -1109,6 +1109,61 @@ a.nav-top-pill {
   font-size: 0.8125rem;
 }
 
+.discovery-pagination {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.discovery-pagination-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.discovery-pagination-info {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.discovery-pagination-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.discovery-page-btn {
+  min-width: 2.25rem;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.8125rem;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.discovery-page-btn:hover:not(:disabled) {
+  border-color: var(--accent-brand);
+  background: rgba(108, 159, 255, 0.08);
+}
+
+.discovery-page-btn--active {
+  border-color: var(--accent-brand);
+  background: rgba(108, 159, 255, 0.15);
+  color: var(--accent-brand);
+  font-weight: 600;
+}
+
+.discovery-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* ─── Discovery Assistant toggle (open/close) ─── */
 .discovery-assistant-toggle {
   position: fixed;
@@ -1252,6 +1307,35 @@ a.nav-top-pill {
 .chat-msg-bot p:last-of-type { margin-bottom: 0; }
 .chat-msg-bot ul { margin: 0.5rem 0 0; padding-left: 1.25rem; }
 .chat-msg-bot li { margin-bottom: 0.2rem; }
+
+.chat-msg-user {
+  margin-left: 1.5rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: rgba(108, 159, 255, 0.12);
+  border: 1px solid rgba(108, 159, 255, 0.25);
+  font-size: 0.8125rem;
+}
+
+.chat-msg-user p { margin: 0; }
+
+.discovery-chat-send-btn {
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent-brand);
+  background: var(--accent-brand);
+  color: #fff;
+  font-size: 0.8125rem;
+  font-family: var(--font);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity var(--transition);
+}
+
+.discovery-chat-send-btn:hover {
+  opacity: 0.9;
+}
 
 .discovery-chat-suggestions {
   padding: 0 1.25rem 0.75rem;

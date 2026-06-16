@@ -64,6 +64,7 @@
 
   var state = { selectedAthleteId: null };
   var deckState = { pdfDoc: null, numPages: 0, currentPage: 1 };
+  var discoveryState = { filteredList: [], currentPage: 1, pageSize: 10 };
 
   if (typeof pdfjsLib !== 'undefined') {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -122,38 +123,96 @@
     };
   }
 
-  function renderDiscovery() {
+  function buildAthleteCardHtml(a) {
+    var teamLabel = a.teamShort || a.team || '';
+    var leagueLabel = a.league ? a.league + ' · ' : '';
+    return '<article class="athlete-card" data-athlete-id="' + a.id + '">' +
+      '<div class="athlete-card-top">' +
+        '<div class="athlete-card-avatar">' + (a.initials || '') + '</div>' +
+        '<div class="athlete-card-info">' +
+          '<strong>#' + (a.rank || '—') + ' ' + (a.name || '') + '</strong>' +
+          '<span>' + leagueLabel + (a.role || '') + (teamLabel ? ' · ' + teamLabel : '') + '</span>' +
+          '<div class="athlete-card-scores">' +
+            '<span>Perf: ' + (a.perf != null ? a.perf : '—') + '</span>' +
+            '<span>Social: ' + (a.social != null ? a.social : '—') + '</span>' +
+            (a.pom != null ? '<span>POM: ' + a.pom + '</span>' : '') +
+            (a.verified ? ' <span class="verified">✓ Verified</span>' : '') +
+          '</div>' +
+          (a.matches != null ? '<span class="athlete-card-meta">Matches: ' + a.matches + ' · Win rate: ' + (a.winRate != null ? a.winRate + '%' : '—') + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+      '<button type="button" class="btn-secondary btn-sm btn-view-athlete">Show profile</button>' +
+      '</article>';
+  }
+
+  function renderDiscoveryPagination(total, page, pageSize) {
+    var paginationEl = document.getElementById('discovery-pagination');
+    if (!paginationEl) return;
+    if (total <= pageSize) {
+      paginationEl.innerHTML = total > 0
+        ? '<span class="discovery-pagination-info">Showing all ' + total + ' athletes</span>'
+        : '';
+      return;
+    }
+    var totalPages = Math.ceil(total / pageSize);
+    page = Math.max(1, Math.min(page, totalPages));
+    var start = (page - 1) * pageSize + 1;
+    var end = Math.min(page * pageSize, total);
+    var html = '<div class="discovery-pagination-inner">' +
+      '<span class="discovery-pagination-info">Showing ' + start + '–' + end + ' of ' + total + '</span>' +
+      '<div class="discovery-pagination-controls">';
+    html += '<button type="button" class="discovery-page-btn" data-page="' + (page - 1) + '" ' + (page <= 1 ? 'disabled' : '') + '>← Prev</button>';
+    for (var i = 1; i <= totalPages; i++) {
+      html += '<button type="button" class="discovery-page-btn' + (i === page ? ' discovery-page-btn--active' : '') + '" data-page="' + i + '">' + i + '</button>';
+    }
+    html += '<button type="button" class="discovery-page-btn" data-page="' + (page + 1) + '" ' + (page >= totalPages ? 'disabled' : '') + '>Next →</button>';
+    html += '</div></div>';
+    paginationEl.innerHTML = html;
+  }
+
+  function renderDiscovery(options) {
+    options = options || {};
     var container = document.getElementById('discovery-athlete-cards');
     var countEl = document.getElementById('discovery-results-count');
     if (!container || !window.ADC_DATA) return;
+
+    if (options.resetPage) discoveryState.currentPage = 1;
+
     var filters = getDiscoveryFilters();
     var list = window.ADC_DATA.getAthletes(filters);
-    container.innerHTML = list.map(function (a) {
-      var teamLabel = a.teamShort || a.team || '';
-      var leagueLabel = a.league ? a.league + ' · ' : '';
-      return '<article class="athlete-card" data-athlete-id="' + a.id + '">' +
-        '<div class="athlete-card-top">' +
-          '<div class="athlete-card-avatar">' + (a.initials || '') + '</div>' +
-          '<div class="athlete-card-info">' +
-            '<strong>#' + (a.rank || '—') + ' ' + (a.name || '') + '</strong>' +
-            '<span>' + leagueLabel + (a.role || '') + (teamLabel ? ' · ' + teamLabel : '') + '</span>' +
-            '<div class="athlete-card-scores">' +
-              '<span>Perf: ' + (a.perf != null ? a.perf : '—') + '</span>' +
-              '<span>Social: ' + (a.social != null ? a.social : '—') + '</span>' +
-              (a.pom != null ? '<span>POM: ' + a.pom + '</span>' : '') +
-              (a.verified ? ' <span class="verified">✓ Verified</span>' : '') +
-            '</div>' +
-            (a.matches != null ? '<span class="athlete-card-meta">Matches: ' + a.matches + ' · Win rate: ' + (a.winRate != null ? a.winRate + '%' : '—') + '</span>' : '') +
-          '</div>' +
-        '</div>' +
-        '<button type="button" class="btn-secondary btn-sm btn-view-athlete">Show profile</button>' +
-        '</article>';
-    }).join('');
+    discoveryState.filteredList = list;
+
+    var pageSize = discoveryState.pageSize;
+    var totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+    if (discoveryState.currentPage > totalPages) discoveryState.currentPage = totalPages;
+    if (discoveryState.currentPage < 1) discoveryState.currentPage = 1;
+
+    var startIdx = (discoveryState.currentPage - 1) * pageSize;
+    var pageList = list.slice(startIdx, startIdx + pageSize);
+
+    container.innerHTML = pageList.map(buildAthleteCardHtml).join('');
+
     if (countEl) {
       var meta = window.ADC_DATA.IPL_META;
-      var suffix = meta ? ' · IPL ' + meta.season + ' top ' + meta.athleteCount : '';
+      var suffix = meta ? ' · IPL ' + meta.season + ' dataset' : '';
       countEl.textContent = list.length + ' athlete' + (list.length !== 1 ? 's' : '') + ' found' + suffix;
     }
+
+    renderDiscoveryPagination(list.length, discoveryState.currentPage, pageSize);
+  }
+
+  function goToDiscoveryPage(page) {
+    var totalPages = Math.max(1, Math.ceil(discoveryState.filteredList.length / discoveryState.pageSize));
+    page = parseInt(page, 10);
+    if (isNaN(page) || page < 1 || page > totalPages) return;
+    discoveryState.currentPage = page;
+    renderDiscovery();
+    var cards = document.getElementById('discovery-athlete-cards');
+    if (cards) cards.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function applyDiscoveryFilters() {
+    renderDiscovery({ resetPage: true });
   }
 
   function renderBrandAthleteProfile(athleteId) {
@@ -362,6 +421,12 @@
   }
 
   function handleCardClick(e) {
+    var pageBtn = e.target.closest('.discovery-page-btn[data-page]');
+    if (pageBtn && !pageBtn.disabled) {
+      e.preventDefault();
+      goToDiscoveryPage(pageBtn.getAttribute('data-page'));
+      return;
+    }
     var card = e.target.closest('.athlete-card[data-athlete-id]');
     if (!card) return;
     var id = card.getAttribute('data-athlete-id');
@@ -396,10 +461,19 @@
     var btnApply = document.getElementById('btn-apply-filters');
     var searchEl = document.getElementById('discovery-search');
     var teamEl = document.getElementById('filter-team');
-    if (btnApply) btnApply.addEventListener('click', function () { renderDiscovery(); });
-    if (searchEl) searchEl.addEventListener('input', function () { renderDiscovery(); });
-    if (teamEl) teamEl.addEventListener('change', function () { renderDiscovery(); });
+    if (btnApply) btnApply.addEventListener('click', applyDiscoveryFilters);
+    if (searchEl) searchEl.addEventListener('input', function () { renderDiscovery({ resetPage: true }); });
+    if (teamEl) teamEl.addEventListener('change', function () { renderDiscovery({ resetPage: true }); });
   });
 
-  window.ADC_APP = { showScreen: showScreen, state: state, renderDiscovery: renderDiscovery, renderBrandAthleteProfile: renderBrandAthleteProfile, getDiscoveryFilters: getDiscoveryFilters };
+  window.ADC_APP = {
+    showScreen: showScreen,
+    state: state,
+    discoveryState: discoveryState,
+    renderDiscovery: renderDiscovery,
+    applyDiscoveryFilters: applyDiscoveryFilters,
+    goToDiscoveryPage: goToDiscoveryPage,
+    renderBrandAthleteProfile: renderBrandAthleteProfile,
+    getDiscoveryFilters: getDiscoveryFilters
+  };
 })();

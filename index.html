@@ -642,7 +642,7 @@
           </div>
           <div class="filter-bar-item">
             <label>Age</label>
-            <input type="text" id="filter-age" placeholder="18–28" value="18-28" />
+            <input type="text" id="filter-age" placeholder="e.g. 22–30" value="" />
           </div>
           <div class="filter-bar-item">
             <label>Gender</label>
@@ -658,15 +658,15 @@
           </div>
           <div class="filter-bar-item">
             <label>Perf</label>
-            <input type="text" id="filter-perf" placeholder="70–100" value="70-100" />
+            <input type="text" id="filter-perf" placeholder="e.g. 50–99" value="" />
           </div>
           <div class="filter-bar-item">
             <label>Social</label>
-            <input type="text" id="filter-social" placeholder="60–100" value="60-100" />
+            <input type="text" id="filter-social" placeholder="e.g. 45–99" value="" />
           </div>
           <div class="filter-bar-item">
             <label>Growth</label>
-            <select id="filter-growth"><option>Any</option><option>Rising</option><option>Stable</option></select>
+            <select id="filter-growth"><option>Any</option><option>Rising</option><option>Stable</option><option>Emerging</option></select>
           </div>
           <div class="filter-bar-item">
             <label>Budget</label>
@@ -691,6 +691,7 @@
             <span class="results-count" id="discovery-results-count">0 athletes found</span>
           </div>
           <div class="athlete-cards" id="discovery-athlete-cards"></div>
+          <nav class="discovery-pagination" id="discovery-pagination" aria-label="Athlete results pages"></nav>
         </div>
         <div class="discovery-chat-wrap">
           <button type="button" class="discovery-assistant-toggle" id="discovery-assistant-toggle" title="Open Discovery Assistant" aria-label="Open Discovery Assistant">
@@ -708,7 +709,7 @@
           </div>
           <div class="discovery-chat-messages" id="discovery-chat-messages">
             <div class="chat-msg chat-msg-bot" id="discovery-welcome-msg">
-              <p>Describe your brief and click <strong>AI suggestion</strong> to get tailored athlete recommendations.</p>
+              <p>Ask about any IPL 2026 athlete's performance — e.g. <em>How is V Kohli performing?</em> or <em>Top POM winners</em>. Click <strong>AI suggestion</strong> for tailored picks.</p>
             </div>
             <div class="discovery-thinking" id="discovery-thinking" hidden>
               <div class="thinking-dots"><span></span><span></span><span></span></div>
@@ -723,9 +724,12 @@
             <button type="button" class="chat-suggestion-chip" data-chip="ipl-top-pom">IPL 2026 · Top POM winners</button>
             <button type="button" class="chat-suggestion-chip" data-chip="ipl-rcb">RCB · High social reach</button>
             <button type="button" class="chat-suggestion-chip" data-chip="ipl-bowlers">Verified bowlers · Rising</button>
+            <button type="button" class="chat-suggestion-chip" data-question="How is V Kohli performing in IPL 2026?">Kohli performance</button>
+            <button type="button" class="chat-suggestion-chip" data-question="Top 5 by social score">Top social scores</button>
           </div>
           <div class="discovery-chat-input-wrap">
-            <input type="text" class="discovery-chat-input" id="discovery-chat-input" placeholder="Describe your brief..." />
+            <input type="text" class="discovery-chat-input" id="discovery-chat-input" placeholder="Ask about IPL 2026 performance..." />
+            <button type="button" class="discovery-chat-send-btn" id="discovery-chat-send-btn" title="Send question">Ask</button>
             <button type="button" class="discovery-chat-ai-btn" id="discovery-ai-suggestion-btn" title="Get AI suggestions">AI suggestion</button>
           </div>
         </aside>
@@ -1006,6 +1010,7 @@
   </section>
 
   <script src="data.js"></script>
+  <script src="ipl-assistant.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="app.js"></script>
   <script>
@@ -1014,12 +1019,46 @@
     var toggleBtn = document.getElementById('discovery-assistant-toggle');
     var closeBtn = document.getElementById('discovery-chat-close');
     var aiBtn = document.getElementById('discovery-ai-suggestion-btn');
+    var sendBtn = document.getElementById('discovery-chat-send-btn');
+    var chatInput = document.getElementById('discovery-chat-input');
+    var messagesEl = document.getElementById('discovery-chat-messages');
     var welcomeMsg = document.getElementById('discovery-welcome-msg');
     var thinkingEl = document.getElementById('discovery-thinking');
     var cardsContainer = document.getElementById('ai-suggestion-cards');
     var overlay = document.getElementById('ai-card-expanded-overlay');
     var expandedContent = document.getElementById('ai-card-expanded-content');
     var expandedClose = document.getElementById('ai-card-expanded-close');
+
+    function appendChatMessage(role, html) {
+      if (!messagesEl) return;
+      var div = document.createElement('div');
+      div.className = 'chat-msg chat-msg-' + role;
+      div.innerHTML = html;
+      messagesEl.appendChild(div);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function handleChatQuestion(text) {
+      text = (text || '').trim();
+      if (!text) return;
+      if (welcomeMsg) welcomeMsg.style.display = 'none';
+      if (cardsContainer) { cardsContainer.hidden = true; cardsContainer.innerHTML = ''; }
+      appendChatMessage('user', '<p>' + text.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>');
+      if (thinkingEl) {
+        thinkingEl.hidden = false;
+        thinkingEl.classList.add('discovery-thinking--active');
+      }
+      setTimeout(function () {
+        if (thinkingEl) {
+          thinkingEl.hidden = true;
+          thinkingEl.classList.remove('discovery-thinking--active');
+        }
+        var answer = window.IPL_ASSISTANT && window.IPL_ASSISTANT.answerQuery
+          ? window.IPL_ASSISTANT.answerQuery(text)
+          : '<p>Assistant unavailable.</p>';
+        appendChatMessage('bot', answer);
+      }, 600);
+    }
 
     function setPanelOpen(open) {
       if (panel) {
@@ -1109,23 +1148,45 @@
           if (sport) sport.value = 'Cricket';
           if (role) role.value = 'All';
           if (team) team.value = 'All';
-          if (perf) perf.value = '60-100';
+          if (perf) perf.value = '';
           if (growth) growth.value = 'Any';
           if (verified) verified.checked = true;
         } else if (d === 'ipl-rcb') {
           if (sport) sport.value = 'Cricket';
           if (team) team.value = 'Royal Challengers Bengaluru';
+          if (perf) perf.value = '';
           if (verified) verified.checked = true;
         } else if (d === 'ipl-bowlers') {
           if (sport) sport.value = 'Cricket';
           if (role) role.value = 'Bowler';
           if (team) team.value = 'All';
-          if (growth) growth.value = 'Rising';
+          if (perf) perf.value = '';
+          if (growth) growth.value = 'Any';
           if (verified) verified.checked = true;
         }
-        if (window.ADC_APP && window.ADC_APP.renderDiscovery) window.ADC_APP.renderDiscovery();
+        if (window.ADC_APP && window.ADC_APP.applyDiscoveryFilters) window.ADC_APP.applyDiscoveryFilters();
+        else if (window.ADC_APP && window.ADC_APP.renderDiscovery) window.ADC_APP.renderDiscovery({ resetPage: true });
         showThinking();
       });
+    });
+    document.querySelectorAll('.chat-suggestion-chip[data-question]').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var q = chip.getAttribute('data-question');
+        if (chatInput) chatInput.value = q;
+        handleChatQuestion(q);
+      });
+    });
+    if (sendBtn) sendBtn.addEventListener('click', function () {
+      var text = chatInput ? chatInput.value : '';
+      handleChatQuestion(text);
+      if (chatInput) chatInput.value = '';
+    });
+    if (chatInput) chatInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleChatQuestion(chatInput.value);
+        chatInput.value = '';
+      }
     });
     if (expandedClose) expandedClose.addEventListener('click', function() { overlay.hidden = true; document.body.classList.remove('ai-overlay-open'); });
     if (overlay) overlay.addEventListener('click', function(e) { if (e.target === overlay) { overlay.hidden = true; document.body.classList.remove('ai-overlay-open'); } });
