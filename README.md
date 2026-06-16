@@ -7,10 +7,15 @@ India’s largest **AI-powered Athlete Discovery & Intelligence Marketplace** �
 Open `index.html` in a browser (double-click or use a local server):
 
 ```bash
-# Optional: serve with a local server
-npx serve .
+npm start
 # or
-python3 -m http.server 8000
+npx serve .
+```
+
+Regenerate IPL athlete rankings from match CSV:
+
+```bash
+npm run build:ipl
 ```
 
 Then open **http://localhost:8000** (or open `index.html` directly).
@@ -18,8 +23,8 @@ Then open **http://localhost:8000** (or open `index.html` directly).
 ## Features
 
 - **URL routing** – Hash-based routes (e.g. `#/`, `#/brand/discovery`, `#/brand/athlete/1`) so you can bookmark and refresh any screen.
-- **Data layer** – Mock athlete database (`data.js`) with 12+ athletes; filter by sport, role, age, region, AI scores, budget, verified. Shortlist persisted in `localStorage`.
-- **Discovery** – Filters and search update results in real time. “Apply filters” and search-as-you-type. Athlete cards are generated from data; clicking a card opens that athlete’s profile.
+- **Data layer** – IPL 2026 athlete database (`data.js`) with top 50 players derived from `data/ipl_matches_2026.csv`. Scores use POM awards, team win rate, and squad availability. Shortlist persisted in `localStorage`.
+- **Discovery** – IPL team filter, search, and ranked athlete cards. Regenerate data with `npm run build:ipl` after updating the CSV.
 - **Discovery Assistant** – AI suggestion button runs a “thinking” animation and shows suggested athletes from the same data; suggestion chips (e.g. “Cricket, North India”) apply filters and show suggestions. Click a suggestion card to expand details or “View full profile.”
 - **Brand athlete profile** – Dynamic content for the selected athlete (name, sport, scores, AI insights). Add/remove from shortlist (saved in `localStorage`). “Send inquiry” pre-fills the athlete in the inquiry form.
 - **Persona journeys** – Athlete (Registration → Profile → Dashboard), Brand (Register → Discovery → Athlete profile → Inquiry → Proposal), Admin (Login → Governance → Revenue).

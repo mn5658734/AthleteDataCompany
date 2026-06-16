@@ -106,6 +106,7 @@
     return {
       sport: document.getElementById('filter-sport') && document.getElementById('filter-sport').value,
       role: document.getElementById('filter-role') && document.getElementById('filter-role').value,
+      team: document.getElementById('filter-team') && document.getElementById('filter-team').value,
       ageMin: age[0] ? parseInt(age[0], 10) : null,
       ageMax: age[1] ? parseInt(age[1], 10) : null,
       region: document.getElementById('filter-location') && document.getElementById('filter-location').value,
@@ -128,23 +129,31 @@
     var filters = getDiscoveryFilters();
     var list = window.ADC_DATA.getAthletes(filters);
     container.innerHTML = list.map(function (a) {
+      var teamLabel = a.teamShort || a.team || '';
+      var leagueLabel = a.league ? a.league + ' · ' : '';
       return '<article class="athlete-card" data-athlete-id="' + a.id + '">' +
         '<div class="athlete-card-top">' +
           '<div class="athlete-card-avatar">' + (a.initials || '') + '</div>' +
           '<div class="athlete-card-info">' +
-            '<strong>' + (a.name || '') + '</strong>' +
-            '<span>' + (a.sport || '') + ' · ' + (a.role || '') + '</span>' +
+            '<strong>#' + (a.rank || '—') + ' ' + (a.name || '') + '</strong>' +
+            '<span>' + leagueLabel + (a.role || '') + (teamLabel ? ' · ' + teamLabel : '') + '</span>' +
             '<div class="athlete-card-scores">' +
               '<span>Perf: ' + (a.perf != null ? a.perf : '—') + '</span>' +
               '<span>Social: ' + (a.social != null ? a.social : '—') + '</span>' +
+              (a.pom != null ? '<span>POM: ' + a.pom + '</span>' : '') +
               (a.verified ? ' <span class="verified">✓ Verified</span>' : '') +
             '</div>' +
+            (a.matches != null ? '<span class="athlete-card-meta">Matches: ' + a.matches + ' · Win rate: ' + (a.winRate != null ? a.winRate + '%' : '—') + '</span>' : '') +
           '</div>' +
         '</div>' +
         '<button type="button" class="btn-secondary btn-sm btn-view-athlete">Show profile</button>' +
         '</article>';
     }).join('');
-    if (countEl) countEl.textContent = list.length + ' athlete' + (list.length !== 1 ? 's' : '') + ' found';
+    if (countEl) {
+      var meta = window.ADC_DATA.IPL_META;
+      var suffix = meta ? ' · IPL ' + meta.season + ' top ' + meta.athleteCount : '';
+      countEl.textContent = list.length + ' athlete' + (list.length !== 1 ? 's' : '') + ' found' + suffix;
+    }
   }
 
   function renderBrandAthleteProfile(athleteId) {
@@ -160,8 +169,15 @@
       return;
     }
     if (avatarEl) avatarEl.textContent = athlete.initials || athlete.name.slice(0, 2).toUpperCase();
-    if (nameEl) nameEl.textContent = athlete.name;
-    if (subEl) subEl.textContent = (athlete.sport || '') + ' · ' + (athlete.role || '') + (athlete.verified ? ' · Verified' : '');
+    if (nameEl) nameEl.textContent = (athlete.rank ? '#' + athlete.rank + ' ' : '') + athlete.name;
+    if (subEl) {
+      var parts = [];
+      if (athlete.league) parts.push(athlete.league);
+      if (athlete.teamShort || athlete.team) parts.push(athlete.teamShort || athlete.team);
+      if (athlete.role) parts.push(athlete.role);
+      if (athlete.verified) parts.push('Verified');
+      subEl.textContent = parts.join(' · ');
+    }
     if (btnShortlist) {
       var inList = window.ADC_DATA.isInShortlist(athlete.id);
       btnShortlist.textContent = inList ? 'Remove from shortlist' : 'Add to shortlist';
@@ -184,9 +200,23 @@
     if (socialMeta) socialMeta.textContent = '↑ ' + (athlete.social >= 80 ? 15 : athlete.social >= 70 ? 10 : 5) + '%';
     if (fitEl) fitEl.textContent = (athlete.perf && athlete.social) ? ((athlete.perf + athlete.social) / 20).toFixed(1) : '—';
     if (roiEl) roiEl.textContent = (athlete.perf >= 80 && athlete.social >= 75) ? 'High' : (athlete.perf >= 70 ? 'Medium' : 'Low');
-    if (injuryEl) injuryEl.textContent = 'Low';
+    if (injuryEl) injuryEl.textContent = athlete.matches >= 12 ? 'Low' : (athlete.matches >= 8 ? 'Moderate' : 'Monitor');
+    var statsEl = document.getElementById('brand-profile-ipl-stats');
+    if (statsEl) {
+      statsEl.innerHTML =
+        '<p><strong>IPL 2026 season stats</strong> (from match dataset)</p>' +
+        '<ul class="ipl-stats-list">' +
+          '<li>Matches played: <strong>' + (athlete.matches != null ? athlete.matches : '—') + '</strong></li>' +
+          '<li>Player of the Match: <strong>' + (athlete.pom != null ? athlete.pom : '—') + '</strong></li>' +
+          '<li>Team wins when selected: <strong>' + (athlete.wins != null ? athlete.wins : '—') + '</strong></li>' +
+          '<li>Win rate: <strong>' + (athlete.winRate != null ? athlete.winRate + '%' : '—') + '</strong></li>' +
+          '<li>Franchise: <strong>' + (athlete.teamShort || athlete.team || '—') + '</strong></li>' +
+          '<li>Discovery rank: <strong>#' + (athlete.rank || '—') + '</strong></li>' +
+        '</ul>' +
+        '<p class="ipl-stats-note">Scores combine POM impact (38%), team win rate (32%), and squad availability (30%). Social score adds POM visibility and star recognition.</p>';
+    }
     var inquiryTo = document.getElementById('inquiry-to-athlete');
-    if (inquiryTo) inquiryTo.value = athlete.name + ' (' + athlete.sport + ' · ' + athlete.role + ')';
+    if (inquiryTo) inquiryTo.value = athlete.name + ' (' + (athlete.teamShort || athlete.team || athlete.sport) + ' · ' + athlete.role + ')';
   }
 
   function showScreen(screenId, params) {
@@ -365,9 +395,11 @@
     initAthleteRegistrationSportRole();
     var btnApply = document.getElementById('btn-apply-filters');
     var searchEl = document.getElementById('discovery-search');
+    var teamEl = document.getElementById('filter-team');
     if (btnApply) btnApply.addEventListener('click', function () { renderDiscovery(); });
     if (searchEl) searchEl.addEventListener('input', function () { renderDiscovery(); });
+    if (teamEl) teamEl.addEventListener('change', function () { renderDiscovery(); });
   });
 
-  window.ADC_APP = { showScreen: showScreen, state: state, renderDiscovery: renderDiscovery, renderBrandAthleteProfile: renderBrandAthleteProfile };
+  window.ADC_APP = { showScreen: showScreen, state: state, renderDiscovery: renderDiscovery, renderBrandAthleteProfile: renderBrandAthleteProfile, getDiscoveryFilters: getDiscoveryFilters };
 })();

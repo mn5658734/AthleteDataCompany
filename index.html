@@ -28,7 +28,7 @@
     <section class="hero">
       <p class="hero-tag">India’s largest AI-powered</p>
       <h1 class="hero-title">Athlete Discovery &<br />Intelligence Marketplace</h1>
-      <p class="hero-sub">Verified identity · AI insights · Sponsorship workflows</p>
+      <p class="hero-sub">Verified identity · AI insights · Sponsorship workflows · Performance Insights</p>
     </section>
 
     <section class="landing-below-cards" aria-label="Brand visibility">
@@ -612,11 +612,33 @@
         <div class="filter-bar-inner">
           <div class="filter-bar-item">
             <label>Sport</label>
-            <select id="filter-sport"><option>All</option><option>Cricket</option><option>Football</option><option>Badminton</option></select>
+            <select id="filter-sport"><option>All</option><option selected>Cricket</option></select>
           </div>
           <div class="filter-bar-item">
             <label>Role</label>
-            <select id="filter-role"><option>All</option><option>Batsman</option><option>Bowler</option><option>All-rounder</option><option>Forward</option><option>Midfielder</option><option>Defender</option><option>Singles</option><option>Doubles</option><option>Player</option></select>
+            <select id="filter-role">
+              <option>All</option>
+              <option>Batsman</option>
+              <option>Bowler</option>
+              <option>All-rounder</option>
+              <option>Wicketkeeper</option>
+            </select>
+          </div>
+          <div class="filter-bar-item">
+            <label>IPL Team</label>
+            <select id="filter-team">
+              <option>All</option>
+              <option>Royal Challengers Bengaluru</option>
+              <option>Mumbai Indians</option>
+              <option>Chennai Super Kings</option>
+              <option>Kolkata Knight Riders</option>
+              <option>Sunrisers Hyderabad</option>
+              <option>Rajasthan Royals</option>
+              <option>Delhi Capitals</option>
+              <option>Punjab Kings</option>
+              <option>Gujarat Titans</option>
+              <option>Lucknow Super Giants</option>
+            </select>
           </div>
           <div class="filter-bar-item">
             <label>Age</label>
@@ -659,13 +681,13 @@
       <div class="discovery-header">
         <div>
           <h1>Athlete Discovery</h1>
-          <p class="screen-desc">Find athletes by filters, search, or the Discovery Assistant.</p>
+          <p class="screen-desc">Top 50 IPL 2026 athletes ranked by AI performance &amp; social scores from match data.</p>
         </div>
       </div>
       <div class="discovery-layout">
         <div class="results-area">
           <div class="results-toolbar">
-            <input type="search" id="discovery-search" placeholder="Search athletes by name or keyword..." class="search-input" />
+            <input type="search" id="discovery-search" placeholder="Search IPL players, teams, roles..." class="search-input" />
             <span class="results-count" id="discovery-results-count">0 athletes found</span>
           </div>
           <div class="athlete-cards" id="discovery-athlete-cards"></div>
@@ -698,9 +720,9 @@
             <div class="ai-suggestion-cards" id="ai-suggestion-cards" hidden></div>
           </div>
           <div class="discovery-chat-suggestions">
-            <button type="button" class="chat-suggestion-chip" data-chip="cricket-north">Cricket, North India</button>
-            <button type="button" class="chat-suggestion-chip" data-chip="pan-india">PAN India known faces</button>
-            <button type="button" class="chat-suggestion-chip" data-chip="football-verified">Football, 18–25, verified</button>
+            <button type="button" class="chat-suggestion-chip" data-chip="ipl-top-pom">IPL 2026 · Top POM winners</button>
+            <button type="button" class="chat-suggestion-chip" data-chip="ipl-rcb">RCB · High social reach</button>
+            <button type="button" class="chat-suggestion-chip" data-chip="ipl-bowlers">Verified bowlers · Rising</button>
           </div>
           <div class="discovery-chat-input-wrap">
             <input type="text" class="discovery-chat-input" id="discovery-chat-input" placeholder="Describe your brief..." />
@@ -742,9 +764,9 @@
         <div class="pv-stat"><span class="pv-value" id="pv-roi">—</span><span class="pv-label">Est. ROI indicator</span></div>
         <div class="pv-stat"><span class="pv-value" id="pv-injury">—</span><span class="pv-label">Injury risk index</span></div>
       </div>
-      <div class="profile-view-section">
+      <div class="profile-view-section" id="brand-profile-ipl-stats">
         <h2>Performance stats</h2>
-        <p>Matches: 45 · Runs: 1,240 · Avg: 38.2 · Tournament level weightage applied.</p>
+        <p>Select an athlete from Discovery to view IPL 2026 season stats.</p>
       </div>
       <div class="profile-view-section">
         <h2>Historical growth</h2>
@@ -1013,13 +1035,10 @@
 
     function getAiSuggestions() {
       if (!window.ADC_DATA) return [];
-      var filters = window.ADC_APP && window.ADC_APP.renderDiscovery ? (function(){
-        var f = document.getElementById('filter-sport');
-        var r = document.getElementById('filter-role');
-        var v = document.getElementById('filter-verified');
-        return { sport: f && f.value !== 'All' ? f.value : null, role: r && r.value !== 'All' ? r.value : null, verifiedOnly: v ? v.checked : false };
-      }()) : {};
-      return window.ADC_DATA.getAthletes(filters).slice(0, 6);
+      if (window.ADC_APP && window.ADC_APP.getDiscoveryFilters) {
+        return window.ADC_DATA.getAthletes(window.ADC_APP.getDiscoveryFilters()).slice(0, 6);
+      }
+      return window.ADC_DATA.getTopAthletes(6);
     }
 
     function showThinking() {
@@ -1045,9 +1064,9 @@
         return '<article class="ai-suggestion-card" data-athlete-id="' + a.id + '">' +
           '<div class="ai-suggestion-card-avatar">' + (a.initials || '') + '</div>' +
           '<div class="ai-suggestion-card-info">' +
-            '<strong>' + a.name + '</strong>' +
-            '<span>' + a.sport + ' · ' + a.role + '</span>' +
-            '<div class="ai-suggestion-card-scores">Perf: ' + a.perf + ' · Social: ' + a.social + (a.verified ? ' <span class="verified">✓</span>' : '') + '</div>' +
+            '<strong>#' + (a.rank || '') + ' ' + a.name + '</strong>' +
+            '<span>' + (a.league || a.sport) + ' · ' + (a.teamShort || '') + ' · ' + a.role + '</span>' +
+            '<div class="ai-suggestion-card-scores">Perf: ' + a.perf + ' · Social: ' + a.social + ' · POM: ' + (a.pom || 0) + (a.verified ? ' <span class="verified">✓</span>' : '') + '</div>' +
           '</div></article>';
       }).join('');
       cardsContainer.querySelectorAll('.ai-suggestion-card').forEach(function(card) {
@@ -1058,10 +1077,10 @@
             expandedContent.innerHTML =
               '<div class="ai-expanded-header">' +
                 '<div class="ai-expanded-avatar">' + (a.initials || '') + '</div>' +
-                '<div><h4>' + a.name + '</h4><p>' + a.sport + ' · ' + a.role + (a.verified ? ' · Verified' : '') + '</p></div>' +
+                '<div><h4>#' + (a.rank || '') + ' ' + a.name + '</h4><p>' + (a.league || a.sport) + ' · ' + (a.teamShort || a.team) + ' · ' + a.role + (a.verified ? ' · Verified' : '') + '</p></div>' +
               '</div>' +
-              '<div class="ai-expanded-section"><h5>AI Performance insights</h5><p>Strong consistency in recent matches; injury risk low. Performance trend +12% over last 6 months. Tier recommendation for brand fit.</p></div>' +
-              '<div class="ai-expanded-section"><h5>AI Presence & reach</h5><p>Growing social following; engagement rate above category average. ' + (a.region || 'PAN India') + ' visibility potential; good fit for regional and national campaigns.</p></div>' +
+              '<div class="ai-expanded-section"><h5>IPL 2026 performance</h5><p>' + a.matches + ' matches · ' + a.pom + ' Player-of-Match awards · ' + a.winRate + '% team win rate when selected. AI performance score: ' + a.perf + '.</p></div>' +
+              '<div class="ai-expanded-section"><h5>Brand & social reach</h5><p>Social score ' + a.social + ' based on POM visibility and franchise recognition. Strong fit for ' + (a.teamShort || 'IPL') + '-aligned campaigns in ' + (a.region || 'PAN India') + '.</p></div>' +
               '<button type="button" class="btn-primary btn-view-full-profile">View full profile</button>';
             overlay.hidden = false;
             document.body.classList.add('ai-overlay-open');
@@ -1080,13 +1099,30 @@
     document.querySelectorAll('.chat-suggestion-chip').forEach(function(chip) {
       chip.addEventListener('click', function() {
         var sport = document.getElementById('filter-sport');
-        var location = document.getElementById('filter-location');
+        var role = document.getElementById('filter-role');
+        var team = document.getElementById('filter-team');
         var verified = document.getElementById('filter-verified');
         var growth = document.getElementById('filter-growth');
+        var perf = document.getElementById('filter-perf');
         var d = chip.getAttribute('data-chip');
-        if (d === 'cricket-north' && sport && location) { sport.value = 'Cricket'; location.value = 'North India'; if (verified) verified.checked = false; }
-        else if (d === 'pan-india' && location) { location.value = 'PAN India'; if (sport) sport.value = 'All'; if (verified) verified.checked = false; }
-        else if (d === 'football-verified' && sport && verified) { sport.value = 'Football'; verified.checked = true; if (location) location.value = ''; }
+        if (d === 'ipl-top-pom') {
+          if (sport) sport.value = 'Cricket';
+          if (role) role.value = 'All';
+          if (team) team.value = 'All';
+          if (perf) perf.value = '60-100';
+          if (growth) growth.value = 'Any';
+          if (verified) verified.checked = true;
+        } else if (d === 'ipl-rcb') {
+          if (sport) sport.value = 'Cricket';
+          if (team) team.value = 'Royal Challengers Bengaluru';
+          if (verified) verified.checked = true;
+        } else if (d === 'ipl-bowlers') {
+          if (sport) sport.value = 'Cricket';
+          if (role) role.value = 'Bowler';
+          if (team) team.value = 'All';
+          if (growth) growth.value = 'Rising';
+          if (verified) verified.checked = true;
+        }
         if (window.ADC_APP && window.ADC_APP.renderDiscovery) window.ADC_APP.renderDiscovery();
         showThinking();
       });

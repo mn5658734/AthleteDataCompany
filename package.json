@@ -1,0 +1,11 @@
+{
+  "name": "athlete-data-company",
+  "version": "1.0.0",
+  "description": "AI-Powered Athlete Discovery & Intelligence Marketplace",
+  "private": true,
+  "scripts": {
+    "start": "npx serve . -p 3000",
+    "dev": "npx serve . -p 3000",
+    "build:ipl": "python3 scripts/build_ipl_data.py"
+  }
+}

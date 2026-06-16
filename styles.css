@@ -1082,6 +1082,25 @@ a.nav-top-pill {
   color: var(--accent);
 }
 
+.athlete-card-meta {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.ipl-stats-list {
+  margin: 0.75rem 0;
+  padding-left: 1.25rem;
+  line-height: 1.7;
+}
+
+.ipl-stats-note {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
 .athlete-card .btn-view-athlete {
   width: 100%;
   margin-top: auto;
