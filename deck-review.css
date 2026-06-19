@@ -563,3 +563,44 @@ td { color: var(--text); }
     margin: 0;
   }
 }
+
+/* ─── Slide 2: Problem (+25% boxes & text) ─── */
+.slide:nth-of-type(2) .kicker { font-size: 15px; margin-bottom: 15px; }
+.slide:nth-of-type(2) h1 { font-size: 55px; margin-bottom: 20px; }
+.slide:nth-of-type(2) .cols-3 { gap: 25px; margin-top: 10px; }
+.slide:nth-of-type(2) .col-card {
+  padding: 25px;
+  border-radius: 15px;
+}
+.slide:nth-of-type(2) .col-card .icon { font-size: 35px; margin-bottom: 12px; }
+.slide:nth-of-type(2) .col-card h3 { font-size: 22.5px; margin-bottom: 15px; }
+.slide:nth-of-type(2) .col-card ul { font-size: 16.25px; padding-left: 22px; }
+.slide:nth-of-type(2) .col-card li { margin-bottom: 10px; }
+.slide:nth-of-type(2) .insight-line {
+  font-size: 18.75px;
+  padding: 17px 22px;
+  margin-top: 30px;
+}
+
+/* ─── Slide 3: Solution (+25% boxes & text) ─── */
+.slide:nth-of-type(3) .kicker { font-size: 15px; margin-bottom: 15px; }
+.slide:nth-of-type(3) h1 { font-size: 55px; margin-bottom: 20px; }
+.slide:nth-of-type(3) .engines { gap: 20px; margin-bottom: 25px; }
+.slide:nth-of-type(3) .engine-card {
+  padding: 20px;
+  border-radius: 12.5px;
+}
+.slide:nth-of-type(3) .engine-card h3 { font-size: 17.5px; margin-bottom: 10px; }
+.slide:nth-of-type(3) .engine-card p { font-size: 15px; line-height: 1.55; }
+.slide:nth-of-type(3) .diagram-wrap { padding: 15px; }
+
+/* ─── Slide 4: Traction (enlarged text) ─── */
+.slide:nth-of-type(4) .kicker { font-size: 15px; }
+.slide:nth-of-type(4) h1 { font-size: 50px; }
+.slide:nth-of-type(4) .subhead { font-size: 25px; margin-bottom: 15px; }
+.slide:nth-of-type(4) .metric-box { padding: 20px; }
+.slide:nth-of-type(4) .metric-value { font-size: 45px !important; }
+.slide:nth-of-type(4) .metric-label { font-size: 16px; }
+.slide:nth-of-type(4) .metric-context { font-size: 14px; }
+.slide:nth-of-type(4) .takeaway { font-size: 17.5px; margin-top: 15px; }
+.slide:nth-of-type(4) .chart-note { font-size: 12.5px; }
