@@ -17,7 +17,7 @@
     <header class="landing-header">
       <a href="#" class="logo" data-nav="landing">Athlete Data Co.</a>
       <nav class="landing-nav">
-        <a href="Athlete-Data-Company..pdf" target="_blank" rel="noopener noreferrer" class="nav-btn-deck">DECK</a>
+        <a href="/deck.html" class="nav-btn-deck" id="nav-deck-link">DECK</a>
         <button type="button" class="nav-top-pill" data-persona="athlete">ATHLETES</button>
         <button type="button" class="nav-top-pill" data-persona="brand">BRANDS</button>
         <button type="button" class="nav-top-pill" data-persona="creator">CREATOR</button>
@@ -103,23 +103,6 @@
       <p>Athlete Data Company · SaaS + AI + Marketplace · Phase 1 MVP</p>
     </footer>
   </main>
-
-  <!-- ═══════════════════════════════════════════════════════════════ -->
-  <!-- DECK VIEWER (same tab, one page + arrows) -->
-  <!-- ═══════════════════════════════════════════════════════════════ -->
-  <section id="screen-deck" class="screen journey-screen deck-screen">
-    <div class="deck-viewer">
-      <div class="deck-toolbar">
-        <button type="button" class="deck-btn deck-prev" id="deck-prev" aria-label="Previous page">←</button>
-        <span class="deck-page-info" id="deck-page-info">Page 1 / 1</span>
-        <button type="button" class="deck-btn deck-next" id="deck-next" aria-label="Next page">→</button>
-      </div>
-      <div class="deck-page-wrap">
-        <canvas id="deck-canvas"></canvas>
-        <p class="deck-fallback" id="deck-fallback">Deck could not be loaded. Ensure <code>Athlete-Data-Company..pdf</code> is in the project root.</p>
-      </div>
-    </div>
-  </section>
 
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <!-- GLOBAL TOP BAR (for journey screens) -->
@@ -1011,7 +994,6 @@
 
   <script src="data.js"></script>
   <script src="ipl-assistant.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="app.js"></script>
   <script>
   (function () {

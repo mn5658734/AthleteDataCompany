@@ -6,6 +6,8 @@
   "scripts": {
     "start": "npx serve . -p 3000",
     "dev": "npx serve . -p 3000",
-    "build:ipl": "python3 scripts/build_ipl_data.py"
+    "build:ipl": "python3 scripts/build_ipl_data.py",
+    "build:deck": "node scripts/build-deck-html.js",
+    "export:deck-pdf": "node scripts/export-deck-pdf.js"
   }
 }

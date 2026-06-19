@@ -1,0 +1,206 @@
+/* Interactive deck — extends review styles */
+
+@import url('deck-review.css');
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.deck-app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.deck-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 10px 16px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+}
+
+.deck-toolbar-left,
+.deck-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deck-toolbar-center {
+  flex: 1;
+  text-align: center;
+}
+
+.deck-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.deck-btn:hover {
+  border-color: var(--accent);
+  background: rgba(0, 212, 170, 0.08);
+}
+
+.deck-btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  font-size: 18px;
+}
+
+.deck-page-info {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.deck-home-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.deck-home-link:hover {
+  text-decoration: underline;
+}
+
+.deck-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.deck-viewport {
+  width: min(100%, calc((100vh - 80px) * 16 / 9));
+  max-width: 1280px;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  box-shadow: var(--shadow, 0 8px 32px rgba(0, 0, 0, 0.5));
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.deck-viewport .slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 36px 44px 32px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(24px);
+  transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s;
+  page-break-after: auto;
+}
+
+.deck-viewport .slide.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  z-index: 1;
+}
+
+.deck-viewport .slide.exit-left {
+  transform: translateX(-24px);
+}
+
+.slide-footer {
+  bottom: 16px;
+  left: 44px;
+  right: 44px;
+}
+
+.metric-value.animate {
+  animation: countPop 0.6s ease forwards;
+}
+
+@keyframes countPop {
+  from { transform: scale(0.85); opacity: 0.5; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.deck-viewport .chart-canvas {
+  max-height: 200px;
+}
+
+.deck-viewport.fullscreen {
+  max-width: none;
+  width: 100vw;
+  height: calc(100vh - 60px);
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+body.deck-fullscreen .deck-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+body.deck-fullscreen .deck-stage {
+  padding: 0;
+}
+
+@media (max-width: 900px) {
+  .deck-viewport .slide {
+    padding: 24px 28px 28px;
+  }
+
+  .deck-viewport .slide h1 {
+    font-size: 28px;
+  }
+
+  .cols-3, .engines, .pillars, .metrics-row, .targets-row {
+    grid-template-columns: 1fr;
+  }
+
+  .split, .split-wide-left {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  .deck-toolbar { display: none !important; }
+  html, body { overflow: visible; height: auto; }
+  .deck-app { height: auto; }
+  .deck-stage { padding: 0; overflow: visible; }
+  .deck-viewport {
+    width: 1280px;
+    height: 720px;
+    max-width: none;
+    box-shadow: none;
+    aspect-ratio: auto;
+  }
+  .deck-viewport .slide {
+    position: relative;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    page-break-after: always;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deck-viewport .slide {
+    transition: none;
+  }
+}

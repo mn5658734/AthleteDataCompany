@@ -11,8 +11,7 @@
     'creator-register': 'Registration', 'creator-profile': 'Profile', 'creator-dashboard': 'Dashboard',
     'brand-register': 'Registration', 'brand-discovery': 'Discovery', 'brand-athlete-profile': 'Athlete profile',
     'brand-inquiry': 'Send inquiry', 'brand-proposal': 'Create proposal',
-    'admin-login': 'Login', 'admin-athlete-governance': 'Athlete governance', 'admin-brand-governance': 'Brand governance', 'admin-revenue': 'Revenue dashboard',
-    'deck': 'Deck'
+    'admin-login': 'Login', 'admin-athlete-governance': 'Athlete governance', 'admin-brand-governance': 'Brand governance', 'admin-revenue': 'Revenue dashboard'
   };
 
   var ATHLETE_SPORT_ROLES = {
@@ -63,11 +62,16 @@
   var journeyBreadcrumb = document.getElementById('journey-breadcrumb');
 
   var state = { selectedAthleteId: null };
-  var deckState = { pdfDoc: null, numPages: 0, currentPage: 1 };
   var discoveryState = { filteredList: [], currentPage: 1, pageSize: 10 };
 
-  if (typeof pdfjsLib !== 'undefined') {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  function isHomePath() {
+    var path = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
+    return path === '/' || path.endsWith('/index.html');
+  }
+
+  function goToDeck() {
+    history.pushState({ adcScreen: 'landing' }, '', window.location.pathname || '/');
+    window.location.href = '/deck.html';
   }
 
   function initAthleteRegistrationSportRole() {
@@ -299,7 +303,8 @@
     if (journeyBreadcrumb) journeyBreadcrumb.textContent = BREADCRUMBS[screenId] || screenId;
 
     if (screenId === 'deck') {
-      initDeckViewer();
+      goToDeck();
+      return;
     } else if (screenId === 'brand-discovery') {
       renderDiscovery();
     } else if (screenId === 'brand-athlete-profile') {
@@ -312,8 +317,6 @@
     var newUrl;
     if (screenId === 'landing') {
       newUrl = window.location.pathname || '/';
-    } else if (screenId === 'deck') {
-      newUrl = '/deck';
     } else {
       newUrl = (window.location.pathname || '/') + '#/' + screenId.replace(/-/g, '/');
       if (params.athleteId) newUrl += '/' + params.athleteId;
@@ -323,79 +326,22 @@
 
   function parseRoute() {
     var path = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
-    if (path === '/deck') return 'deck';
+    if (path === '/deck') {
+      goToDeck();
+      return 'landing';
+    }
     var hash = (window.location.hash || '#/').slice(1).replace(/^\/+|\/+$/g, '');
     var parts = hash ? hash.split('/') : [];
     if (parts.length === 0 || parts[0] === '') return 'landing';
-    if (parts[0] === 'deck') return 'deck';
+    if (parts[0] === 'deck') {
+      goToDeck();
+      return 'landing';
+    }
     if (parts[0] === 'brand' && parts[1] === 'athlete' && parts[2]) {
       state.selectedAthleteId = parseInt(parts[2], 10);
       return 'brand-athlete-profile';
     }
     return parts.join('-');
-  }
-
-  function initDeckViewer() {
-    var canvas = document.getElementById('deck-canvas');
-    var fallback = document.getElementById('deck-fallback');
-    var pageInfo = document.getElementById('deck-page-info');
-    var prevBtn = document.getElementById('deck-prev');
-    var nextBtn = document.getElementById('deck-next');
-    if (!canvas || !pageInfo) return;
-
-    function showFallback(show) {
-      if (fallback) fallback.style.display = show ? 'block' : 'none';
-      canvas.style.display = show ? 'none' : 'block';
-      if (prevBtn) prevBtn.disabled = show;
-      if (nextBtn) nextBtn.disabled = show;
-      if (pageInfo && show) pageInfo.textContent = '—';
-    }
-
-    function renderDeckPage(pageNum) {
-      if (!deckState.pdfDoc || !canvas) return;
-      deckState.currentPage = pageNum;
-      pageInfo.textContent = 'Page ' + pageNum + ' / ' + deckState.numPages;
-      prevBtn.disabled = pageNum <= 1;
-      nextBtn.disabled = pageNum >= deckState.numPages;
-      deckState.pdfDoc.getPage(pageNum).then(function (page) {
-        var scale = 1.5;
-        var viewport = page.getViewport({ scale: scale });
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-        page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport });
-      });
-    }
-
-    if (deckState.pdfDoc) {
-      showFallback(false);
-      renderDeckPage(deckState.currentPage);
-      return;
-    }
-
-    if (typeof pdfjsLib === 'undefined') {
-      showFallback(true);
-      return;
-    }
-
-    var pdfPath = 'Athlete-Data-Company..pdf';
-    pdfjsLib.getDocument(pdfPath).promise.then(function (pdf) {
-      deckState.pdfDoc = pdf;
-      deckState.numPages = pdf.numPages;
-      deckState.currentPage = 1;
-      showFallback(false);
-      renderDeckPage(1);
-    }).catch(function () {
-      showFallback(true);
-    });
-
-    if (prevBtn) prevBtn.onclick = function () {
-      if (!deckState.pdfDoc || deckState.currentPage <= 1) return;
-      renderDeckPage(deckState.currentPage - 1);
-    };
-    if (nextBtn) nextBtn.onclick = function () {
-      if (!deckState.pdfDoc || deckState.currentPage >= deckState.numPages) return;
-      renderDeckPage(deckState.currentPage + 1);
-    };
   }
 
   function handleNavClick(e) {
@@ -450,7 +396,17 @@
   }
 
   window.addEventListener('hashchange', function () { showScreen(parseRoute()); });
+  window.addEventListener('pageshow', function () {
+    if (isHomePath() && !window.location.hash) showScreen('landing');
+  });
   window.addEventListener('load', function () {
+    var deckLink = document.getElementById('nav-deck-link');
+    if (deckLink) {
+      deckLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        goToDeck();
+      });
+    }
     if (isPageReload()) {
       window.history.replaceState(null, '', '/');
       showScreen('landing');
@@ -474,6 +430,7 @@
     applyDiscoveryFilters: applyDiscoveryFilters,
     goToDiscoveryPage: goToDiscoveryPage,
     renderBrandAthleteProfile: renderBrandAthleteProfile,
-    getDiscoveryFilters: getDiscoveryFilters
+    getDiscoveryFilters: getDiscoveryFilters,
+    goToDeck: goToDeck
   };
 })();

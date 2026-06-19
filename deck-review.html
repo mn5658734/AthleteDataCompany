@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ADC Pitch Deck — Content Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="deck-review.css" />
+</head>
+<body>
+
+<!-- Slide 1: Title -->
+<section class="slide slide-title">
+  <div class="brand-lockup">
+    <span class="badge">Athlete Data Company</span>
+    <span class="badge badge-brand">SportsTrade</span>
+  </div>
+  <p class="kicker">ADC Intelligence — Powered by SportsTrade</p>
+  <h1>Building the Data Layer for the Athlete Economy</h1>
+  <p class="subhead">The first marketplace turning athlete performance, fan behaviour, and brand demand into a unified financial ecosystem.</p>
+  <p class="pull-quote">"We are turning athletes into an investable asset class."</p>
+  <div class="slide-footer">
+    <span>Confidential · Seed Round 2025</span>
+    <span class="slide-num">01 / 11</span>
+  </div>
+</section>
+
+<!-- Slide 2: Problem -->
+<section class="slide">
+  <p class="kicker">The Opportunity</p>
+  <h1>The Athlete Economy Is Broken</h1>
+  <div class="cols-3">
+    <div class="col-card athletes">
+      <div class="icon">🏃</div>
+      <h3>Athletes</h3>
+      <ul>
+        <li>Less than 1% monetize before reaching elite level</li>
+        <li>No structured digital identity — visibility depends on selection, not merit</li>
+        <li>Uncertain career span with no financial upside from fan loyalty</li>
+      </ul>
+    </div>
+    <div class="col-card brands">
+      <div class="icon">🏢</div>
+      <h3>Brands</h3>
+      <ul>
+        <li>No data-driven discovery at grassroots level</li>
+        <li>Poor ROI visibility in grassroots sponsorship spend</li>
+        <li>Campaign decisions based on gut feel, not audience alignment</li>
+      </ul>
+    </div>
+    <div class="col-card fans">
+      <div class="icon">👥</div>
+      <h3>Fans</h3>
+      <ul>
+        <li>Passive consumption only — watch, scroll, forget</li>
+        <li>No ownership or long-term engagement with athlete growth</li>
+        <li>No stake in the athletes they already support</li>
+      </ul>
+    </div>
+  </div>
+  <p class="insight-line">India has 600M+ sports fans and 1.5M+ grassroots athletes — but no connective tissue between them.</p>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">02 / 11</span>
+  </div>
+</section>
+
+<!-- Slide 3: Solution -->
+<section class="slide">
+  <p class="kicker">The Solution</p>
+  <h1>ADC — Three Proprietary Engines, One Platform</h1>
+  <div class="engines">
+    <div class="engine-card">
+      <h3>Athlete Score Engine</h3>
+      <p>Performance + consistency + growth potential → quantified into a single investable signal. Powers verified digital identity and brand discovery ranking.</p>
+    </div>
+    <div class="engine-card">
+      <h3>Fan Signal Engine</h3>
+      <p>Real-money behaviour on SportsTrade (trades, portfolio holds, repeat engagement) → converted into a Fan Conviction Score. Social media buzz layered on top.</p>
+    </div>
+    <div class="engine-card">
+      <h3>Brand Match Engine</h3>
+      <p>Data-driven athlete–brand pairing based on audience alignment, ROI potential, and campaign fit. Replaces manual scouting with AI-backed recommendations.</p>
+    </div>
+  </div>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 1168 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Platform architecture diagram">
+      <defs>
+        <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00d4aa"/><stop offset="100%" stop-color="#6c9fff"/></linearGradient>
+      </defs>
+      <rect x="0" y="20" width="130" height="44" rx="6" fill="#121922" stroke="#00d4aa" stroke-width="1.5"/>
+      <text x="65" y="47" text-anchor="middle" fill="#e6edf3" font-size="11" font-family="Outfit,sans-serif" font-weight="600">Athlete Score</text>
+      <path d="M130 42 H170" stroke="#00d4aa" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <rect x="170" y="20" width="130" height="44" rx="6" fill="#121922" stroke="#2a3544"/>
+      <text x="235" y="47" text-anchor="middle" fill="#8b9cad" font-size="11" font-family="Outfit,sans-serif">Athlete Profile</text>
+      <rect x="340" y="20" width="130" height="44" rx="6" fill="#121922" stroke="#6c9fff" stroke-width="1.5"/>
+      <text x="405" y="47" text-anchor="middle" fill="#e6edf3" font-size="11" font-family="Outfit,sans-serif" font-weight="600">Fan Signal</text>
+      <path d="M470 42 H510" stroke="#6c9fff" stroke-width="1.5"/>
+      <rect x="510" y="20" width="130" height="44" rx="6" fill="#121922" stroke="#2a3544"/>
+      <text x="575" y="47" text-anchor="middle" fill="#8b9cad" font-size="11" font-family="Outfit,sans-serif">Fan Layer</text>
+      <rect x="680" y="20" width="130" height="44" rx="6" fill="#121922" stroke="#c084fc" stroke-width="1.5"/>
+      <text x="745" y="47" text-anchor="middle" fill="#e6edf3" font-size="11" font-family="Outfit,sans-serif" font-weight="600">Brand Match</text>
+      <path d="M810 42 H850" stroke="#c084fc" stroke-width="1.5"/>
+      <rect x="850" y="20" width="130" height="44" rx="6" fill="#121922" stroke="#2a3544"/>
+      <text x="915" y="47" text-anchor="middle" fill="#8b9cad" font-size="11" font-family="Outfit,sans-serif">Brand Dashboard</text>
+      <path d="M980 42 H1020" stroke="url(#g1)" stroke-width="2"/>
+      <rect x="1020" y="12" width="148" height="60" rx="8" fill="rgba(0,212,170,0.12)" stroke="#00d4aa" stroke-width="1.5"/>
+      <text x="1094" y="40" text-anchor="middle" fill="#00d4aa" font-size="11" font-family="Outfit,sans-serif" font-weight="700">Unified ADC</text>
+      <text x="1094" y="56" text-anchor="middle" fill="#00d4aa" font-size="11" font-family="Outfit,sans-serif" font-weight="700">Marketplace</text>
+      <text x="584" y="100" text-anchor="middle" fill="#8b9cad" font-size="10" font-family="Outfit,sans-serif">Athlete Score → Athlete Profile · Fan Signal → Fan Layer · Brand Match → Brand Dashboard → Unified ADC Marketplace</text>
+    </svg>
+  </div>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">03 / 11</span>
+  </div>
+</section>
+
+<!-- Slide 4: Traction -->
+<section class="slide">
+  <p class="kicker">Traction</p>
+  <h1>Early Proof of Product–Market Fit</h1>
+  <p class="subhead" style="margin-bottom:12px">SportsTrade — our fan-economy layer — validated demand before marketplace scale.</p>
+  <div class="split split-wide-left">
+    <div>
+      <div class="metrics-row" style="grid-template-columns:1fr">
+        <div class="metric-box" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:left;padding:16px">
+          <div><span class="metric-value" style="font-size:36px">₹40L+</span><span class="metric-label">Beta transaction volume</span><span class="metric-context">Real-money engagement, not vanity signups</span></div>
+          <div><span class="metric-value" style="font-size:36px">800+</span><span class="metric-label">Active users</span><span class="metric-context">IPL, Border–Gavaskar Trophy &amp; Champions Trophy</span></div>
+          <div><span class="metric-value" style="font-size:36px">85+</span><span class="metric-label">Net Promoter Score</span><span class="metric-context">Strong repeat engagement and word-of-mouth</span></div>
+        </div>
+      </div>
+      <p class="takeaway">Fans will pay to have skin in the game. ADC converts that signal into athlete value.</p>
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="14" fill="#8b9cad" font-size="10" font-family="Outfit,sans-serif">Beta transaction volume (illustrative)</text>
+        <line x1="40" y1="190" x2="460" y2="190" stroke="#2a3544" stroke-width="1"/>
+        <line x1="40" y1="30" x2="40" y2="190" stroke="#2a3544" stroke-width="1"/>
+        <polyline points="40,170 120,150 200,120 280,80 360,55 440,35" fill="none" stroke="#00d4aa" stroke-width="2.5"/>
+        <circle cx="120" cy="150" r="4" fill="#00d4aa"/>
+        <circle cx="200" cy="120" r="4" fill="#00d4aa"/>
+        <circle cx="280" cy="80" r="4" fill="#00d4aa"/>
+        <circle cx="360" cy="55" r="4" fill="#00d4aa"/>
+        <circle cx="440" cy="35" r="4" fill="#00d4aa"/>
+        <text x="120" y="208" text-anchor="middle" fill="#8b9cad" font-size="9" font-family="Outfit,sans-serif">IPL</text>
+        <text x="200" y="208" text-anchor="middle" fill="#8b9cad" font-size="9" font-family="Outfit,sans-serif">BGT</text>
+        <text x="360" y="208" text-anchor="middle" fill="#8b9cad" font-size="9" font-family="Outfit,sans-serif">CT</text>
+        <text x="440" y="208" text-anchor="middle" fill="#8b9cad" font-size="9" font-family="Outfit,sans-serif">Now</text>
+      </svg>
+      <p class="chart-note">Illustrative growth across tournament windows</p>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>SportsTrade Beta</span>
+    <span class="slide-num">04 / 11</span>
+  </div>
+</section>
+
+<!-- Slide 5: Product -->
+<section class="slide">
+  <p class="kicker">Product Overview</p>
+  <h1>ADC + SportsTrade — What the Platform Surfaces</h1>
+  <div class="pillars">
+    <div class="pillar">
+      <h3>Athlete Profile</h3>
+      <p>Verified digital identity · AI performance score · Growth potential rating · Discoverable by brands and fans</p>
+    </div>
+    <div class="pillar">
+      <h3>Fan Layer (SportsTrade)</h3>
+      <p>Athlete investment portfolio · Loyalty rewards · Long-term stake in athlete growth · sportstrade.world</p>
+    </div>
+    <div class="pillar">
+      <h3>Brand Dashboard</h3>
+      <p>Athlete discovery &amp; shortlisting · ROI tracking on campaigns · Social signal &amp; fan conviction data · Sponsorship workflow</p>
+    </div>
+  </div>
+  <p class="tagline">One profile. One fan layer. One brand intelligence surface.</p>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">05 / 11</span>
+  </div>
+</section>
+
+<!-- Slide 6: Market -->
+<section class="slide">
+  <p class="kicker">Market Size</p>
+  <h1>Massive, Untapped Athlete Economy</h1>
+  <div class="split">
+    <div>
+      <table>
+        <thead><tr><th>Segment</th><th>Size</th><th>Insight</th></tr></thead>
+        <tbody>
+          <tr><td>Sports fans (India)</td><td><strong>600M+</strong></td><td>Mobile-first; seeking alternatives to fantasy-only engagement</td></tr>
+          <tr><td>Grassroots athletes</td><td><strong>1.5M+</strong></td><td>Largely unmonetized, undiscovered talent pool</td></tr>
+          <tr><td>India sports economy</td><td><strong>$10B+</strong></td><td>Fast-growing; digital infrastructure still immature</td></tr>
+          <tr><td>Sponsorship market</td><td><strong>$2B+</strong></td><td>Grassroots sponsorship structurally unserved</td></tr>
+        </tbody>
+      </table>
+      <p class="insight-line" style="margin-top:14px;font-size:13px"><strong>Entry wedge:</strong> Grassroots sports monetization — where brands spend blindly and athletes earn nothing.</p>
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="14" fill="#8b9cad" font-size="10" font-family="Outfit,sans-serif">Market opportunity (relative scale)</text>
+        <rect x="120" y="30" width="340" height="22" rx="4" fill="#00d4aa" opacity="0.9"/>
+        <text x="110" y="45" text-anchor="end" fill="#e6edf3" font-size="10" font-family="Outfit,sans-serif">600M+ Fans</text>
+        <rect x="120" y="62" width="85" height="22" rx="4" fill="#6c9fff" opacity="0.9"/>
+        <text x="110" y="77" text-anchor="end" fill="#e6edf3" font-size="10" font-family="Outfit,sans-serif">1.5M+ Athletes</text>
+        <rect x="120" y="94" width="280" height="22" rx="4" fill="#c084fc" opacity="0.8"/>
+        <text x="110" y="109" text-anchor="end" fill="#e6edf3" font-size="10" font-family="Outfit,sans-serif">$10B+ Economy</text>
+        <rect x="120" y="126" width="170" height="22" rx="4" fill="#fbbf24" opacity="0.85"/>
+        <text x="110" y="141" text-anchor="end" fill="#e6edf3" font-size="10" font-family="Outfit,sans-serif">$2B+ Sponsorship</text>
+        <text x="240" y="175" text-anchor="middle" fill="#8b9cad" font-size="9" font-family="Outfit,sans-serif">Grassroots sponsorship = structural white space</text>
+      </svg>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">06 / 11</span>
+  </div>
+</section>
+
+<!-- Slide 7: Business Model -->
+<section class="slide">
+  <p class="kicker">Business Model</p>
+  <h1>Multi-Layer Revenue Engine</h1>
+  <div class="split">
+    <div>
+      <ol class="revenue-list">
+        <li><strong>Marketplace commission</strong> — 10–20% on athlete–brand sponsorship deals</li>
+        <li><strong>SaaS subscriptions</strong> — Brand &amp; agency dashboards (discovery, analytics, fan intelligence)</li>
+        <li><strong>Future expansion</strong> — Athlete data APIs, scouting intelligence, media &amp; content monetization</li>
+      </ol>
+      <table style="margin-top:8px">
+        <thead><tr><th>Phase</th><th>Focus</th><th>Channels</th></tr></thead>
+        <tbody>
+          <tr><td>1 — Supply</td><td>Athlete onboarding</td><td>Academies, colleges, federations</td></tr>
+          <tr><td>2 — Monetization</td><td>Brand revenue</td><td>D2C brands, startups, regional sponsors</td></tr>
+          <tr><td>3 — Fan layer</td><td>Engagement scale</td><td>Fantasy sports users, sports influencers</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+        <text x="240" y="16" text-anchor="middle" fill="#8b9cad" font-size="10" font-family="Outfit,sans-serif">Supply → Signal → Monetization flywheel</text>
+        <circle cx="240" cy="110" r="70" fill="none" stroke="#2a3544" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <rect x="190" y="28" width="100" height="36" rx="6" fill="#121922" stroke="#00d4aa"/>
+        <text x="240" y="50" text-anchor="middle" fill="#00d4aa" font-size="10" font-family="Outfit,sans-serif" font-weight="600">Athlete Supply</text>
+        <rect x="350" y="92" width="100" height="36" rx="6" fill="#121922" stroke="#6c9fff"/>
+        <text x="400" y="114" text-anchor="middle" fill="#6c9fff" font-size="10" font-family="Outfit,sans-serif" font-weight="600">Fan Signal</text>
+        <rect x="190" y="156" width="100" height="36" rx="6" fill="#121922" stroke="#c084fc"/>
+        <text x="240" y="178" text-anchor="middle" fill="#c084fc" font-size="10" font-family="Outfit,sans-serif" font-weight="600">Brand Revenue</text>
+        <rect x="30" y="92" width="100" height="36" rx="6" fill="#121922" stroke="#fbbf24"/>
+        <text x="80" y="114" text-anchor="middle" fill="#fbbf24" font-size="9" font-family="Outfit,sans-serif" font-weight="600">More Supply</text>
+        <path d="M240 64 Q310 70 350 92" fill="none" stroke="#00d4aa" stroke-width="1.5"/>
+        <path d="M400 128 Q340 160 290 172" fill="none" stroke="#6c9fff" stroke-width="1.5"/>
+        <path d="M190 174 Q120 160 80 128" fill="none" stroke="#c084fc" stroke-width="1.5"/>
+        <path d="M80 92 Q130 60 190 46" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+      </svg>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">07 / 11</span>
+  </div>
+</section>
+
+<!-- Slide 8: Competition -->
+<section class="slide">
+  <p class="kicker">Competitive Landscape</p>
+  <h1>Defensible Athlete Data Network</h1>
+  <table class="matrix-table">
+    <thead>
+      <tr><th>Capability</th><th>Kibi Sports</th><th>IndiaSports</th><th>Opendorse (US)</th><th class="adc-col">ADC</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Fan economy layer</td><td class="check-no">❌</td><td class="check-no">❌</td><td class="check-no">❌</td><td class="adc-col check-yes">✅</td></tr>
+      <tr><td>Fan signal engine</td><td class="check-no">❌</td><td class="check-partial">⚠</td><td class="check-no">❌</td><td class="adc-col check-yes">✅</td></tr>
+      <tr><td>AI athlete scoring</td><td class="check-no">❌</td><td class="check-no">❌</td><td class="check-partial">⚠</td><td class="adc-col check-yes">✅</td></tr>
+      <tr><td>Grassroots focus</td><td class="check-yes">✅</td><td class="check-partial">⚠</td><td class="check-yes">✅</td><td class="adc-col check-yes">✅</td></tr>
+      <tr><td>Brand marketplace</td><td class="check-yes">✅</td><td class="check-no">❌</td><td class="check-yes">✅</td><td class="adc-col check-yes">✅</td></tr>
+    </tbody>
+  </table>
+  <p class="moat">Only platform combining athlete intelligence, fan behaviour data, and end-to-end monetization in one network.</p>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">08 / 11</span>
+  </div>
+</section>
+
+<!-- Slide 9: Roadmap -->
+<section class="slide">
+  <p class="kicker">Roadmap</p>
+  <h1>Path to Scale Before IPL 2027</h1>
+  <div class="targets-row">
+    <div class="target-box"><div class="num">50K</div><div class="lbl">Verified athletes</div></div>
+    <div class="target-box"><div class="num">5K</div><div class="lbl">Active brand accounts</div></div>
+    <div class="target-box"><div class="num">1M+</div><div class="lbl">Engaged fans (SportsTrade)</div></div>
+  </div>
+  <table>
+    <thead><tr><th>Quarter</th><th>Milestone</th></tr></thead>
+    <tbody>
+      <tr><td>Q3 2025</td><td>Athlete supply partnerships (academies + federations); MVP marketplace live</td></tr>
+      <tr><td>Q1 2026</td><td>First 50 brand pilots; SaaS dashboard GA</td></tr>
+      <tr><td>Q3 2026</td><td>Fan layer integration at scale; 10K athletes verified</td></tr>
+      <tr><td>Q1 2027</td><td>IPL 2027 launch window — full GTM across all three layers</td></tr>
+    </tbody>
+  </table>
+  <div class="diagram-wrap" style="margin-top:14px;padding:8px 12px">
+    <svg viewBox="0 0 1168 40" xmlns="http://www.w3.org/2000/svg">
+      <line x1="40" y1="20" x2="1128" y2="20" stroke="#2a3544" stroke-width="2"/>
+      <circle cx="40" cy="20" r="8" fill="#00d4aa"/>
+      <circle cx="380" cy="20" r="8" fill="#00d4aa"/>
+      <circle cx="720" cy="20" r="8" fill="#00d4aa"/>
+      <circle cx="1060" cy="20" r="10" fill="#6c9fff" stroke="#00d4aa" stroke-width="2"/>
+      <text x="40" y="38" text-anchor="middle" fill="#8b9cad" font-size="9" font-family="Outfit,sans-serif">Q3'25</text>
+      <text x="380" y="38" text-anchor="middle" fill="#8b9cad" font-size="9" font-family="Outfit,sans-serif">Q1'26</text>
+      <text x="720" y="38" text-anchor="middle" fill="#8b9cad" font-size="9" font-family="Outfit,sans-serif">Q3'26</text>
+      <text x="1060" y="38" text-anchor="middle" fill="#6c9fff" font-size="9" font-family="Outfit,sans-serif" font-weight="600">IPL 2027</text>
+    </svg>
+  </div>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">09 / 11</span>
+  </div>
+</section>
+
+<!-- Slide 10: Team & Ask -->
+<section class="slide">
+  <p class="kicker">Team &amp; The Ask</p>
+  <h1>Founders with Product &amp; Sports DNA</h1>
+  <div class="split">
+    <div>
+      <div class="founder-card">
+        <h3>Milan Nayak</h3>
+        <p class="founder-role">Founder &amp; CEO</p>
+        <ul>
+          <li>9+ years as product leader across AI, SaaS, BFSI &amp; SportsTech</li>
+          <li>National-level sports background — athlete by experience, builder by profession</li>
+          <li>Built SportsTrade from concept to ₹40L+ beta volume</li>
+        </ul>
+      </div>
+      <div class="ask-box">
+        Raising <strong>₹1.5 Cr</strong> for <strong>10% equity</strong> · Seed round
+      </div>
+      <table>
+        <thead><tr><th>Allocation</th><th>%</th><th>Focus</th></tr></thead>
+        <tbody>
+          <tr><td>Product development</td><td>30%</td><td>Engine refinement, marketplace MVP, mobile</td></tr>
+          <tr><td>GTM &amp; partnerships</td><td>40%</td><td>Athlete supply, brand pilots, federation deals</td></tr>
+          <tr><td>Hiring &amp; operations</td><td>30%</td><td>Engineering, data, community</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="diagram-wrap" style="display:flex;align-items:center;justify-content:center;min-height:320px">
+      <svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="140" cy="140" r="90" fill="none" stroke="#2a3544" stroke-width="20"/>
+        <circle cx="140" cy="140" r="90" fill="none" stroke="#00d4aa" stroke-width="20" stroke-dasharray="169.6 565.5" stroke-dashoffset="0" transform="rotate(-90 140 140)"/>
+        <circle cx="140" cy="140" r="90" fill="none" stroke="#6c9fff" stroke-width="20" stroke-dasharray="226.2 565.5" stroke-dashoffset="-169.6" transform="rotate(-90 140 140)"/>
+        <circle cx="140" cy="140" r="90" fill="none" stroke="#c084fc" stroke-width="20" stroke-dasharray="169.6 565.5" stroke-dashoffset="-395.8" transform="rotate(-90 140 140)"/>
+        <text x="140" y="132" text-anchor="middle" fill="#e6edf3" font-size="14" font-family="Outfit,sans-serif" font-weight="600">Use of Funds</text>
+        <text x="140" y="152" text-anchor="middle" fill="#8b9cad" font-size="11" font-family="Outfit,sans-serif">₹1.5 Cr Seed</text>
+        <rect x="20" y="250" width="10" height="10" fill="#00d4aa"/><text x="36" y="259" fill="#8b9cad" font-size="10" font-family="Outfit,sans-serif">30% Product</text>
+        <rect x="120" y="250" width="10" height="10" fill="#6c9fff"/><text x="136" y="259" fill="#8b9cad" font-size="10" font-family="Outfit,sans-serif">40% GTM</text>
+        <rect x="210" y="250" width="10" height="10" fill="#c084fc"/><text x="226" y="259" fill="#8b9cad" font-size="10" font-family="Outfit,sans-serif">30% Ops</text>
+      </svg>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">10 / 11</span>
+  </div>
+</section>
+
+<!-- Slide 11: Close -->
+<section class="slide slide-close">
+  <p class="kicker">Thank You</p>
+  <h1>Join Us in Building the Athlete Economy</h1>
+  <div class="close-details">
+    <strong>Milan Nayak</strong> · Athlete Data Company<br />
+    <strong>Product:</strong> sportstrade.world · Live prototype demo available
+  </div>
+  <div class="cta-bar">Let's Talk · Seed Round Open · Demo on Request</div>
+  <p class="vision-recap">Turning athletes into an investable asset class — with data, fans, and brands on one platform.</p>
+  <div class="slide-footer">
+    <span>ADC Intelligence — Powered by SportsTrade</span>
+    <span class="slide-num">11 / 11</span>
+  </div>
+</section>
+
+</body>
+</html>
