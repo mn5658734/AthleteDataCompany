@@ -337,6 +337,7 @@
       goToDeck();
       return 'landing';
     }
+    if (parts[0] === 'landing-content') return 'landing';
     if (parts[0] === 'brand' && parts[1] === 'athlete' && parts[2]) {
       state.selectedAthleteId = parseInt(parts[2], 10);
       return 'brand-athlete-profile';
@@ -395,6 +396,15 @@
     return false;
   }
 
+  function initHeroScroll() {
+    var scrollBtn = document.getElementById('hero-scroll-btn');
+    var landingContent = document.getElementById('landing-content');
+    if (!scrollBtn || !landingContent) return;
+    scrollBtn.addEventListener('click', function () {
+      landingContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
   window.addEventListener('hashchange', function () { showScreen(parseRoute()); });
   window.addEventListener('pageshow', function () {
     if (isHomePath() && !window.location.hash) showScreen('landing');
@@ -414,6 +424,7 @@
       showScreen(parseRoute());
     }
     initAthleteRegistrationSportRole();
+    initHeroScroll();
     var btnApply = document.getElementById('btn-apply-filters');
     var searchEl = document.getElementById('discovery-search');
     var teamEl = document.getElementById('filter-team');
