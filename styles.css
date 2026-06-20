@@ -308,8 +308,158 @@ a.nav-top-pill {
 .hero-hub-svg {
   display: block;
   overflow: visible;
-  width: 367px;
-  height: 228px;
+  width: min(367px, 100%);
+  height: auto;
+  aspect-ratio: 168 / 108;
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .landing-header,
+  .landing-header--hero {
+    padding: 0.85rem 1rem;
+  }
+
+  .logo {
+    font-size: 1.05rem;
+  }
+
+  .landing-nav .nav-btn-deck {
+    margin-left: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .nav-btn-login {
+    margin-left: 0.65rem;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.8rem;
+  }
+
+  .hero-viewport-body {
+    padding: 0.25rem 1rem 3.25rem;
+    align-items: center;
+  }
+
+  .hero--splash {
+    padding: 0 0.25rem;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .hero--splash::before {
+    inset: -0.75rem -0.5rem;
+  }
+
+  .hero-hub-anim {
+    margin-bottom: 1.25rem;
+    width: 100%;
+    max-width: min(100%, 300px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-hub-svg {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .hero--splash .hero-tag {
+    margin-top: 0.5rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+  }
+
+  .hero--splash .hero-title {
+    font-size: clamp(1.55rem, 7.5vw, 2rem);
+    margin-bottom: 0.65rem;
+  }
+
+  .hero-sub--splash {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    padding: 0 0.15rem;
+  }
+
+  .hero-viewport-bg {
+    background-position: center 28%;
+    opacity: 0.26;
+  }
+
+  .hero-scroll-hint {
+    bottom: 0.5rem;
+  }
+
+  .landing-below-cards {
+    padding: 2rem 1.15rem 1.5rem;
+  }
+
+  .landing-below-cards--follow {
+    padding-top: 2rem;
+  }
+
+  .landing-below-headline {
+    font-size: clamp(1.45rem, 5.5vw, 1.85rem);
+  }
+
+  .landing-below-subhead {
+    font-size: clamp(1.2rem, 4.5vw, 1.5rem);
+  }
+
+  .landing-below-desc {
+    font-size: 0.9375rem;
+  }
+
+  .match-panel {
+    padding: 1rem;
+  }
+
+  .match-panel-deal {
+    gap: 0.65rem;
+    padding: 0.65rem;
+  }
+
+  .match-panel-brand,
+  .match-panel-athlete {
+    justify-content: center;
+  }
+
+  .match-panel-athlete {
+    flex-direction: row;
+    text-align: left;
+  }
+
+  .match-metric {
+    grid-template-columns: 6.5rem 1fr auto;
+    gap: 0.4rem;
+  }
+
+  .persona-buttons {
+    padding: 0 0.25rem;
+  }
+
+  .hero {
+    padding: 2.5rem 1rem 2rem;
+  }
+
+  .register-journey-as {
+    font-size: 0.95rem;
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero-hub-svg {
+    max-width: 260px;
+  }
+
+  .hero--splash .hero-title {
+    font-size: 1.45rem;
+  }
+
+  .nav-btn-login {
+    padding: 0.3rem 0.55rem;
+    font-size: 0.72rem;
+  }
 }
 
 .hero--splash .hero-tag {
@@ -433,28 +583,27 @@ a.nav-top-pill {
 
 @media (max-height: 640px) {
   .hero-viewport-body {
-    padding-bottom: 3.5rem;
+    padding-bottom: 3rem;
   }
 
   .hero-title {
-    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-size: clamp(1.65rem, 4vw, 2.25rem);
   }
 
   .hero-hub-anim {
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   }
 
   .hero-hub-svg {
-    width: 306px;
-    height: 189px;
+    max-width: 260px;
   }
 
   .hero--splash .hero-tag {
-    margin-top: 0.75rem;
+    margin-top: 0.35rem;
   }
 
   .hero-scroll-hint {
-    bottom: 0.75rem;
+    bottom: 0.5rem;
   }
 }
 
