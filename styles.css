@@ -369,6 +369,10 @@ a.nav-top-pill {
 .hub-node--brand { animation-delay: 0.6s; }
 .hub-node--fan { animation-delay: 1.2s; }
 
+.hub-node-icon {
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.35));
+}
+
 @keyframes hubNodePulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.72; }
