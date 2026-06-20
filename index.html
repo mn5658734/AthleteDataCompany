@@ -14,19 +14,56 @@
   <!-- LANDING PAGE -->
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <main id="screen-landing" class="screen active">
-    <header class="landing-header">
-      <a href="#" class="logo" data-nav="landing">Athlete Data Co.</a>
-      <nav class="landing-nav">
-        <a href="/deck.html" class="nav-btn-deck" id="nav-deck-link">DECK</a>
-        <a href="/login.html" class="nav-btn-login" id="nav-login-link">LOGIN</a>
-      </nav>
-    </header>
-    <section class="hero">
-      <p class="hero-tag">India’s largest AI-powered</p>
-      <h1 class="hero-title">Athlete Discovery &<br />Intelligence Marketplace</h1>
-      <p class="hero-sub">Verified identity · AI insights · Sponsorship workflows · Performance Insights</p>
+    <section class="hero-viewport" id="hero-viewport">
+      <header class="landing-header landing-header--hero">
+        <a href="#" class="logo" data-nav="landing">Athlete Data Co.</a>
+        <nav class="landing-nav">
+          <a href="/deck.html" class="nav-btn-deck" id="nav-deck-link">DECK</a>
+          <a href="/login.html" class="nav-btn-login" id="nav-login-link">LOGIN</a>
+        </nav>
+      </header>
+
+      <div class="hero-viewport-body">
+        <section class="hero hero--splash">
+          <div class="hero-sports-anim" aria-hidden="true">
+            <svg class="hero-sports-svg" viewBox="0 0 120 88" width="120" height="88" xmlns="http://www.w3.org/2000/svg">
+              <circle class="hero-pulse-ring" cx="60" cy="44" r="14" fill="none" stroke="currentColor" stroke-width="1"/>
+              <circle class="hero-pulse-ring hero-pulse-ring--delay" cx="60" cy="44" r="14" fill="none" stroke="currentColor" stroke-width="1"/>
+              <circle cx="60" cy="44" r="5" fill="var(--accent)" opacity="0.9"/>
+              <circle cx="60" cy="44" r="9" fill="none" stroke="var(--accent)" stroke-width="1" opacity="0.35"/>
+              <g class="hero-orbit hero-orbit--a">
+                <circle class="hero-sport-ball hero-sport-ball--cricket" cx="60" cy="18" r="5"/>
+                <path class="hero-sport-seam" d="M58 16 Q60 18 62 16" fill="none" stroke="#fff" stroke-width="0.8" opacity="0.7"/>
+              </g>
+              <g class="hero-orbit hero-orbit--b">
+                <circle class="hero-sport-ball hero-sport-ball--football" cx="96" cy="44" r="5"/>
+              </g>
+              <g class="hero-orbit hero-orbit--c">
+                <circle class="hero-sport-ball hero-sport-ball--basketball" cx="60" cy="70" r="5"/>
+                <path class="hero-sport-lines" d="M57 70 H63 M60 67 V73" stroke="#f59e0b" stroke-width="0.7" opacity="0.6"/>
+              </g>
+              <line class="hero-data-link" x1="60" y1="44" x2="60" y2="23" stroke="var(--accent-brand)" stroke-width="0.8" opacity="0.35"/>
+              <line class="hero-data-link hero-data-link--b" x1="60" y1="44" x2="91" y2="44" stroke="var(--accent-brand)" stroke-width="0.8" opacity="0.35"/>
+              <line class="hero-data-link hero-data-link--c" x1="60" y1="44" x2="60" y2="65" stroke="var(--accent-brand)" stroke-width="0.8" opacity="0.35"/>
+            </svg>
+          </div>
+          <p class="hero-tag">India’s largest AI-powered</p>
+          <h1 class="hero-title">Athlete Discovery &<br />Intelligence Marketplace</h1>
+          <p class="hero-sub hero-sub--splash">Verified identity · AI insights · Sponsorship workflows · Performance Insights</p>
+        </section>
+      </div>
+
+      <a href="#landing-content" class="hero-scroll-hint" aria-label="Scroll to explore">
+        <span class="hero-scroll-label">Scroll</span>
+        <span class="hero-scroll-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 5v14M5 12l7 7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </a>
     </section>
 
+    <div id="landing-content">
     <section class="landing-below-cards" aria-label="Brand visibility">
       <div class="landing-below-inner">
         <div class="landing-below-copy">
@@ -170,6 +207,7 @@
     <footer class="landing-footer">
       <p>Athlete Data Company · SaaS + AI + Marketplace · v1.1</p>
     </footer>
+    </div>
   </main>
 
   <!-- ═══════════════════════════════════════════════════════════════ -->

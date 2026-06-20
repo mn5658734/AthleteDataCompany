@@ -218,6 +218,149 @@ a.nav-top-pill {
   color: var(--text);
 }
 
+/* ─── Landing hero viewport (full screen) ─── */
+.hero-viewport {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 0%, rgba(0, 212, 170, 0.07), transparent),
+    radial-gradient(ellipse 50% 35% at 80% 60%, rgba(108, 159, 255, 0.05), transparent);
+}
+
+.landing-header--hero {
+  flex-shrink: 0;
+}
+
+.hero-viewport-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2rem 4rem;
+}
+
+.hero--splash {
+  padding: 0 2rem;
+}
+
+.hero-sub--splash {
+  margin-bottom: 0;
+}
+
+.hero-sports-anim {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  color: var(--accent);
+}
+
+.hero-sports-svg {
+  display: block;
+  overflow: visible;
+}
+
+.hero-pulse-ring {
+  transform-origin: 60px 44px;
+  animation: heroPulse 2.4s ease-out infinite;
+  opacity: 0;
+}
+
+.hero-pulse-ring--delay {
+  animation-delay: 1.2s;
+}
+
+@keyframes heroPulse {
+  0% { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.hero-orbit {
+  transform-origin: 60px 44px;
+}
+
+.hero-orbit--a { animation: heroOrbit 6s linear infinite; }
+.hero-orbit--b { animation: heroOrbit 8s linear infinite reverse; }
+.hero-orbit--c { animation: heroOrbit 7s linear infinite; animation-delay: -2s; }
+
+@keyframes heroOrbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.hero-sport-ball--cricket { fill: #dc2626; }
+.hero-sport-ball--football { fill: #fff; stroke: #334155; stroke-width: 0.6; }
+.hero-sport-ball--basketball { fill: #ea580c; }
+
+.hero-data-link {
+  transform-origin: 60px 44px;
+  animation: heroLinkPulse 2s ease-in-out infinite;
+}
+
+.hero-data-link--b { animation-delay: 0.35s; }
+.hero-data-link--c { animation-delay: 0.7s; }
+
+@keyframes heroLinkPulse {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.55; }
+}
+
+.hero-scroll-hint {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.hero-scroll-hint:hover {
+  color: var(--accent);
+}
+
+.hero-scroll-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hero-scroll-icon {
+  display: flex;
+  animation: heroScrollBounce 2s ease-in-out infinite;
+}
+
+@keyframes heroScrollBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.65; }
+  50% { transform: translateY(6px); opacity: 1; }
+}
+
+@media (max-height: 640px) {
+  .hero-viewport-body {
+    padding-bottom: 3.5rem;
+  }
+
+  .hero-title {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+  }
+
+  .hero-sports-anim {
+    margin-bottom: 0.75rem;
+    transform: scale(0.85);
+  }
+
+  .hero-scroll-hint {
+    bottom: 0.75rem;
+  }
+}
+
 .hero {
   max-width: 960px;
   margin: 0 auto;
