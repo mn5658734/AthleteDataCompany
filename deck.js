@@ -119,7 +119,7 @@
     if (index === 9 && !charts.funds) {
       var fundsWrap = slide.querySelectorAll('.diagram-wrap')[0];
       if (fundsWrap && !slide.querySelector('#funds-chart')) {
-        fundsWrap.innerHTML = '<canvas id="funds-chart" class="chart-canvas" height="280"></canvas>';
+        fundsWrap.innerHTML = '<canvas id="funds-chart" class="chart-canvas" height="225"></canvas>';
         var fctx = document.getElementById('funds-chart');
         if (fctx) {
           charts.funds = new Chart(fctx, {

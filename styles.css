@@ -190,6 +190,29 @@ a.nav-top-pill {
   color: var(--text);
 }
 
+.nav-btn-login {
+  margin-left: 1.5rem;
+  padding: 0.45rem 1rem;
+  border: 1px solid rgba(0, 212, 170, 0.45);
+  border-radius: 999px;
+  background: rgba(0, 212, 170, 0.08);
+  color: var(--accent);
+  font-family: var(--font);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.nav-btn-login:hover {
+  background: rgba(0, 212, 170, 0.16);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
 .nav-top-pill:focus {
   outline: none;
   color: var(--text);

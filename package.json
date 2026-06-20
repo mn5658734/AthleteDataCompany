@@ -1,6 +1,6 @@
 {
   "name": "athlete-data-company",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "AI-Powered Athlete Discovery & Intelligence Marketplace",
   "private": true,
   "scripts": {

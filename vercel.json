@@ -1,6 +1,8 @@
 {
   "rewrites": [
     { "source": "/deck", "destination": "/deck.html" },
-    { "source": "/deck/", "destination": "/deck.html" }
+    { "source": "/deck/", "destination": "/deck.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/login/", "destination": "/login.html" }
   ]
 }
