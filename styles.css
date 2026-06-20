@@ -253,12 +253,19 @@ a.nav-top-pill {
 .hero-hub-anim {
   display: flex;
   justify-content: center;
-  margin-bottom: 1.35rem;
+  margin-bottom: 3rem;
 }
 
 .hero-hub-svg {
   display: block;
   overflow: visible;
+  width: 252px;
+  height: 156px;
+}
+
+.hero--splash .hero-tag {
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
 }
 
 .hub-orbit-ring {
@@ -390,8 +397,16 @@ a.nav-top-pill {
   }
 
   .hero-hub-anim {
-    margin-bottom: 0.75rem;
-    transform: scale(0.88);
+    margin-bottom: 2rem;
+  }
+
+  .hero-hub-svg {
+    width: 210px;
+    height: 130px;
+  }
+
+  .hero--splash .hero-tag {
+    margin-top: 0.75rem;
   }
 
   .hero-scroll-hint {
