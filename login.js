@@ -102,5 +102,11 @@
     });
   }
 
-  setPersona(selectedPersona);
+  function getPersonaFromQuery() {
+    var match = /[?&]persona=([^&]+)/.exec(window.location.search);
+    return match ? decodeURIComponent(match[1]) : '';
+  }
+
+  var initialPersona = getPersonaFromQuery();
+  setPersona(PERSONA_REDIRECTS[initialPersona] ? initialPersona : 'athlete');
 })();

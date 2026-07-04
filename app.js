@@ -355,9 +355,9 @@
   function handlePersonaClick(e) {
     var btn = e.target.closest('[data-persona]');
     if (!btn) return;
+    e.preventDefault();
     var persona = btn.getAttribute('data-persona');
-    var start = PERSONA_START[persona];
-    if (start) showScreen(start);
+    window.location.href = '/login.html?persona=' + encodeURIComponent(persona);
   }
 
   function handleNextClick(e) {
