@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADC Pitch Deck V2 — Athlete Data Company</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="deck-v2.css" />
+</head>
+<body>
+<div class="deck-app">
+  <header class="deck-toolbar">
+    <div class="deck-toolbar-left">
+      <a href="/" class="deck-home-link" id="deck-home-link">← Home</a>
+      <span class="deck-badge-v2">DECK V2</span>
+    </div>
+    <div class="deck-toolbar-center">
+      <button type="button" class="deck-btn deck-btn-icon" id="deck-prev" aria-label="Previous">←</button>
+      <span class="deck-page-info" id="deck-page-info">1 / 12</span>
+      <button type="button" class="deck-btn deck-btn-icon" id="deck-next" aria-label="Next">→</button>
+    </div>
+    <div class="deck-toolbar-right">
+      <a href="/deck.html" class="deck-btn" title="View original deck (V1)">V1</a>
+      <button type="button" class="deck-btn" id="deck-print">Print</button>
+      <button type="button" class="deck-btn" id="deck-fullscreen">Fullscreen</button>
+    </div>
+  </header>
+  <div class="deck-stage">
+    <div class="deck-viewport" id="deck-viewport">
+
+<!-- Slide 1: Title -->
+<section class="slide slide-title active">
+  <div class="brand-lockup">
+    <span class="badge">Athlete Data Company</span>
+    <span class="badge badge-brand">Pre-Seed 2025</span>
+  </div>
+  <h1>The Data Layer for the Athlete Economy</h1>
+  <p class="subhead">A category-defining B2B intelligence platform. One data spine turns athlete performance, health, and social signals into brand-grade commercial intelligence — replacing gut feel with verified data.</p>
+  <p class="pull-quote">"We are building the Bloomberg terminal of the athlete economy."</p>
+  <div class="slide-footer">
+    <span>Confidential · Pre-Seed 2025</span>
+    <span class="slide-num">01 / 12</span>
+  </div>
+</section>
+
+<!-- Slide 2: The Insight / Problem (B2B focus) -->
+<section class="slide">
+  <p class="kicker">The Insight</p>
+  <h1>A $135B Industry Runs on Gut Feel</h1>
+  <p class="subhead">The athlete endorsement and sponsorship market runs on follower counts and spreadsheets. There is no centralized system to quantify an athlete's commercial value. This is not a gap — it is a market.</p>
+  <div class="cols-3">
+    <div class="col-card athletes">
+      <h3>5 questions no CMO can answer</h3>
+      <ul>
+        <li><strong>Brand fit</strong> — does this athlete match our audience?</li>
+        <li><strong>Longevity</strong> — will they still be relevant in 3 years?</li>
+        <li><strong>Audience quality</strong> — real reach or vanity followers?</li>
+      </ul>
+    </div>
+    <div class="col-card brands">
+      <h3>&nbsp;</h3>
+      <ul>
+        <li><strong>Market rate</strong> — what is a fair price for this deal?</li>
+        <li><strong>ROI</strong> — what return did the last campaign actually drive?</li>
+        <li>Decisions get made on gut feel — with no predictability.</li>
+      </ul>
+    </div>
+    <div class="col-card fans">
+      <h3>Who pays first</h3>
+      <ul>
+        <li><strong>Brand CMOs</strong> and sponsorship agencies buying certainty.</li>
+        <li>Federations mapping and monetizing their talent pipeline.</li>
+        <li>The commercial buyer — not the fan — is the wedge.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="insight-line">Brands, athletes, and federations all demonstrably lose money to fragmented silos — <strong>Catapult, OpenSponsorship, and agency spreadsheets don't talk to each other.</strong></p>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">02 / 12</span>
+  </div>
+</section>
+
+<!-- Slide 3: Team (moved earlier — establish founder authority) -->
+<section class="slide">
+  <p class="kicker">Team</p>
+  <h1>Structural Founder–Market Fit</h1>
+  <p class="subhead">The only team that has lived every side of this multi-sided problem — technical execution, elite athlete management, and federation operations.</p>
+  <div class="founder-grid">
+    <div class="founder-card">
+      <h3>Milan Nayak</h3>
+      <p class="founder-role">Founder &amp; CEO</p>
+      <div class="founder-tags"><span>Product Execution</span><span>AI / ML</span><span>SportsTrade Builder</span></div>
+      <ul>
+        <li>9+ yrs product leader — AI, SaaS, BFSI &amp; SportsTech</li>
+        <li>National-level athlete · builder by profession</li>
+        <li>Took SportsTrade from concept to ₹40L+ beta volume</li>
+      </ul>
+    </div>
+    <div class="founder-card">
+      <h3>Antriksh Jaiswal</h3>
+      <p class="founder-role">Co-founder</p>
+      <div class="founder-tags"><span>Pro Athlete</span><span>Elite Agency Management</span><span>Federation Operations</span></div>
+      <ul>
+        <li>Direct access to Tier-1 Indian Olympic athletes &amp; federations</li>
+        <li>15 years of institutional trust across the sports ecosystem</li>
+        <li>Owns the warm supply &amp; demand pipeline (Khelo India, IOS)</li>
+      </ul>
+    </div>
+  </div>
+  <p class="hire-note"><strong>Funded by this round:</strong> a Lead Data Engineer / AI architect to own the data spine — the technical heavy-hitter that de-risks execution.</p>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">03 / 12</span>
+  </div>
+</section>
+
+<!-- Slide 4: The Solution — One Data Spine (the billion-dollar slide) -->
+<section class="slide">
+  <p class="kicker">The Solution</p>
+  <h1>One Data Spine. Three Intelligence Products.</h1>
+  <div class="engines">
+    <div class="engine-card">
+      <h3>ADC Athlete Profile</h3>
+      <p>Verified digital identity — performance, longevity, and social signals quantified into a single investable score.</p>
+    </div>
+    <div class="engine-card">
+      <h3>Brand Intelligence SaaS</h3>
+      <p>Terminal access to brand-fit scoring and predictive ROI modelling. The core seed product for CMOs and agencies.</p>
+    </div>
+    <div class="engine-card">
+      <h3>Federation Dashboard</h3>
+      <p>Talent-pipeline mapping and commercial analytics for academies, federations, and state sporting bodies.</p>
+    </div>
+  </div>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 1168 168" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="One data spine architecture">
+      <!-- inputs -->
+      <text x="20" y="24" fill="#8b9cad" font-size="12" font-family="Outfit,sans-serif">Data inputs</text>
+      <g font-family="Outfit,sans-serif" font-size="13" fill="#e6edf3">
+        <rect x="20" y="34" width="190" height="26" rx="6" fill="#121922" stroke="#2a3544"/><text x="34" y="51">⚙ Performance Engine</text>
+        <rect x="20" y="66" width="190" height="26" rx="6" fill="#121922" stroke="#2a3544"/><text x="34" y="83">♥ Health &amp; Longevity</text>
+        <rect x="20" y="98" width="190" height="26" rx="6" fill="#121922" stroke="#2a3544"/><text x="34" y="115">💬 Social Scoring</text>
+        <rect x="20" y="130" width="190" height="26" rx="6" fill="#121922" stroke="#2a3544"/><text x="34" y="147">★ Expert Rating</text>
+      </g>
+      <!-- arrows to spine -->
+      <path d="M210 47 H470" stroke="#00d4aa" stroke-width="1.3"/>
+      <path d="M210 79 H470" stroke="#00d4aa" stroke-width="1.3"/>
+      <path d="M210 111 H470" stroke="#00d4aa" stroke-width="1.3"/>
+      <path d="M210 143 H470" stroke="#00d4aa" stroke-width="1.3"/>
+      <!-- spine -->
+      <rect x="470" y="30" width="14" height="128" rx="7" fill="#00d4aa"/>
+      <text x="500" y="97" fill="#00d4aa" font-size="15" font-family="Outfit,sans-serif" font-weight="700">The Spine</text>
+      <!-- arrows to products -->
+      <path d="M600 95 C 700 95, 760 51, 900 51" fill="none" stroke="#6c9fff" stroke-width="1.5"/>
+      <path d="M600 95 H900" fill="none" stroke="#6c9fff" stroke-width="1.5"/>
+      <path d="M600 95 C 700 95, 760 139, 900 139" fill="none" stroke="#6c9fff" stroke-width="1.5"/>
+      <g font-family="Outfit,sans-serif" font-size="13" font-weight="600" fill="#e6edf3">
+        <rect x="900" y="36" width="250" height="30" rx="6" fill="rgba(0,212,170,0.12)" stroke="#00d4aa"/><text x="916" y="55">ADC Athlete Profile</text>
+        <rect x="900" y="80" width="250" height="30" rx="6" fill="rgba(108,159,255,0.12)" stroke="#6c9fff"/><text x="916" y="99">Brand Intelligence SaaS</text>
+        <rect x="900" y="124" width="250" height="30" rx="6" fill="rgba(192,132,252,0.12)" stroke="#c084fc"/><text x="916" y="143">Federation Dashboard</text>
+      </g>
+    </svg>
+  </div>
+  <p class="spine-note"><strong>Data acquisition &amp; compliance:</strong> direct federation/academy integrations and athlete-consented wearables &amp; APIs, governed by a DPDPA-compliant data architecture. The dataset compounds with every athlete; the moat deepens with every deal.</p>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">04 / 12</span>
+  </div>
+</section>
+
+<!-- Slide 5: Why Now — 2025 Convergence -->
+<section class="slide">
+  <p class="kicker">Why Now</p>
+  <h1>The 2025 Convergence</h1>
+  <p class="subhead">Four structural shifts make this the exact — and only — window to build the data spine. None of these forces existed five years ago.</p>
+  <div class="conv-grid">
+    <div class="conv-card"><span class="conv-icon">🔩</span><div><h3>Data Maturity</h3><p>Wearables and open APIs are collapsing data-collection costs to near zero.</p></div></div>
+    <div class="conv-card"><span class="conv-icon">🌐</span><div><h3>NIL Globalization</h3><p>Athletes worldwide are demanding direct commercial control of their value.</p></div></div>
+    <div class="conv-card"><span class="conv-icon">📊</span><div><h3>Brand ROI Crisis</h3><p>44% of non-sports brands now demand hard data before sponsorship spend.</p></div></div>
+    <div class="conv-card"><span class="conv-icon">📍</span><div><h3>Unmapped Markets</h3><p>India &amp; the GCC are booming but completely undocumented — no data layer exists.</p></div></div>
+  </div>
+  <p class="insight-line">As data-collection costs <strong>collapse</strong> and brand demand for verified ROI <strong>climbs</strong>, the widening gap between the two is exactly where ADC's margin lives.</p>
+  <span class="window-chip">2025–2027 Founding Window</span>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">05 / 12</span>
+  </div>
+</section>
+
+<!-- Slide 6: Market — $20B wedge, India-first -->
+<section class="slide">
+  <p class="kicker">Market</p>
+  <h1>A $20B Wedge Into a $135B Industry</h1>
+  <p class="subhead">Entering at the point of maximum pain, in the fastest-growing geography. Start in grassroots India, expand to the GCC, then scale globally.</p>
+  <div class="split">
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 480 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TAM SAM SOM">
+        <circle cx="170" cy="125" r="118" fill="#1a2230" stroke="#2a3544"/>
+        <circle cx="170" cy="125" r="80" fill="#223042" stroke="#2a3544"/>
+        <circle cx="170" cy="125" r="42" fill="#00d4aa" opacity="0.85"/>
+        <text x="170" y="120" text-anchor="middle" fill="#0a0e14" font-size="12" font-family="Outfit,sans-serif" font-weight="700">India/GCC</text>
+        <text x="170" y="135" text-anchor="middle" fill="#0a0e14" font-size="11" font-family="Outfit,sans-serif" font-weight="700">$181M+</text>
+        <line x1="288" y1="40" x2="360" y2="40" stroke="#2a3544"/>
+        <text x="358" y="36" fill="#8b9cad" font-size="11" font-family="Outfit,sans-serif">Global Sports Tech</text>
+        <text x="358" y="50" fill="#e6edf3" font-size="12" font-family="Outfit,sans-serif" font-weight="600">$135B TAM</text>
+        <line x1="250" y1="90" x2="352" y2="112" stroke="#2a3544"/>
+        <text x="358" y="108" fill="#8b9cad" font-size="11" font-family="Outfit,sans-serif">Sports Analytics</text>
+        <text x="358" y="122" fill="#e6edf3" font-size="12" font-family="Outfit,sans-serif" font-weight="600">$20B SAM</text>
+        <line x1="205" y1="150" x2="352" y2="182" stroke="#00d4aa"/>
+        <text x="358" y="178" fill="#8b9cad" font-size="11" font-family="Outfit,sans-serif">India/GCC Wedge</text>
+        <text x="358" y="192" fill="#00d4aa" font-size="12" font-family="Outfit,sans-serif" font-weight="700">$181M+ SOM</text>
+      </svg>
+    </div>
+    <div>
+      <table>
+        <thead><tr><th>Horizon</th><th>Footprint</th><th>ARR</th></tr></thead>
+        <tbody>
+          <tr><td>Year 1 · India</td><td>2K athletes · 15 brands</td><td><strong>₹1–2 Cr</strong></td></tr>
+          <tr><td>Year 2 · India + GCC</td><td>10K athletes</td><td><strong>₹5–8 Cr</strong></td></tr>
+          <tr><td>Year 3 · Scale</td><td>50K athletes</td><td><strong>₹15–25 Cr</strong></td></tr>
+        </tbody>
+      </table>
+      <p class="insight-line"><strong>Entry wedge:</strong> grassroots Indian sports — the fastest-growing geography, and completely devoid of a data layer. SOM focused on Indian brands &amp; agencies.</p>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">06 / 12</span>
+  </div>
+</section>
+
+<!-- Slide 7: Pipeline & Proof of Concept (traction rewrite) -->
+<section class="slide">
+  <p class="kicker">Traction</p>
+  <h1>We Are Not Starting From Zero</h1>
+  <p class="subhead">Our unfair advantage at Pre-Seed is distribution. 15 years of institutional trust means we acquire athlete supply and brand demand without cold outreach — the B2B network is already active.</p>
+  <div class="pipe-grid">
+    <div class="pipe-col supply">
+      <h3>Data &amp; Supply Pipeline</h3>
+      <div class="pipe-item"><div class="pi-title">Elite Athlete Network</div><div class="pi-desc">Onboarding access to India's top Olympic-tier athletes (Mary Kom, Manu Bhaker, Mirabai Chanu) via management relationships.</div></div>
+      <div class="pipe-item"><div class="pi-title">Institutional Federations</div><div class="pi-desc">Active integration talks with Special Olympics Bharat, Khelo India, and state-level sporting bodies.</div></div>
+      <div class="pipe-item"><div class="pi-title">Research Validation</div><div class="pi-desc">Direct conduit to IIT Madras CESSA for biometric data validation and algorithmic auditing.</div></div>
+    </div>
+    <div class="pipe-col demand">
+      <h3>Brand Demand Pipeline</h3>
+      <div class="pipe-item"><div class="pi-title">IndiVox Brand Network</div><div class="pi-desc">Active mandates with 10+ endemic and non-endemic brands ready to pilot the ADC Brand Dashboard.</div></div>
+      <div class="pipe-item"><div class="pi-title">First 5 Customers</div><div class="pi-desc">Targeted LOIs from regional federations seeking talent-pipeline mapping.</div></div>
+      <p class="signal-strip">Demand signal, validated: SportsTrade beta moved <strong>₹40L+</strong> in real-money volume across <strong>800+</strong> users at an <strong>85 NPS</strong> — proof that verified athlete outcomes move money.</p>
+    </div>
+  </div>
+  <p class="validation-metric">We do not need to buy our first 2,000 athletes or 10 brands — they are already in our network.</p>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">07 / 12</span>
+  </div>
+</section>
+
+<!-- Slide 8: Business Model — 2 core streams -->
+<section class="slide">
+  <p class="kicker">Business Model</p>
+  <h1>Core Monetisation at Seed. Infrastructure at Scale.</h1>
+  <p class="subhead">We charge for access to intelligence that reduces commercial risk. At the Seed stage, we are ruthlessly focused on two revenue streams.</p>
+  <div class="split">
+    <div>
+      <div class="stream-grid">
+        <div class="stream-card">
+          <h3>1 · Brand Intelligence SaaS</h3>
+          <ul>
+            <li><strong>Who pays:</strong> Brand CMOs &amp; sponsorship agencies</li>
+            <li><strong>Product:</strong> athlete brand-fit scoring &amp; predictive ROI modelling</li>
+            <li><strong>Unit economics:</strong> ₹15K–25K / year per brand seat · 80%+ gross margin</li>
+          </ul>
+        </div>
+        <div class="stream-card">
+          <h3>2 · Deal Intelligence Commission</h3>
+          <ul>
+            <li><strong>Who pays:</strong> brands executing deals via the ADC engine</li>
+            <li><strong>Product:</strong> data-backed athlete endorsement contracting</li>
+            <li><strong>Unit economics:</strong> 10–20% take rate (₹50K–10L per deal)</li>
+          </ul>
+        </div>
+      </div>
+      <p class="phase3-box"><strong>Phase 3 infrastructure play (Series A+):</strong> once the dataset achieves liquidity (50,000+ athletes), ADC becomes an API layer — per-query access for third-party platforms, fantasy leagues, and scouting desks building on our data spine.</p>
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Compounding flywheel">
+        <text x="160" y="18" text-anchor="middle" fill="#8b9cad" font-size="12" font-family="Outfit,sans-serif">The compounding flywheel · 80%+ margins</text>
+        <circle cx="160" cy="160" r="92" fill="none" stroke="#2a3544" stroke-width="2" stroke-dasharray="5 5"/>
+        <g font-family="Outfit,sans-serif" font-size="13" fill="#e6edf3" text-anchor="middle">
+          <text x="160" y="60">Richer Data</text>
+          <text x="270" y="164">Better Brand<tspan x="270" dy="16">Matching</tspan></text>
+          <text x="160" y="270">More Brand Revenue</text>
+          <text x="52" y="164">More Athletes<tspan x="52" dy="16">Join</tspan></text>
+        </g>
+        <g fill="none" stroke="#00d4aa" stroke-width="2">
+          <path d="M196 74 A92 92 0 0 1 244 128" marker-end="url(#a2)"/>
+          <path d="M244 192 A92 92 0 0 1 196 246" marker-end="url(#a2)"/>
+          <path d="M124 246 A92 92 0 0 1 76 192" marker-end="url(#a2)"/>
+          <path d="M76 128 A92 92 0 0 1 124 74" marker-end="url(#a2)"/>
+        </g>
+        <defs><marker id="a2" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#00d4aa"/></marker></defs>
+      </svg>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">08 / 12</span>
+  </div>
+</section>
+
+<!-- Slide 9: Competition — Category Creation -->
+<section class="slide">
+  <p class="kicker">Competition</p>
+  <h1>Category Creation, Not Disruption</h1>
+  <p class="subhead">No single player has built the multi-layer intelligence spine. Incumbents own one slice; none connect athlete data, brand demand, and predictive ROI.</p>
+  <div class="split">
+    <div>
+      <table class="matrix-table">
+        <thead>
+          <tr><th>Capability</th><th class="adc-col">ADC</th><th>Catapult</th><th>Open&shy;Sponsorship</th><th>Wasserman / CAA</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>On-field data</td><td class="adc-col check-yes">✅</td><td class="check-yes">✅</td><td class="check-no">❌</td><td class="check-no">❌</td></tr>
+          <tr><td>Longevity modelling</td><td class="adc-col check-yes">✅</td><td class="check-partial">⚠</td><td class="check-no">❌</td><td class="check-no">❌</td></tr>
+          <tr><td>AI matching</td><td class="adc-col check-yes">✅</td><td class="check-no">❌</td><td class="check-partial">⚠</td><td class="check-no">❌</td></tr>
+          <tr><td>Grassroots focus</td><td class="adc-col check-yes">✅</td><td class="check-no">❌</td><td class="check-partial">⚠</td><td class="check-no">❌</td></tr>
+          <tr><td>Predictive ROI</td><td class="adc-col check-yes">✅</td><td class="check-no">❌</td><td class="check-partial">⚠</td><td class="check-partial">⚠</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 420 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Positioning quadrant">
+        <line x1="40" y1="20" x2="40" y2="210" stroke="#2a3544"/>
+        <line x1="40" y1="210" x2="400" y2="210" stroke="#2a3544"/>
+        <line x1="220" y1="20" x2="220" y2="210" stroke="#2a3544" stroke-dasharray="4 4"/>
+        <line x1="40" y1="115" x2="400" y2="115" stroke="#2a3544" stroke-dasharray="4 4"/>
+        <text x="220" y="234" text-anchor="middle" fill="#8b9cad" font-size="11" font-family="Outfit,sans-serif">Data depth (single → multi-layer)</text>
+        <text x="18" y="115" text-anchor="middle" fill="#8b9cad" font-size="11" font-family="Outfit,sans-serif" transform="rotate(-90 18 115)">Geography (US → India-native)</text>
+        <circle cx="350" cy="55" r="9" fill="#00d4aa"/>
+        <text x="350" y="42" text-anchor="middle" fill="#00d4aa" font-size="12" font-family="Outfit,sans-serif" font-weight="700">ADC</text>
+        <circle cx="120" cy="150" r="6" fill="#8b9cad"/><text x="120" y="172" text-anchor="middle" fill="#8b9cad" font-size="9" font-family="Outfit,sans-serif">Catapult</text>
+        <circle cx="165" cy="120" r="6" fill="#8b9cad"/><text x="165" y="105" text-anchor="middle" fill="#8b9cad" font-size="9" font-family="Outfit,sans-serif">OpenSpons.</text>
+        <circle cx="95" cy="185" r="6" fill="#8b9cad"/><text x="95" y="200" text-anchor="middle" fill="#8b9cad" font-size="9" font-family="Outfit,sans-serif">Wasserman</text>
+      </svg>
+    </div>
+  </div>
+  <p class="moat">First-mover advantage in unmapped geographies builds an impossible-to-replicate data moat — the spine deepens with every athlete and every deal.</p>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">09 / 12</span>
+  </div>
+</section>
+
+<!-- Slide 10: Roadmap — 18-Month Execution -->
+<section class="slide">
+  <p class="kicker">Roadmap</p>
+  <h1>18-Month Execution Roadmap</h1>
+  <p class="subhead">This round buys 18 months of runway to prove the data spine works in the fastest-growing geography: India. We dominate the Indian ecosystem before deploying capital into the GCC.</p>
+  <div class="phase-grid">
+    <div class="phase-card">
+      <div class="phase-name">Phase 1 · Supply Foundation</div>
+      <div class="phase-months">Months 1–6</div>
+      <ul>
+        <li><strong>Build:</strong> MVP Data Spine &amp; Athlete Profile</li>
+        <li><strong>Acquire:</strong> 1,000 verified athletes via academy/federation network</li>
+        <li><strong>Metric:</strong> 3 Federation pilot LOIs secured</li>
+      </ul>
+    </div>
+    <div class="phase-card">
+      <div class="phase-name">Phase 2 · Monetisation &amp; PMF</div>
+      <div class="phase-months">Months 7–12</div>
+      <ul>
+        <li><strong>Build:</strong> Brand Dashboard Beta &amp; AI Brand-Matching v1</li>
+        <li><strong>Acquire:</strong> first 10 paying brand clients via IndiVox network</li>
+        <li><strong>Metric:</strong> ₹25L–50L ARR</li>
+      </ul>
+    </div>
+    <div class="phase-card">
+      <div class="phase-name">Phase 3 · Scale to Series A</div>
+      <div class="phase-months">Months 13–18</div>
+      <ul>
+        <li><strong>Build:</strong> deal-flow automation &amp; full data-compliance audits</li>
+        <li><strong>Acquire:</strong> 5,000+ athletes, 30+ brand clients</li>
+        <li><strong>Metric:</strong> ₹1.5–2 Cr ARR · demonstrated cohort retention</li>
+      </ul>
+    </div>
+  </div>
+  <div class="diagram-wrap diagram-wrap--timeline">
+    <svg viewBox="0 0 1168 44" xmlns="http://www.w3.org/2000/svg">
+      <line x1="40" y1="22" x2="1128" y2="22" stroke="#2a3544" stroke-width="2"/>
+      <circle cx="200" cy="22" r="8" fill="#00d4aa"/>
+      <circle cx="584" cy="22" r="8" fill="#6c9fff"/>
+      <circle cx="968" cy="22" r="10" fill="#c084fc" stroke="#00d4aa" stroke-width="2"/>
+      <text x="200" y="42" text-anchor="middle" fill="#8b9cad" font-size="10" font-family="Outfit,sans-serif">M6 · 1,000 athletes</text>
+      <text x="584" y="42" text-anchor="middle" fill="#8b9cad" font-size="10" font-family="Outfit,sans-serif">M12 · ₹25–50L ARR</text>
+      <text x="968" y="42" text-anchor="middle" fill="#c084fc" font-size="10" font-family="Outfit,sans-serif" font-weight="600">M18 · ₹1.5–2 Cr ARR · Series A ready</text>
+    </svg>
+  </div>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">10 / 12</span>
+  </div>
+</section>
+
+<!-- Slide 11: The Ask — Pre-Seed -->
+<section class="slide">
+  <p class="kicker">The Ask</p>
+  <h1>₹1.5 Cr Pre-Seed for 10% Equity</h1>
+  <p class="ask-hero">Funding the core infrastructure and initial liquidity in India — capital matched directly to India-only MVP milestones.</p>
+  <div class="split">
+    <div>
+      <table>
+        <thead><tr><th>Allocation</th><th>Amount</th><th>Primary output</th></tr></thead>
+        <tbody>
+          <tr><td>Engineering &amp; AI Build</td><td><strong>₹60L · 40%</strong></td><td>Lead Data Engineer, AI Engine v1, DPDPA data architecture</td></tr>
+          <tr><td>GTM &amp; Supply Acquisition</td><td><strong>₹60L · 40%</strong></td><td>Federation integrations, brand pilot conversions</td></tr>
+          <tr><td>Ops &amp; Legal Compliance</td><td><strong>₹30L · 20%</strong></td><td>Privacy-compliance framework, core operations</td></tr>
+        </tbody>
+      </table>
+      <div class="diagram-wrap diagram-wrap--funds" style="margin-top:14px;padding:10px 14px">
+        <svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Use of funds" style="max-height:130px">
+          <circle cx="65" cy="65" r="42" fill="none" stroke="#00d4aa" stroke-width="18" stroke-dasharray="105.6 263.9" transform="rotate(-90 65 65)"/>
+          <circle cx="65" cy="65" r="42" fill="none" stroke="#6c9fff" stroke-width="18" stroke-dasharray="105.6 263.9" stroke-dashoffset="-105.6" transform="rotate(-90 65 65)"/>
+          <circle cx="65" cy="65" r="42" fill="none" stroke="#c084fc" stroke-width="18" stroke-dasharray="52.8 263.9" stroke-dashoffset="-211.2" transform="rotate(-90 65 65)"/>
+          <text x="65" y="62" text-anchor="middle" fill="#e6edf3" font-size="13" font-family="Outfit,sans-serif" font-weight="600">₹1.5 Cr</text>
+          <text x="65" y="78" text-anchor="middle" fill="#8b9cad" font-size="10" font-family="Outfit,sans-serif">Pre-Seed</text>
+          <g font-family="Outfit,sans-serif" font-size="11" fill="#8b9cad">
+            <rect x="138" y="28" width="10" height="10" fill="#00d4aa"/><text x="154" y="37">40% Engineering &amp; AI</text>
+            <rect x="138" y="58" width="10" height="10" fill="#6c9fff"/><text x="154" y="67">40% GTM &amp; Supply</text>
+            <rect x="138" y="88" width="10" height="10" fill="#c084fc"/><text x="154" y="97">20% Ops &amp; Legal</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div>
+      <h3>What this round achieves — the Series A milestones</h3>
+      <ul class="achieve-list">
+        <li><strong>₹1.5 Cr ARR</strong> in predictable SaaS + commission revenue</li>
+        <li><strong>5,000+ verified athletes</strong> locked into the data spine</li>
+        <li><strong>30+ brand clients</strong> actively relying on ADC for deal intelligence</li>
+        <li><strong>Proven unit economics</strong> in India — ready for GCC expansion capital</li>
+      </ul>
+      <p class="partner-note">Beyond capital, we are looking for partners with B2B SaaS and data-infrastructure expertise who can accelerate our brand-side pipeline.</p>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>Athlete Data Company</span>
+    <span class="slide-num">11 / 12</span>
+  </div>
+</section>
+
+<!-- Slide 12: Close -->
+<section class="slide slide-close">
+  <p class="kicker">Thank You</p>
+  <h1>Join Us in Building the Athlete Economy</h1>
+  <div class="close-details">
+    <strong>Milan Nayak</strong> &amp; <strong>Antriksh Jaiswal</strong> · Athlete Data Company<br />
+    <strong>Product:</strong> sportstrade.world · Live prototype demo available
+  </div>
+  <div class="cta-bar">Let's Talk · Pre-Seed Open · Demo on Request</div>
+  <p class="vision-recap">The Bloomberg terminal of the athlete economy — turning verified athlete data into brand-grade commercial intelligence, one data spine for brands, athletes, and federations.</p>
+  <div class="slide-footer">
+    <span>ADC Intelligence — Rebuilt on IC Feedback</span>
+    <span class="slide-num">12 / 12</span>
+  </div>
+</section>
+
+    </div>
+  </div>
+</div>
+<script src="deck-v2.js"></script>
+</body>
+</html>
