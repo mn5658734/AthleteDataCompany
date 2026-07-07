@@ -483,6 +483,8 @@
     if (isLanding) {
       if (journeyPersonaLabel) journeyPersonaLabel.textContent = '';
       if (journeyBreadcrumb) journeyBreadcrumb.textContent = '';
+      renderSidebar('landing');
+      setMobileSidebarOpen(false);
       var homeUrl = '/';
       if (window.location.pathname !== homeUrl || window.location.hash || window.location.search) {
         window.history.replaceState(null, '', homeUrl);
