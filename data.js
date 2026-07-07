@@ -60,7 +60,7 @@
     { id: 50, rank: 50, name: 'SN Thakur', initials: 'ST', sport: 'Cricket', league: 'IPL 2026', role: 'Batsman', age: 27, region: 'PAN India', gender: 'Male', perf: 50, social: 45, verified: true, growth: 'Emerging', budget: '₹1–5L', team: 'Mumbai Indians', teamShort: 'MI', matches: 9, pom: 1, wins: 2, winRate: 22.2 },
   ];
 
-  var STORAGE_KEYS = { shortlist: 'adc_shortlist', athleteProfile: 'adc_athlete_profile', brandProfile: 'adc_brand_profile' };
+  var STORAGE_KEYS = { shortlist: 'adc_shortlist', athleteProfile: 'adc_athlete_profile', brandProfile: 'adc_brand_profile', requests: 'adc_requests' };
 
   function getAthletes(filters) {
     filters = filters || {};
@@ -127,6 +127,38 @@
     return getShortlist().indexOf(parseInt(id, 10)) !== -1;
   }
 
+  /* ─── Sponsorship requests (proposals sent by brands to athletes) ─── */
+  function getSponsorshipRequests() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEYS.requests);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function setSponsorshipRequests(list) {
+    try {
+      localStorage.setItem(STORAGE_KEYS.requests, JSON.stringify(list));
+    } catch (e) {}
+  }
+
+  function addSponsorshipRequest(req) {
+    var list = getSponsorshipRequests();
+    req.id = 'req-' + Date.now();
+    req.createdAt = new Date().toISOString();
+    if (!req.status) req.status = 'Under review';
+    list.unshift(req);
+    setSponsorshipRequests(list);
+    return req;
+  }
+
+  function updateSponsorshipRequestStatus(id, status) {
+    var list = getSponsorshipRequests().map(function (r) {
+      if (r.id === id) r.status = status;
+      return r;
+    });
+    setSponsorshipRequests(list);
+  }
+
   global.ADC_DATA = {
     getAthletes: getAthletes,
     getTopAthletes: getTopAthletes,
@@ -136,6 +168,9 @@
     addToShortlist: addToShortlist,
     removeFromShortlist: removeFromShortlist,
     isInShortlist: isInShortlist,
+    getSponsorshipRequests: getSponsorshipRequests,
+    addSponsorshipRequest: addSponsorshipRequest,
+    updateSponsorshipRequestStatus: updateSponsorshipRequestStatus,
     IPL_META: IPL_META,
     ATHLETES: ATHLETES
   };

@@ -1243,6 +1243,212 @@ a.nav-top-pill {
   font-family: var(--font-mono);
 }
 
+.journey-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  line-height: 1;
+}
+
+/* ─── Persona side navigation ─── */
+.journey-sidebar {
+  display: none;
+  position: fixed;
+  top: 56px;
+  left: 0;
+  bottom: 0;
+  width: 236px;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  padding: 1.25rem 0.85rem;
+  overflow-y: auto;
+  z-index: 90;
+}
+
+.journey-sidebar.journey-sidebar--visible { display: block; }
+
+.journey-sidebar-group-label {
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  padding: 0 0.65rem;
+  margin-bottom: 0.6rem;
+}
+
+.journey-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.6rem 0.7rem;
+  margin-bottom: 0.2rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.journey-nav-item:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.journey-nav-item.journey-nav-item--active {
+  background: rgba(0, 212, 170, 0.14);
+  color: var(--accent);
+}
+
+.journey-nav-item .journey-nav-icon {
+  font-size: 1.05rem;
+  width: 1.4rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.journey-nav-item .journey-nav-badge {
+  margin-left: auto;
+  background: var(--accent);
+  color: #0a0e14;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.35rem;
+}
+
+.journey-sidebar-scrim {
+  display: none;
+  position: fixed;
+  inset: 56px 0 0 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 85;
+}
+
+/* Shift journey content right to make room for the sidebar */
+body.has-sidebar .journey-screen.active { padding-left: 236px; }
+
+/* ─── Requests list (sponsorship / brand requests / shortlist) ─── */
+.requests-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.requests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.request-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+}
+
+.request-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.request-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.request-card-sub {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin: 0.15rem 0 0;
+}
+
+.request-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.6rem 1.25rem;
+  margin-bottom: 0.85rem;
+}
+
+.request-meta-item .rm-label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.15rem;
+}
+
+.request-meta-item .rm-value {
+  font-size: 0.9rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.request-status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.request-status--review { background: rgba(108, 159, 255, 0.16); color: #6c9fff; }
+.request-status--negotiation { background: rgba(240, 180, 41, 0.16); color: #f0b429; }
+.request-status--accepted { background: rgba(0, 212, 170, 0.16); color: var(--accent); }
+.request-status--rejected { background: rgba(255, 107, 107, 0.16); color: #ff6b6b; }
+
+.request-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.requests-empty {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 900px) {
+  .journey-menu-toggle { display: inline-block; }
+  body.has-sidebar .journey-screen.active { padding-left: 0; }
+  .journey-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    width: 260px;
+    box-shadow: 2px 0 18px rgba(0, 0, 0, 0.35);
+  }
+  .journey-sidebar.journey-sidebar--visible { display: block; }
+  .journey-sidebar.journey-sidebar--open { transform: translateX(0); }
+  .journey-sidebar-scrim.journey-sidebar-scrim--open { display: block; }
+}
+
 /* ─── Journey screens common ─── */
 .screen-inner {
   max-width: 720px;

@@ -255,12 +255,17 @@
   <!-- GLOBAL TOP BAR (for journey screens) -->
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <header class="journey-header" id="journey-header">
+    <button type="button" class="journey-menu-toggle" id="journey-menu-toggle" aria-label="Toggle menu">☰</button>
     <button type="button" class="back-to-landing" data-nav="landing" aria-label="Back to home">
       ← Home
     </button>
     <span class="journey-persona" id="journey-persona-label"></span>
     <div class="journey-breadcrumb" id="journey-breadcrumb"></div>
   </header>
+
+  <!-- Persona side navigation (populated by app.js) -->
+  <aside class="journey-sidebar" id="journey-sidebar" aria-label="Persona navigation"></aside>
+  <div class="journey-sidebar-scrim" id="journey-sidebar-scrim" hidden></div>
 
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <!-- ATHLETE JOURNEY -->
@@ -476,6 +481,14 @@
     </div>
   </section>
 
+  <section id="screen-athlete-requests" class="screen journey-screen">
+    <div class="screen-inner dashboard-screen">
+      <h1>Sponsorship Requests</h1>
+      <p class="screen-desc">Proposals sent to you by brands and agencies. Accept, negotiate, or reject each request.</p>
+      <div class="requests-list" id="athlete-requests-list" data-role="athlete"></div>
+    </div>
+  </section>
+
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <!-- SPORTS CONTENT CREATOR JOURNEY -->
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -681,6 +694,14 @@
       <div class="form-actions">
         <button type="button" class="btn-secondary" data-next="creator-profile">← Edit profile</button>
       </div>
+    </div>
+  </section>
+
+  <section id="screen-creator-requests" class="screen journey-screen">
+    <div class="screen-inner dashboard-screen">
+      <h1>Brand Requests</h1>
+      <p class="screen-desc">Collaboration and sponsored-content briefs sent to you by brands. Accept, negotiate, or reject.</p>
+      <div class="requests-list" id="creator-requests-list" data-role="creator"></div>
     </div>
   </section>
 
@@ -943,21 +964,27 @@
       <h1>Create sponsorship proposal</h1>
       <p class="screen-desc">Define campaign duration, deliverables, and budget. Athlete can Accept / Negotiate / Reject.</p>
       <form class="proto-form">
-        <div class="form-row">
-          <label>Athlete</label>
-          <input type="text" value="Rahul K." readonly class="readonly" />
+        <div class="form-row two-cols">
+          <div>
+            <label>Athlete</label>
+            <input type="text" id="proposal-athlete" value="" readonly class="readonly" placeholder="Select an athlete from Discovery" />
+          </div>
+          <div>
+            <label>Brand / campaign name</label>
+            <input type="text" id="proposal-brand" placeholder="e.g. Energy Drink Co. · IPL 2026" />
+          </div>
         </div>
         <div class="form-row">
           <label>Campaign duration</label>
-          <input type="text" placeholder="e.g. 6 months" />
+          <input type="text" id="proposal-duration" placeholder="e.g. 6 months" />
         </div>
         <div class="form-row">
           <label>Deliverables</label>
-          <textarea placeholder="Social posts, events, jersey branding, etc."></textarea>
+          <textarea id="proposal-deliverables" placeholder="Social posts, events, jersey branding, etc."></textarea>
         </div>
         <div class="form-row">
           <label>Budget</label>
-          <input type="text" placeholder="Amount (₹)" />
+          <input type="text" id="proposal-budget" placeholder="Amount (₹)" />
         </div>
         <div class="form-row">
           <label>Attach documents</label>
@@ -965,7 +992,7 @@
         </div>
         <div class="form-actions">
           <button type="button" class="btn-secondary" data-next="brand-inquiry">← Back</button>
-          <button type="button" class="btn-primary" data-next="brand-discovery">Submit proposal →</button>
+          <button type="button" class="btn-primary" id="btn-submit-proposal">Submit proposal →</button>
         </div>
       </form>
       <div class="status-timeline">
@@ -978,6 +1005,27 @@
           <li><span class="dot"></span> Closed</li>
         </ul>
       </div>
+    </div>
+  </section>
+
+  <section id="screen-brand-requests" class="screen journey-screen">
+    <div class="screen-inner dashboard-screen">
+      <div class="requests-header">
+        <div>
+          <h1>Sponsorship Requests</h1>
+          <p class="screen-desc">Every proposal you send is tracked here with full campaign details and live status.</p>
+        </div>
+        <button type="button" class="btn-primary" data-next="brand-discovery">+ New from Discovery</button>
+      </div>
+      <div class="requests-list" id="brand-requests-list" data-role="brand"></div>
+    </div>
+  </section>
+
+  <section id="screen-brand-shortlist" class="screen journey-screen">
+    <div class="screen-inner dashboard-screen">
+      <h1>Shortlist</h1>
+      <p class="screen-desc">Athletes you saved from Discovery. Open a profile to send an inquiry or proposal.</p>
+      <div class="requests-list" id="brand-shortlist-list" data-role="shortlist"></div>
     </div>
   </section>
 

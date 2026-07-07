@@ -7,11 +7,50 @@
   var PERSONA_START = { athlete: 'athlete-register', brand: 'brand-register', admin: 'admin-login', creator: 'creator-register' };
   var PERSONA_LABELS = { athlete: 'Athlete', brand: 'Brand / Agency', admin: 'Admin', creator: 'Sports Content Creator' };
   var BREADCRUMBS = {
-    'athlete-register': 'Registration', 'athlete-profile': 'Profile', 'athlete-dashboard': 'Dashboard',
-    'creator-register': 'Registration', 'creator-profile': 'Profile', 'creator-dashboard': 'Dashboard',
+    'athlete-register': 'Registration', 'athlete-profile': 'Profile', 'athlete-dashboard': 'Dashboard', 'athlete-requests': 'Sponsorship requests',
+    'creator-register': 'Registration', 'creator-profile': 'Profile', 'creator-dashboard': 'Dashboard', 'creator-requests': 'Brand requests',
     'brand-register': 'Registration', 'brand-discovery': 'Discovery', 'brand-athlete-profile': 'Athlete profile',
-    'brand-inquiry': 'Send inquiry', 'brand-proposal': 'Create proposal',
+    'brand-inquiry': 'Send inquiry', 'brand-proposal': 'Create proposal', 'brand-requests': 'Sponsorship requests', 'brand-shortlist': 'Shortlist',
     'admin-login': 'Login', 'admin-athlete-governance': 'Athlete governance', 'admin-brand-governance': 'Brand governance', 'admin-revenue': 'Revenue dashboard'
+  };
+
+  // Left-hand navigation menu per persona. `badge:` keys pull a live count.
+  var NAV_MENUS = {
+    athlete: {
+      label: 'Athlete',
+      items: [
+        { icon: '📊', label: 'Dashboard', screen: 'athlete-dashboard' },
+        { icon: '👤', label: 'My Profile', screen: 'athlete-profile' },
+        { icon: '🤝', label: 'Sponsorship Requests', screen: 'athlete-requests', badge: 'athlete-requests' },
+        { icon: '📝', label: 'Registration', screen: 'athlete-register' }
+      ]
+    },
+    creator: {
+      label: 'Content Creator',
+      items: [
+        { icon: '📊', label: 'Dashboard', screen: 'creator-dashboard' },
+        { icon: '👤', label: 'My Profile', screen: 'creator-profile' },
+        { icon: '🤝', label: 'Brand Requests', screen: 'creator-requests', badge: 'creator-requests' },
+        { icon: '📝', label: 'Registration', screen: 'creator-register' }
+      ]
+    },
+    brand: {
+      label: 'Brand / Agency',
+      items: [
+        { icon: '🔍', label: 'Athlete Discovery', screen: 'brand-discovery' },
+        { icon: '🤝', label: 'Sponsorship Requests', screen: 'brand-requests', badge: 'brand-requests' },
+        { icon: '⭐', label: 'Shortlist', screen: 'brand-shortlist', badge: 'shortlist' },
+        { icon: '🏢', label: 'Account', screen: 'brand-register' }
+      ]
+    },
+    admin: {
+      label: 'Admin Console',
+      items: [
+        { icon: '🛡️', label: 'Athlete Governance', screen: 'admin-athlete-governance' },
+        { icon: '🏢', label: 'Brand Governance', screen: 'admin-brand-governance' },
+        { icon: '💹', label: 'Revenue Dashboard', screen: 'admin-revenue' }
+      ]
+    }
   };
 
   var ATHLETE_SPORT_ROLES = {
@@ -282,6 +321,157 @@
     if (inquiryTo) inquiryTo.value = athlete.name + ' (' + (athlete.teamShort || athlete.team || athlete.sport) + ' · ' + athlete.role + ')';
   }
 
+  function getBadgeCount(key) {
+    if (!window.ADC_DATA) return 0;
+    if (key === 'shortlist') return window.ADC_DATA.getShortlist().length;
+    var reqs = window.ADC_DATA.getSponsorshipRequests();
+    if (key === 'brand-requests') return reqs.length;
+    if (key === 'athlete-requests' || key === 'creator-requests') {
+      var target = key === 'athlete-requests' ? 'athlete' : 'creator';
+      return reqs.filter(function (r) { return (r.target || 'athlete') === target; }).length;
+    }
+    return 0;
+  }
+
+  function renderSidebar(screenId) {
+    var sidebar = document.getElementById('journey-sidebar');
+    if (!sidebar) return;
+    var persona = getPersonaForScreen(screenId);
+    var menu = persona && NAV_MENUS[persona];
+    document.body.classList.toggle('has-sidebar', !!menu);
+    if (!menu) {
+      sidebar.classList.remove('journey-sidebar--visible', 'journey-sidebar--open');
+      return;
+    }
+    sidebar.classList.add('journey-sidebar--visible');
+    var html = '<div class="journey-sidebar-group-label">' + menu.label + '</div>';
+    html += menu.items.map(function (item) {
+      var active = item.screen === screenId ? ' journey-nav-item--active' : '';
+      var badge = '';
+      if (item.badge) {
+        var count = getBadgeCount(item.badge);
+        if (count > 0) badge = '<span class="journey-nav-badge">' + count + '</span>';
+      }
+      return '<button type="button" class="journey-nav-item' + active + '" data-nav="' + item.screen + '">' +
+        '<span class="journey-nav-icon">' + item.icon + '</span>' +
+        '<span class="journey-nav-text">' + item.label + '</span>' + badge +
+        '</button>';
+    }).join('');
+    sidebar.innerHTML = html;
+  }
+
+  function setMobileSidebarOpen(open) {
+    var sidebar = document.getElementById('journey-sidebar');
+    var scrim = document.getElementById('journey-sidebar-scrim');
+    if (sidebar) sidebar.classList.toggle('journey-sidebar--open', open);
+    if (scrim) {
+      scrim.classList.toggle('journey-sidebar-scrim--open', open);
+      scrim.hidden = !open;
+    }
+  }
+
+  function statusClass(status) {
+    var s = (status || '').toLowerCase();
+    if (s.indexOf('negoti') !== -1) return 'request-status--negotiation';
+    if (s.indexOf('accept') !== -1 || s.indexOf('approv') !== -1) return 'request-status--accepted';
+    if (s.indexOf('reject') !== -1) return 'request-status--rejected';
+    return 'request-status--review';
+  }
+
+  function escapeHtml(str) {
+    return String(str == null ? '' : str).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+
+  function buildRequestCardHtml(req, role) {
+    var title = role === 'brand'
+      ? (req.athlete || 'Athlete')
+      : (req.brand || 'Brand / Agency');
+    var sub = role === 'brand'
+      ? ('Campaign: ' + (req.brand || '—'))
+      : ('Proposal for: ' + (req.athlete || 'you'));
+    var dateLabel = req.createdAt ? new Date(req.createdAt).toLocaleDateString() : '';
+    var actions = '';
+    if (role !== 'brand') {
+      actions = '<div class="request-actions">' +
+        '<button type="button" class="btn-sm btn-primary" data-req-action="Accepted" data-req-id="' + req.id + '">Accept</button>' +
+        '<button type="button" class="btn-sm btn-outline" data-req-action="Negotiation" data-req-id="' + req.id + '">Negotiate</button>' +
+        '<button type="button" class="btn-sm btn-secondary" data-req-action="Rejected" data-req-id="' + req.id + '">Reject</button>' +
+        '</div>';
+    }
+    return '<div class="request-card">' +
+      '<div class="request-card-top">' +
+        '<div><p class="request-card-title">' + escapeHtml(title) + '</p>' +
+        '<p class="request-card-sub">' + escapeHtml(sub) + (dateLabel ? ' · ' + dateLabel : '') + '</p></div>' +
+        '<span class="request-status ' + statusClass(req.status) + '">' + escapeHtml(req.status) + '</span>' +
+      '</div>' +
+      '<div class="request-meta">' +
+        '<div class="request-meta-item"><span class="rm-label">Duration</span><span class="rm-value">' + escapeHtml(req.duration || '—') + '</span></div>' +
+        '<div class="request-meta-item"><span class="rm-label">Budget</span><span class="rm-value">' + escapeHtml(req.budget || '—') + '</span></div>' +
+        '<div class="request-meta-item"><span class="rm-label">NDA</span><span class="rm-value">' + (req.nda ? 'Requested' : 'No') + '</span></div>' +
+        '<div class="request-meta-item"><span class="rm-label">Deliverables</span><span class="rm-value">' + escapeHtml(req.deliverables || '—') + '</span></div>' +
+      '</div>' +
+      (req.message ? '<p class="request-card-sub">“' + escapeHtml(req.message) + '”</p>' : '') +
+      actions +
+      '</div>';
+  }
+
+  function renderRequests(containerId, role, filterTarget) {
+    var container = document.getElementById(containerId);
+    if (!container || !window.ADC_DATA) return;
+    var reqs = window.ADC_DATA.getSponsorshipRequests();
+    if (filterTarget) reqs = reqs.filter(function (r) { return (r.target || 'athlete') === filterTarget; });
+    if (!reqs.length) {
+      var empty = role === 'brand'
+        ? 'No sponsorship requests yet. Send a proposal from an athlete profile in Discovery and it will appear here.'
+        : 'No requests yet. When a brand sends you a proposal, it will show up here.';
+      container.innerHTML = '<div class="requests-empty">' + empty + '</div>';
+      return;
+    }
+    container.innerHTML = reqs.map(function (r) { return buildRequestCardHtml(r, role); }).join('');
+  }
+
+  function renderBrandShortlist() {
+    var container = document.getElementById('brand-shortlist-list');
+    if (!container || !window.ADC_DATA) return;
+    var ids = window.ADC_DATA.getShortlist();
+    if (!ids.length) {
+      container.innerHTML = '<div class="requests-empty">Your shortlist is empty. Add athletes from Discovery to compare them here.</div>';
+      return;
+    }
+    container.innerHTML = ids.map(function (id) {
+      var a = window.ADC_DATA.getAthleteById(parseInt(id, 10));
+      if (!a) return '';
+      return buildAthleteCardHtml(a);
+    }).join('');
+  }
+
+  function submitProposal() {
+    var athleteEl = document.getElementById('proposal-athlete');
+    var brandEl = document.getElementById('proposal-brand');
+    var durationEl = document.getElementById('proposal-duration');
+    var deliverablesEl = document.getElementById('proposal-deliverables');
+    var budgetEl = document.getElementById('proposal-budget');
+    var msgEl = document.querySelector('#screen-brand-inquiry textarea');
+    var ndaEl = document.querySelector('#screen-brand-inquiry input[type="checkbox"]');
+    var athlete = window.ADC_DATA && window.ADC_DATA.getAthleteById(state.selectedAthleteId);
+    var req = {
+      athlete: (athleteEl && athleteEl.value) || (athlete && athlete.name) || 'Selected athlete',
+      athleteId: state.selectedAthleteId || null,
+      brand: (brandEl && brandEl.value.trim()) || 'Your Brand',
+      duration: durationEl && durationEl.value.trim(),
+      deliverables: deliverablesEl && deliverablesEl.value.trim(),
+      budget: budgetEl && budgetEl.value.trim(),
+      message: msgEl && msgEl.value.trim(),
+      nda: ndaEl ? ndaEl.checked : false,
+      target: 'athlete',
+      status: 'Under review'
+    };
+    if (window.ADC_DATA) window.ADC_DATA.addSponsorshipRequest(req);
+    showScreen('brand-requests');
+  }
+
   function showScreen(screenId, params) {
     params = params || {};
     if (!screenId) return;
@@ -302,6 +492,9 @@
     if (journeyPersonaLabel) journeyPersonaLabel.textContent = PERSONA_LABELS[getPersonaForScreen(screenId)] || '';
     if (journeyBreadcrumb) journeyBreadcrumb.textContent = BREADCRUMBS[screenId] || screenId;
 
+    renderSidebar(screenId);
+    setMobileSidebarOpen(false);
+
     if (screenId === 'deck') {
       goToDeck();
       return;
@@ -312,6 +505,20 @@
       renderBrandAthleteProfile(id);
     } else if (screenId === 'brand-inquiry' && state.selectedAthleteId) {
       renderBrandAthleteProfile(state.selectedAthleteId);
+    } else if (screenId === 'brand-proposal') {
+      var athleteEl = document.getElementById('proposal-athlete');
+      var selected = window.ADC_DATA && window.ADC_DATA.getAthleteById(state.selectedAthleteId);
+      if (athleteEl) athleteEl.value = selected
+        ? (selected.name + ' (' + (selected.teamShort || selected.team || selected.sport) + ' · ' + selected.role + ')')
+        : '';
+    } else if (screenId === 'brand-requests') {
+      renderRequests('brand-requests-list', 'brand');
+    } else if (screenId === 'brand-shortlist') {
+      renderBrandShortlist();
+    } else if (screenId === 'athlete-requests') {
+      renderRequests('athlete-requests-list', 'athlete', 'athlete');
+    } else if (screenId === 'creator-requests') {
+      renderRequests('creator-requests-list', 'creator', 'creator');
     }
 
     var newUrl;
@@ -380,9 +587,33 @@
     if (id) { state.selectedAthleteId = parseInt(id, 10); showScreen('brand-athlete-profile'); }
   }
 
+  function handleProposalSubmit(e) {
+    var btn = e.target.closest('#btn-submit-proposal');
+    if (!btn) return;
+    e.preventDefault();
+    submitProposal();
+  }
+
+  function handleRequestAction(e) {
+    var btn = e.target.closest('[data-req-action]');
+    if (!btn) return;
+    e.preventDefault();
+    var id = btn.getAttribute('data-req-id');
+    var status = btn.getAttribute('data-req-action');
+    if (window.ADC_DATA) window.ADC_DATA.updateSponsorshipRequestStatus(id, status);
+    var listEl = btn.closest('.requests-list');
+    var role = listEl ? listEl.getAttribute('data-role') : null;
+    if (role === 'athlete') renderRequests('athlete-requests-list', 'athlete', 'athlete');
+    else if (role === 'creator') renderRequests('creator-requests-list', 'creator', 'creator');
+    var current = parseRoute();
+    renderSidebar(current);
+  }
+
   document.body.addEventListener('click', function (e) {
     handleNavClick(e);
     handlePersonaClick(e);
+    handleProposalSubmit(e);
+    handleRequestAction(e);
     handleNextClick(e);
     handleCardClick(e);
   });
@@ -425,6 +656,13 @@
     }
     initAthleteRegistrationSportRole();
     initHeroScroll();
+    var menuToggle = document.getElementById('journey-menu-toggle');
+    var scrim = document.getElementById('journey-sidebar-scrim');
+    if (menuToggle) menuToggle.addEventListener('click', function () {
+      var sidebar = document.getElementById('journey-sidebar');
+      setMobileSidebarOpen(!(sidebar && sidebar.classList.contains('journey-sidebar--open')));
+    });
+    if (scrim) scrim.addEventListener('click', function () { setMobileSidebarOpen(false); });
     var btnApply = document.getElementById('btn-apply-filters');
     var searchEl = document.getElementById('discovery-search');
     var teamEl = document.getElementById('filter-team');
