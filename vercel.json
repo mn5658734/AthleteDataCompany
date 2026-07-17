@@ -1,7 +1,7 @@
 {
   "rewrites": [
-    { "source": "/deck", "destination": "/deck.html" },
-    { "source": "/deck/", "destination": "/deck.html" },
+    { "source": "/deck", "destination": "/deck-v2.html" },
+    { "source": "/deck/", "destination": "/deck-v2.html" },
     { "source": "/deck-v2", "destination": "/deck-v2.html" },
     { "source": "/deck-v2/", "destination": "/deck-v2.html" },
     { "source": "/login", "destination": "/login.html" },

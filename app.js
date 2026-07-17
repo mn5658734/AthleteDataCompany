@@ -110,7 +110,7 @@
 
   function goToDeck() {
     history.pushState({ adcScreen: 'landing' }, '', window.location.pathname || '/');
-    window.location.href = '/deck.html';
+    window.location.href = '/deck';
   }
 
   function initAthleteRegistrationSportRole() {

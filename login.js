@@ -98,7 +98,7 @@
   if (deckLink) {
     deckLink.addEventListener('click', function (e) {
       e.preventDefault();
-      window.location.href = '/deck.html';
+      window.location.href = '/deck';
     });
   }
 
