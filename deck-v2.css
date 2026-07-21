@@ -199,6 +199,7 @@ h3 { font-size: 16px; font-weight: 600; margin: 0 0 8px; color: var(--accent); }
 
 /* ─── Generic grids / cards ─── */
 .cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 8px; }
+.cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 8px; }
 
 .col-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
 .col-card h3 { color: var(--text); font-size: 18px; margin-bottom: 12px; }
@@ -207,6 +208,7 @@ h3 { font-size: 16px; font-weight: 600; margin: 0 0 8px; color: var(--accent); }
 .col-card .icon { font-size: 26px; margin-bottom: 8px; }
 .col-card.athletes { border-top: 3px solid var(--accent); }
 .col-card.brands { border-top: 3px solid var(--accent-brand); }
+.col-card.wedge { border-top: 3px solid var(--accent-brand); }
 .col-card.fans { border-top: 3px solid var(--accent-purple); }
 
 .engines { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 18px; }
@@ -397,7 +399,7 @@ body.deck-fullscreen .deck-stage { padding: 0; }
   .slide { padding: 24px 28px 28px; }
   .slide h1 { font-size: 28px; }
   .slide-title h1 { font-size: 34px; }
-  .cols-3, .engines, .phase-grid { grid-template-columns: 1fr; }
+  .cols-3, .cols-2, .engines, .phase-grid { grid-template-columns: 1fr; }
   .split, .split-wide-left, .conv-grid, .pipe-grid, .stream-grid, .founder-grid { grid-template-columns: 1fr; }
 }
 
