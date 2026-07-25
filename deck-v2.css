@@ -236,6 +236,13 @@ td strong { color: var(--accent); }
 .check-partial { color: var(--accent-warn); }
 .check-no { color: var(--danger); }
 
+.shift-table { margin-top: 8px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.shift-table th, .shift-table td { padding: 13px 16px; font-size: 14.5px; }
+.shift-table th:first-child, .shift-table td:first-child { width: 22%; }
+.shift-table tbody tr:last-child td { border-bottom: none; }
+.shift-table td:nth-child(2) { color: var(--text-muted); }
+.shift-table td:last-child { color: var(--text); font-weight: 500; }
+
 /* ─── SVG containers ─── */
 .diagram-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
 .diagram-wrap svg { display: block; width: 100%; height: auto; }
@@ -363,6 +370,15 @@ td strong { color: var(--accent); }
   color: var(--text);
 }
 .hire-note strong { color: var(--accent-warn); }
+
+/* Team slide carries four cards — tighten spacing so nothing clips the footer */
+.slide-team .subhead { margin-bottom: 12px; }
+.slide-team .founder-grid { gap: 12px; margin-top: 0; }
+.slide-team .founder-card { padding: 13px 16px; }
+.slide-team .founder-tags { margin-bottom: 9px; }
+.slide-team .founder-role { margin-bottom: 8px; }
+.slide-team .founder-card li { margin-bottom: 4px; }
+.slide-team .hire-note { margin-top: 10px; padding: 10px 16px; font-size: 13.5px; }
 
 /* ─── V2: Ask ─── */
 .ask-hero {
