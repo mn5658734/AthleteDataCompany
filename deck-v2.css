@@ -318,6 +318,7 @@ td strong { color: var(--accent); }
 .stream-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; border-top: 3px solid var(--accent); }
 .stream-card:nth-child(2) { border-top-color: var(--accent-brand); }
 .stream-card h3 { color: var(--text); font-size: 17px; margin-bottom: 10px; }
+.stream-card .stream-sub { display: block; margin-top: 4px; font-size: 12.5px; font-weight: 500; color: var(--text-muted); }
 .stream-card ul { margin: 0; padding-left: 0; list-style: none; font-size: 13.5px; }
 .stream-card li { margin-bottom: 7px; color: var(--text-muted); }
 .stream-card li strong { color: var(--text); }
