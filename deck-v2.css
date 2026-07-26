@@ -232,6 +232,10 @@ td strong { color: var(--accent); }
 .matrix-table th, .matrix-table td { text-align: center; }
 .matrix-table td:first-child, .matrix-table th:first-child { text-align: left; }
 .matrix-table .adc-col { background: rgba(0, 212, 170, 0.08); font-weight: 600; }
+.competitor-matrix { table-layout: fixed; font-size: 12px; }
+.competitor-matrix th, .competitor-matrix td { padding: 9px 5px; }
+.competitor-matrix th:first-child, .competitor-matrix td:first-child { width: 30%; }
+.competitor-matrix th:not(:first-child), .competitor-matrix td:not(:first-child) { width: 14%; }
 .check-yes { color: var(--accent); }
 .check-partial { color: var(--accent-warn); }
 .check-no { color: var(--danger); }
