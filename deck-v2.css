@@ -350,14 +350,22 @@ td strong { color: var(--accent); }
 .founder-card:nth-child(2) { border-top-color: var(--accent-brand); }
 .founder-card:nth-child(3) { border-top-color: var(--accent-purple); }
 .founder-card:nth-child(4) { border-top-color: var(--accent-warn); }
-.founder-card h3 { color: var(--text); font-size: 18px; margin-bottom: 2px; }
-.founder-role { font-size: 13px; color: var(--accent); margin: 0 0 6px; font-weight: 600; }
+.founder-card h3 { color: var(--text); font-size: 18px; margin: 0; }
+.founder-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+.founder-role { font-size: 13px; color: var(--accent); margin: 0 0 10px; font-weight: 600; }
 .founder-card:nth-child(2) .founder-role { color: var(--accent-brand); }
 .founder-card:nth-child(3) .founder-role { color: var(--accent-purple); }
 .founder-card:nth-child(4) .founder-role { color: var(--accent-warn); }
 .founder-linkedin {
   display: inline-block;
-  margin: 0 0 10px;
+  flex-shrink: 0;
+  margin: 0;
   font-size: 12px;
   font-weight: 600;
   color: #6c9fff;
@@ -392,8 +400,7 @@ td strong { color: var(--accent); }
 .slide-team .founder-grid { gap: 12px; margin-top: 0; }
 .slide-team .founder-card { padding: 13px 16px; }
 .slide-team .founder-tags { margin-bottom: 9px; }
-.slide-team .founder-role { margin-bottom: 4px; }
-.slide-team .founder-linkedin { margin-bottom: 8px; }
+.slide-team .founder-role { margin-bottom: 8px; }
 .slide-team .founder-card li { margin-bottom: 4px; }
 .slide-team .hire-note { margin-top: 10px; padding: 10px 16px; font-size: 13.5px; }
 
