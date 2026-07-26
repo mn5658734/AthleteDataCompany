@@ -282,6 +282,7 @@ td strong { color: var(--accent); }
 
 /* ─── V2: Pipeline columns ─── */
 .pipe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 4px; }
+.pipe-grid--single { grid-template-columns: 1fr; max-width: 720px; }
 .pipe-col h3 { font-size: 17px; color: var(--text); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
 .pipe-col.supply h3 { border-bottom-color: var(--accent); }
 .pipe-col.demand h3 { border-bottom-color: var(--accent-brand); }
