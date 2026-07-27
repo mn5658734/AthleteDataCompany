@@ -68,6 +68,41 @@
     downloadBtn.setAttribute('aria-busy', loading ? 'true' : 'false');
   }
 
+  function getSlideLinkRects(slideEl) {
+    var slideRect = slideEl.getBoundingClientRect();
+    if (!slideRect.width || !slideRect.height) return [];
+
+    var scaleX = PDF_WIDTH / slideRect.width;
+    var scaleY = PDF_HEIGHT / slideRect.height;
+    var rects = [];
+
+    slideEl.querySelectorAll('a[href]').forEach(function (anchor) {
+      var rect = anchor.getBoundingClientRect();
+      var href = anchor.getAttribute('href');
+      if (!href) return;
+
+      var width = rect.width * scaleX;
+      var height = rect.height * scaleY;
+      if (width <= 0 || height <= 0) return;
+
+      rects.push({
+        href: href,
+        x: (rect.left - slideRect.left) * scaleX,
+        y: (rect.top - slideRect.top) * scaleY,
+        w: width,
+        h: height
+      });
+    });
+
+    return rects;
+  }
+
+  function addSlideLinksToPdf(pdf, slideEl) {
+    getSlideLinkRects(slideEl).forEach(function (link) {
+      pdf.link(link.x, link.y, link.w, link.h, { url: link.href });
+    });
+  }
+
   async function downloadDeckPdf() {
     if (isExporting) return;
     isExporting = true;
@@ -107,6 +142,7 @@
         var imgData = canvas.toDataURL('image/jpeg', 0.92);
         if (i > 0) pdf.addPage([PDF_WIDTH, PDF_HEIGHT], 'landscape');
         pdf.addImage(imgData, 'JPEG', 0, 0, PDF_WIDTH, PDF_HEIGHT);
+        addSlideLinksToPdf(pdf, slides[i]);
       }
 
       pdf.save('ADC-Pitch-Deck.pdf');
