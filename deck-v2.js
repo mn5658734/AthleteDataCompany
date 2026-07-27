@@ -13,7 +13,7 @@
 
   if (!viewport) return;
 
-  var slides = Array.prototype.slice.call(viewport.querySelectorAll('.slide'));
+  var slides = Array.prototype.slice.call(viewport.querySelectorAll('.slide:not(.slide-hidden)'));
   var current = 0;
   var isExporting = false;
 

@@ -108,7 +108,13 @@ body.deck-exporting .slide { transition: none !important; }
   overflow: hidden;
 }
 
-/* ─── Slide shell ─── */
+.slide.slide-hidden {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
 .slide {
   position: absolute;
   inset: 0;
