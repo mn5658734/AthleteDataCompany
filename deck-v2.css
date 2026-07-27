@@ -59,7 +59,19 @@ html, body {
   transition: background 0.15s, border-color 0.15s;
 }
 .deck-btn:hover { border-color: var(--accent); background: rgba(0, 212, 170, 0.08); }
-.deck-btn-icon { width: 40px; height: 40px; padding: 0; font-size: 18px; }
+.deck-btn-icon { width: 40px; height: 40px; padding: 0; font-size: 18px; display: inline-flex; align-items: center; justify-content: center; }
+.deck-btn-icon .deck-icon { display: block; }
+.deck-btn-icon.is-loading { opacity: 0.6; cursor: wait; pointer-events: none; }
+.deck-btn-icon.is-loading .deck-icon { animation: deck-spin 0.8s linear infinite; }
+@keyframes deck-spin { to { transform: rotate(360deg); } }
+
+body.deck-exporting .slide { transition: none !important; }
+.deck-viewport.deck-export-capture {
+  width: 1280px !important;
+  height: 720px !important;
+  max-width: none !important;
+  aspect-ratio: auto !important;
+}
 
 .deck-badge-v2 {
   display: inline-block;
