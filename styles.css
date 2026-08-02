@@ -1226,9 +1226,12 @@ a.nav-top-pill {
   border-top: 1px solid var(--border);
 }
 
-.landing-trust-inner,
 .landing-advisors-inner {
   text-align: center;
+}
+
+.landing-advisors .landing-trust-kicker {
+  margin-bottom: 0;
 }
 
 .landing-trust-kicker {
@@ -1273,13 +1276,27 @@ a.nav-top-pill {
   align-items: center;
   gap: 0.65rem;
   min-width: 9.5rem;
-  padding: 0.85rem 1.1rem;
+  max-width: 16rem;
+  padding: 0.75rem 1rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 12px;
   color: var(--text);
   text-decoration: none;
   transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+
+.partner-logo--brand {
+  min-width: 11rem;
+}
+
+.partner-logo--brand img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 10px;
+  flex-shrink: 0;
+  background: #fff;
 }
 
 .partner-logo--link:hover {
@@ -1312,17 +1329,19 @@ a.nav-top-pill {
 }
 
 .partner-logo-name {
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   font-weight: 600;
   letter-spacing: -0.01em;
+  text-align: left;
+  line-height: 1.25;
 }
 
 .advisor-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.25rem;
-  max-width: 920px;
-  margin: 0 auto;
+  max-width: 960px;
+  margin: 1.5rem auto 0;
   text-align: left;
 }
 
@@ -1338,6 +1357,17 @@ a.nav-top-pill {
 
 .advisor-card:nth-child(2) {
   border-top-color: var(--accent-brand);
+}
+
+.advisor-photo {
+  flex-shrink: 0;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  border: 2px solid var(--border);
+  background: var(--bg-elevated);
 }
 
 .advisor-avatar {
@@ -1359,11 +1389,37 @@ a.nav-top-pill {
   background: linear-gradient(135deg, var(--accent-brand), #4f7de8);
 }
 
+.advisor-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.15rem;
+}
+
 .advisor-name {
   margin: 0 0 0.25rem;
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--text);
+}
+
+.advisor-header .advisor-name {
+  margin-bottom: 0;
+}
+
+.advisor-linkedin {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #6c9fff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(108, 159, 255, 0.35);
+}
+
+.advisor-linkedin:hover {
+  color: var(--accent);
+  border-bottom-color: rgba(0, 212, 170, 0.5);
 }
 
 .advisor-role {
@@ -1392,6 +1448,7 @@ a.nav-top-pill {
   .partner-logo {
     min-width: calc(50% - 0.5rem);
     flex: 1 1 calc(50% - 0.5rem);
+    max-width: none;
   }
 }
 
