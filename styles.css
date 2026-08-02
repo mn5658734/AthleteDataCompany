@@ -134,11 +134,23 @@ body {
 }
 
 .logo {
+  display: inline-flex;
+  align-items: center;
   font-weight: 700;
   font-size: 1.25rem;
   color: var(--accent);
   text-decoration: none;
   letter-spacing: -0.02em;
+  line-height: 0;
+}
+
+.logo-img {
+  display: block;
+  height: 48px;
+  width: auto;
+  max-width: min(200px, 48vw);
+  object-fit: contain;
+  border-radius: 8px;
 }
 
 .landing-nav a {
@@ -322,6 +334,11 @@ a.nav-top-pill {
 
   .logo {
     font-size: 1.05rem;
+  }
+
+  .logo-img {
+    height: 40px;
+    max-width: min(160px, 52vw);
   }
 
   .landing-nav .nav-btn-deck {
