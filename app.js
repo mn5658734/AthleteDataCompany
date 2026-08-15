@@ -386,75 +386,6 @@
   }
 
   /** Scoring-engine column schema. Missing values render as NA. */
-  var DATA_COLUMN_GROUPS = [
-    {
-      id: 'identity',
-      label: 'Player',
-      columns: [
-        { key: 'rank', label: 'Rank' },
-        { key: 'id', label: 'ID' },
-        { key: 'name', label: 'Name' },
-        { key: 'initials', label: 'Initials' },
-        { key: 'sport', label: 'Sport' },
-        { key: 'league', label: 'League' },
-        { key: 'role', label: 'Role' },
-        { key: 'age', label: 'Age' },
-        { key: 'region', label: 'Region' },
-        { key: 'gender', label: 'Gender' },
-        { key: 'team', label: 'Team' },
-        { key: 'teamShort', label: 'Team Short' }
-      ]
-    },
-    {
-      id: 'perf',
-      label: '1. Performance Engine',
-      columns: [
-        { key: 'matches', label: 'Match & Season Stats (Matches)' },
-        { key: 'pom', label: 'POM Awards' },
-        { key: 'wins', label: 'Team Wins' },
-        { key: 'winRate', label: 'Win Rate %' },
-        { key: 'growth', label: 'Consistency & Progression' },
-        { key: 'tournamentLevel', label: 'Tournament & Competition Level', resolve: function (a) { return a.league; } },
-        { key: 'fitnessAvailability', label: 'Fitness & Availability' },
-        { key: 'perf', label: 'Performance Score' }
-      ]
-    },
-    {
-      id: 'social',
-      label: '2. Social & Fan Signal Engine',
-      columns: [
-        { key: 'socialEngagement', label: 'Social Media Engagement' },
-        { key: 'fanFollowingSentiment', label: 'Fan Following & Sentiment' },
-        { key: 'communityInteractions', label: 'Community Interactions' },
-        { key: 'newsMediaMentions', label: 'News & Media Mentions' },
-        { key: 'social', label: 'Social & Fan Score' }
-      ]
-    },
-    {
-      id: 'brand',
-      label: '3. Brand Matching Engine',
-      columns: [
-        { key: 'brandAudienceFit', label: 'Brand & Audience Fit', resolve: function (a) {
-          if (a.perf == null || a.social == null) return null;
-          return ((Number(a.perf) + Number(a.social)) / 20).toFixed(1);
-        }},
-        { key: 'locationSport', label: 'Location & Sport Category', resolve: function (a) {
-          var parts = [a.region, a.sport].filter(function (v) { return v != null && v !== ''; });
-          return parts.length ? parts.join(' · ') : null;
-        }},
-        { key: 'engagementCredibility', label: 'Engagement & Credibility', resolve: function (a) {
-          if (a.verified == null) return null;
-          return a.verified ? 'Verified' : 'Unverified';
-        }},
-        { key: 'sponsorshipReadiness', label: 'Sponsorship Readiness', resolve: function (a) { return a.budget; } },
-        { key: 'brandMatchScore', label: 'Brand Match Score', resolve: function (a) {
-          if (a.perf == null || a.social == null) return null;
-          return ((Number(a.perf) + Number(a.social)) / 20).toFixed(1);
-        }}
-      ]
-    }
-  ];
-
   var BAT_FIELDS = [
     { key: 'innings', label: 'Innings' },
     { key: 'runs', label: 'Runs' },
@@ -481,13 +412,248 @@
   ];
   var CRIC_FORMATS = ['Test', 'ODI', 'T20I'];
   var dataViewState = { view: 'scoring' };
+  var scoringRowsCache = null;
+
+  function normalizePlayerName(name) {
+    return String(name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+
+  function cricsheetBucketKey(fmt, kind) {
+    var base = fmt === 'T20I' ? 't20i' : fmt.toLowerCase();
+    return base + (kind === 'bat' ? 'Bat' : 'Bowl');
+  }
 
   function cricsheetNested(player, fmt, kind, field) {
-    var bucket = kind === 'bat'
-      ? player[(fmt === 'T20I' ? 't20i' : fmt.toLowerCase()) + 'Bat']
-      : player[(fmt === 'T20I' ? 't20i' : fmt.toLowerCase()) + 'Bowl'];
+    var bucket = player[cricsheetBucketKey(fmt, kind)];
     if (!bucket) return null;
     return bucket[field];
+  }
+
+  function mapFormatFields(fmt, kind, fields) {
+    return fields.map(function (f) {
+      return {
+        key: cricsheetBucketKey(fmt, kind) + '-' + f.key,
+        label: f.label,
+        resolve: function (row) { return cricsheetNested(row, fmt, kind, f.key); }
+      };
+    });
+  }
+
+  /** Performance Engine = Domestic (IPL) + Test/ODI/T20I batting & bowling from Cricsheet. */
+  function buildScoringEngineGroups() {
+    var groups = [
+      {
+        id: 'identity',
+        label: 'Player',
+        columns: [
+          { key: 'rank', label: 'Rank' },
+          { key: 'id', label: 'ID' },
+          { key: 'name', label: 'Name' },
+          { key: 'initials', label: 'Initials' },
+          { key: 'sport', label: 'Sport' },
+          { key: 'role', label: 'Role' },
+          { key: 'age', label: 'Age' },
+          { key: 'region', label: 'Region' },
+          { key: 'gender', label: 'Gender' },
+          { key: 'team', label: 'Team' },
+          { key: 'teamShort', label: 'Team Short' }
+        ]
+      },
+      {
+        id: 'perf-domestic',
+        label: '1. Performance · Domestic (IPL)',
+        columns: [
+          { key: 'domesticLeague', label: 'Domestic League', resolve: function (a) { return a.league || a.domesticLeague; } },
+          { key: 'matches', label: 'Match & Season Stats (Matches)' },
+          { key: 'pom', label: 'POM Awards' },
+          { key: 'wins', label: 'Team Wins' },
+          { key: 'winRate', label: 'Win Rate %' },
+          { key: 'growth', label: 'Consistency & Progression' },
+          { key: 'tournamentLevel', label: 'Tournament & Competition Level', resolve: function (a) { return a.league || a.domesticLeague; } },
+          { key: 'fitnessAvailability', label: 'Fitness & Availability' },
+          { key: 'perf', label: 'Overall Performance Score' }
+        ]
+      }
+    ];
+
+    CRIC_FORMATS.forEach(function (fmt) {
+      var idBase = fmt === 'T20I' ? 't20i' : fmt.toLowerCase();
+      groups.push({
+        id: 'perf-' + idBase + '-bat',
+        label: '1. Performance · ' + fmt + ' Batting',
+        columns: mapFormatFields(fmt, 'bat', BAT_FIELDS)
+      });
+      groups.push({
+        id: 'perf-' + idBase + '-bowl',
+        label: '1. Performance · ' + fmt + ' Bowling',
+        columns: mapFormatFields(fmt, 'bowl', BOWL_FIELDS)
+      });
+    });
+
+    groups.push(
+      {
+        id: 'social',
+        label: '2. Social & Fan Signal Engine',
+        columns: [
+          { key: 'socialEngagement', label: 'Social Media Engagement' },
+          { key: 'fanFollowingSentiment', label: 'Fan Following & Sentiment' },
+          { key: 'communityInteractions', label: 'Community Interactions' },
+          { key: 'newsMediaMentions', label: 'News & Media Mentions' },
+          { key: 'social', label: 'Social & Fan Score' }
+        ]
+      },
+      {
+        id: 'brand',
+        label: '3. Brand Matching Engine',
+        columns: [
+          { key: 'brandAudienceFit', label: 'Brand & Audience Fit', resolve: function (a) {
+            if (a.perf == null || a.social == null) return null;
+            return ((Number(a.perf) + Number(a.social)) / 20).toFixed(1);
+          }},
+          { key: 'locationSport', label: 'Location & Sport Category', resolve: function (a) {
+            var parts = [a.region, a.sport].filter(function (v) { return v != null && v !== ''; });
+            return parts.length ? parts.join(' · ') : null;
+          }},
+          { key: 'engagementCredibility', label: 'Engagement & Credibility', resolve: function (a) {
+            if (a.verified == null) return null;
+            return a.verified ? 'Verified' : 'Unverified';
+          }},
+          { key: 'sponsorshipReadiness', label: 'Sponsorship Readiness', resolve: function (a) { return a.budget; } },
+          { key: 'brandMatchScore', label: 'Brand Match Score', resolve: function (a) {
+            if (a.perf == null || a.social == null) return null;
+            return ((Number(a.perf) + Number(a.social)) / 20).toFixed(1);
+          }}
+        ]
+      }
+    );
+    return groups;
+  }
+
+  function initialsFromName(name) {
+    var parts = String(name || '').replace(/\./g, ' ').trim().split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    return String(name || '').slice(0, 2).toUpperCase() || 'NA';
+  }
+
+  function emptyScoringRow(name) {
+    return {
+      rank: null,
+      id: null,
+      name: name,
+      initials: initialsFromName(name),
+      sport: 'Cricket',
+      role: null,
+      age: null,
+      region: null,
+      gender: null,
+      team: null,
+      teamShort: null,
+      league: null,
+      domesticLeague: null,
+      matches: null,
+      pom: null,
+      wins: null,
+      winRate: null,
+      growth: null,
+      fitnessAvailability: null,
+      perf: null,
+      socialEngagement: null,
+      fanFollowingSentiment: null,
+      communityInteractions: null,
+      newsMediaMentions: null,
+      social: null,
+      verified: null,
+      budget: null,
+      testBat: null,
+      testBowl: null,
+      odiBat: null,
+      odiBowl: null,
+      t20iBat: null,
+      t20iBowl: null
+    };
+  }
+
+  function applyIplAthlete(row, athlete) {
+    row.rank = athlete.rank != null ? athlete.rank : row.rank;
+    row.id = athlete.id != null ? athlete.id : row.id;
+    row.name = athlete.name || row.name;
+    row.initials = athlete.initials || row.initials;
+    row.sport = athlete.sport || row.sport;
+    row.role = athlete.role != null ? athlete.role : row.role;
+    row.age = athlete.age != null ? athlete.age : row.age;
+    row.region = athlete.region != null ? athlete.region : row.region;
+    row.gender = athlete.gender != null ? athlete.gender : row.gender;
+    row.team = athlete.team != null ? athlete.team : row.team;
+    row.teamShort = athlete.teamShort != null ? athlete.teamShort : row.teamShort;
+    row.league = athlete.league != null ? athlete.league : row.league;
+    row.domesticLeague = athlete.league || 'IPL';
+    row.matches = athlete.matches != null ? athlete.matches : row.matches;
+    row.pom = athlete.pom != null ? athlete.pom : row.pom;
+    row.wins = athlete.wins != null ? athlete.wins : row.wins;
+    row.winRate = athlete.winRate != null ? athlete.winRate : row.winRate;
+    row.growth = athlete.growth != null ? athlete.growth : row.growth;
+    row.perf = athlete.perf != null ? athlete.perf : row.perf;
+    row.social = athlete.social != null ? athlete.social : row.social;
+    row.verified = athlete.verified != null ? athlete.verified : row.verified;
+    row.budget = athlete.budget != null ? athlete.budget : row.budget;
+    return row;
+  }
+
+  function applyCricsheetPlayer(row, player) {
+    row.name = row.name || player.player;
+    row.initials = row.initials || initialsFromName(player.player);
+    row.sport = row.sport || 'Cricket';
+    row.testBat = player.testBat || null;
+    row.testBowl = player.testBowl || null;
+    row.odiBat = player.odiBat || null;
+    row.odiBowl = player.odiBowl || null;
+    row.t20iBat = player.t20iBat || null;
+    row.t20iBowl = player.t20iBowl || null;
+    return row;
+  }
+
+  function getScoringEngineRows() {
+    if (scoringRowsCache) return scoringRowsCache;
+    var byNorm = {};
+    var rows = [];
+
+    function upsert(name) {
+      var key = normalizePlayerName(name);
+      if (!key) return null;
+      if (!byNorm[key]) {
+        var row = emptyScoringRow(name);
+        byNorm[key] = row;
+        rows.push(row);
+      }
+      return byNorm[key];
+    }
+
+    var cricPlayers = (window.ADC_CRICSHEET && window.ADC_CRICSHEET.players) || [];
+    cricPlayers.forEach(function (p) {
+      var row = upsert(p.player);
+      if (row) applyCricsheetPlayer(row, p);
+    });
+
+    var athletes = (window.ADC_DATA && typeof window.ADC_DATA.getAthletes === 'function')
+      ? window.ADC_DATA.getAthletes({})
+      : [];
+    athletes.forEach(function (a) {
+      var row = upsert(a.name);
+      if (row) applyIplAthlete(row, a);
+    });
+
+    rows.sort(function (a, b) {
+      var ar = a.rank != null ? a.rank : 9999;
+      var br = b.rank != null ? b.rank : 9999;
+      if (ar !== br) return ar - br;
+      var aRuns = ((a.odiBat && a.odiBat.runs) || 0) + ((a.testBat && a.testBat.runs) || 0) + ((a.t20iBat && a.t20iBat.runs) || 0);
+      var bRuns = ((b.odiBat && b.odiBat.runs) || 0) + ((b.testBat && b.testBat.runs) || 0) + ((b.t20iBat && b.t20iBat.runs) || 0);
+      if (bRuns !== aRuns) return bRuns - aRuns;
+      return String(a.name).localeCompare(String(b.name));
+    });
+
+    scoringRowsCache = rows;
+    return rows;
   }
 
   function buildCricsheetCareerGroups() {
@@ -497,28 +663,16 @@
       columns: [{ key: 'player', label: 'Player' }]
     }];
     CRIC_FORMATS.forEach(function (fmt) {
-      var idBase = fmt.toLowerCase();
+      var idBase = fmt === 'T20I' ? 't20i' : fmt.toLowerCase();
       groups.push({
         id: idBase + '-bat',
         label: fmt + ' Batting',
-        columns: BAT_FIELDS.map(function (f) {
-          return {
-            key: idBase + '-bat-' + f.key,
-            label: f.label,
-            resolve: function (row) { return cricsheetNested(row, fmt, 'bat', f.key); }
-          };
-        })
+        columns: mapFormatFields(fmt, 'bat', BAT_FIELDS)
       });
       groups.push({
         id: idBase + '-bowl',
         label: fmt + ' Bowling',
-        columns: BOWL_FIELDS.map(function (f) {
-          return {
-            key: idBase + '-bowl-' + f.key,
-            label: f.label,
-            resolve: function (row) { return cricsheetNested(row, fmt, 'bowl', f.key); }
-          };
-        })
+        columns: mapFormatFields(fmt, 'bowl', BOWL_FIELDS)
       });
     });
     return groups;
@@ -537,19 +691,14 @@
   var DATA_VIEWS = {
     scoring: {
       label: 'Scoring Engines',
-      footnote: 'Performance Score = POM impact (38%) + team win rate (32%) + availability (30%). Social Score = performance + POM visibility + star recognition. Brand Fit = (Perf + Social) / 20. Source: IPL 2026 match CSV via scoring engine.',
+      footnote: 'Performance Engine includes Domestic/IPL columns plus all Test, ODI, and T20I batting & bowling data points from india_cricsheet_stats.py. Missing values show as NA. Social/Brand fields stay engine-aligned; Brand Fit = (Perf + Social) / 20 when both scores exist.',
       showLegend: true,
-      getGroups: function () { return DATA_COLUMN_GROUPS; },
-      getRows: function () {
-        if (!window.ADC_DATA || typeof window.ADC_DATA.getAthletes !== 'function') return [];
-        return window.ADC_DATA.getAthletes({}).slice().sort(function (a, b) {
-          return (a.rank || a.id || 0) - (b.rank || b.id || 0);
-        });
-      },
+      getGroups: buildScoringEngineGroups,
+      getRows: getScoringEngineRows,
       searchHay: function (a) {
         return [a.name, a.team, a.teamShort, a.role, a.sport, a.league, a.region, a.growth, a.budget].join(' ');
       },
-      unit: 'athletes'
+      unit: 'players'
     },
     cricsheet: {
       label: 'Cricsheet Career',

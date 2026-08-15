@@ -3046,6 +3046,24 @@ body.ai-overlay-open { overflow: hidden; }
   background: rgba(108, 159, 255, 0.08);
 }
 
+.data-engine-pill--test {
+  border-color: rgba(108, 159, 255, 0.45);
+  color: #9ec0ff;
+  background: rgba(108, 159, 255, 0.06);
+}
+
+.data-engine-pill--odi {
+  border-color: rgba(0, 212, 170, 0.5);
+  color: #5ee9c7;
+  background: rgba(0, 212, 170, 0.08);
+}
+
+.data-engine-pill--t20i {
+  border-color: rgba(192, 132, 252, 0.5);
+  color: #d2a8ff;
+  background: rgba(192, 132, 252, 0.08);
+}
+
 .data-engine-pill--social {
   border-color: rgba(0, 212, 170, 0.5);
   color: #5ee9c7;
@@ -3130,31 +3148,53 @@ body.ai-overlay-open { overflow: hidden; }
 .data-th-group--brand { background: #1a1526; color: #d2a8ff; }
 
 .data-th--identity { background: #151e28; }
-.data-th--perf { background: #121c2c; }
+.data-th--perf,
+.data-th--perf-domestic { background: #121c2c; }
 .data-th--social { background: #0f221f; }
 .data-th--brand { background: #1a1526; }
 .data-th--matches,
 .data-th-group--matches { background: #151e28; color: #b7c4d4; }
 .data-th--test-bat,
-.data-th-group--test-bat { background: #121c2c; color: #8eb4ff; }
+.data-th-group--test-bat,
+.data-th--perf-test-bat,
+.data-th-group--perf-test-bat { background: #121c2c; color: #8eb4ff; }
 .data-th--test-bowl,
-.data-th-group--test-bowl { background: #0f221f; color: #5ee9c7; }
+.data-th-group--test-bowl,
+.data-th--perf-test-bowl,
+.data-th-group--perf-test-bowl { background: #0f221f; color: #5ee9c7; }
 .data-th--odi-bat,
-.data-th-group--odi-bat { background: #1a2230; color: #9ec0ff; }
+.data-th-group--odi-bat,
+.data-th--perf-odi-bat,
+.data-th-group--perf-odi-bat { background: #1a2230; color: #9ec0ff; }
 .data-th--odi-bowl,
-.data-th-group--odi-bowl { background: #12261f; color: #7af0cf; }
+.data-th-group--odi-bowl,
+.data-th--perf-odi-bowl,
+.data-th-group--perf-odi-bowl { background: #12261f; color: #7af0cf; }
 .data-th--t20i-bat,
-.data-th-group--t20i-bat { background: #1a1526; color: #d2a8ff; }
+.data-th-group--t20i-bat,
+.data-th--perf-t20i-bat,
+.data-th-group--perf-t20i-bat { background: #1a1526; color: #d2a8ff; }
 .data-th--t20i-bowl,
-.data-th-group--t20i-bowl { background: #241820; color: #f0b4c8; }
+.data-th-group--t20i-bowl,
+.data-th--perf-t20i-bowl,
+.data-th-group--perf-t20i-bowl { background: #241820; color: #f0b4c8; }
+.data-th-group--perf-domestic,
+.data-th--perf-domestic { background: #121c2c; color: #8eb4ff; }
 
-.data-td--test-bat { background: rgba(108, 159, 255, 0.05); }
-.data-td--test-bowl { background: rgba(0, 212, 170, 0.05); }
-.data-td--odi-bat { background: rgba(108, 159, 255, 0.04); }
-.data-td--odi-bowl { background: rgba(0, 212, 170, 0.04); }
-.data-td--t20i-bat { background: rgba(192, 132, 252, 0.05); }
-.data-td--t20i-bowl { background: rgba(240, 180, 200, 0.05); }
+.data-td--test-bat,
+.data-td--perf-test-bat { background: rgba(108, 159, 255, 0.05); }
+.data-td--test-bowl,
+.data-td--perf-test-bowl { background: rgba(0, 212, 170, 0.05); }
+.data-td--odi-bat,
+.data-td--perf-odi-bat { background: rgba(108, 159, 255, 0.04); }
+.data-td--odi-bowl,
+.data-td--perf-odi-bowl { background: rgba(0, 212, 170, 0.04); }
+.data-td--t20i-bat,
+.data-td--perf-t20i-bat { background: rgba(192, 132, 252, 0.05); }
+.data-td--t20i-bowl,
+.data-td--perf-t20i-bowl { background: rgba(240, 180, 200, 0.05); }
 .data-td--matches { background: rgba(139, 156, 173, 0.05); }
+.data-td--perf-domestic { background: rgba(108, 159, 255, 0.06); }
 
 .data-table tbody tr:hover td {
   filter: brightness(1.12);
