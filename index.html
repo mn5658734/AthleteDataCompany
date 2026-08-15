@@ -398,15 +398,16 @@
       <div class="data-screen-header">
         <div>
           <h1>Athlete Scoring Data</h1>
-          <p class="screen-desc">All player data points aligned to ADC scoring engines. Missing values show as <strong>NA</strong>.</p>
+          <p class="screen-desc">Scoring-engine fields plus all Cricsheet career data points (India Test/ODI/T20I, 2010+). Missing values show as <strong>NA</strong>.</p>
         </div>
         <div class="data-screen-tools">
           <label class="data-search-label" for="data-search">Search</label>
-          <input type="search" id="data-search" class="data-search" placeholder="Name, team, role…" autocomplete="off" />
+          <input type="search" id="data-search" class="data-search" placeholder="Name, team, opponent…" autocomplete="off" />
           <span class="data-count" id="data-count"></span>
         </div>
       </div>
-      <div class="data-engine-legend" aria-label="Scoring engines">
+      <div class="data-view-tabs" id="data-view-tabs" role="tablist" aria-label="Data views"></div>
+      <div class="data-engine-legend" id="data-engine-legend" aria-label="Scoring engines">
         <span class="data-engine-pill data-engine-pill--identity">Player</span>
         <span class="data-engine-pill data-engine-pill--perf">1. Performance Engine</span>
         <span class="data-engine-pill data-engine-pill--social">2. Social &amp; Fan Signal</span>
@@ -418,7 +419,7 @@
           <tbody id="data-table-body"></tbody>
         </table>
       </div>
-      <p class="data-footnote">Performance Score = POM impact (38%) + team win rate (32%) + availability (30%). Social Score = performance + POM visibility + star recognition. Brand Fit = (Perf + Social) / 20. Source: IPL 2026 match CSV via scoring engine.</p>
+      <p class="data-footnote" id="data-footnote">Performance Score = POM impact (38%) + team win rate (32%) + availability (30%). Social Score = performance + POM visibility + star recognition. Brand Fit = (Perf + Social) / 20. Source: IPL 2026 match CSV via scoring engine.</p>
     </div>
   </section>
 
@@ -1343,6 +1344,7 @@
   </section>
 
   <script src="data.js"></script>
+  <script src="cricsheet-stats.js"></script>
   <script src="ipl-assistant.js"></script>
   <script src="app.js"></script>
   <script>

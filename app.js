@@ -455,42 +455,227 @@
     }
   ];
 
-  function dataCellValue(athlete, col) {
-    var raw = col.resolve ? col.resolve(athlete) : athlete[col.key];
+  var BAT_FIELDS = [
+    { key: 'innings', label: 'Innings' },
+    { key: 'runs', label: 'Runs' },
+    { key: 'ballsFaced', label: 'Balls Faced' },
+    { key: 'notOuts', label: 'Not Outs' },
+    { key: 'highest', label: 'Highest Score' },
+    { key: 'average', label: 'Average' },
+    { key: 'strikeRate', label: 'Strike Rate' },
+    { key: 'hundreds', label: '100s' },
+    { key: 'fifties', label: '50s' },
+    { key: 'fours', label: '4s' },
+    { key: 'sixes', label: '6s' },
+    { key: 'foursSixes', label: '4s / 6s' }
+  ];
+  var BOWL_FIELDS = [
+    { key: 'inningsBowled', label: 'Innings Bowled' },
+    { key: 'overs', label: 'Overs' },
+    { key: 'balls', label: 'Balls' },
+    { key: 'runsConceded', label: 'Runs Conceded' },
+    { key: 'wickets', label: 'Wickets' },
+    { key: 'average', label: 'Average' },
+    { key: 'economy', label: 'Economy' },
+    { key: 'best', label: 'Best (innings)' }
+  ];
+  var CRIC_FORMATS = ['Test', 'ODI', 'T20I'];
+  var dataViewState = { view: 'scoring' };
+
+  function cricsheetNested(player, fmt, kind, field) {
+    var bucket = kind === 'bat'
+      ? player[(fmt === 'T20I' ? 't20i' : fmt.toLowerCase()) + 'Bat']
+      : player[(fmt === 'T20I' ? 't20i' : fmt.toLowerCase()) + 'Bowl'];
+    if (!bucket) return null;
+    return bucket[field];
+  }
+
+  function buildCricsheetCareerGroups() {
+    var groups = [{
+      id: 'identity',
+      label: 'Player',
+      columns: [{ key: 'player', label: 'Player' }]
+    }];
+    CRIC_FORMATS.forEach(function (fmt) {
+      var idBase = fmt.toLowerCase();
+      groups.push({
+        id: idBase + '-bat',
+        label: fmt + ' Batting',
+        columns: BAT_FIELDS.map(function (f) {
+          return {
+            key: idBase + '-bat-' + f.key,
+            label: f.label,
+            resolve: function (row) { return cricsheetNested(row, fmt, 'bat', f.key); }
+          };
+        })
+      });
+      groups.push({
+        id: idBase + '-bowl',
+        label: fmt + ' Bowling',
+        columns: BOWL_FIELDS.map(function (f) {
+          return {
+            key: idBase + '-bowl-' + f.key,
+            label: f.label,
+            resolve: function (row) { return cricsheetNested(row, fmt, 'bowl', f.key); }
+          };
+        })
+      });
+    });
+    return groups;
+  }
+
+  function buildFlatColumns(headers, groupId, groupLabel) {
+    return [{
+      id: groupId,
+      label: groupLabel,
+      columns: headers.map(function (h) {
+        return { key: h.key, label: h.label };
+      })
+    }];
+  }
+
+  var DATA_VIEWS = {
+    scoring: {
+      label: 'Scoring Engines',
+      footnote: 'Performance Score = POM impact (38%) + team win rate (32%) + availability (30%). Social Score = performance + POM visibility + star recognition. Brand Fit = (Perf + Social) / 20. Source: IPL 2026 match CSV via scoring engine.',
+      showLegend: true,
+      getGroups: function () { return DATA_COLUMN_GROUPS; },
+      getRows: function () {
+        if (!window.ADC_DATA || typeof window.ADC_DATA.getAthletes !== 'function') return [];
+        return window.ADC_DATA.getAthletes({}).slice().sort(function (a, b) {
+          return (a.rank || a.id || 0) - (b.rank || b.id || 0);
+        });
+      },
+      searchHay: function (a) {
+        return [a.name, a.team, a.teamShort, a.role, a.sport, a.league, a.region, a.growth, a.budget].join(' ');
+      },
+      unit: 'athletes'
+    },
+    cricsheet: {
+      label: 'Cricsheet Career',
+      footnote: 'All batting & bowling data points from india_cricsheet_stats.py (India Test/ODI/T20I, 2010+, ball-by-ball). Missing format/stat cells show as NA.',
+      showLegend: false,
+      getGroups: buildCricsheetCareerGroups,
+      getRows: function () {
+        return (window.ADC_CRICSHEET && window.ADC_CRICSHEET.players) || [];
+      },
+      searchHay: function (row) { return row.player || ''; },
+      unit: 'players'
+    },
+    matches: {
+      label: 'Matches',
+      footnote: 'India international matches parsed from Cricsheet (2010+).',
+      showLegend: false,
+      getGroups: function () {
+        return buildFlatColumns([
+          { key: 'matchId', label: 'Match ID' },
+          { key: 'date', label: 'Date' },
+          { key: 'format', label: 'Format' },
+          { key: 'event', label: 'Event' },
+          { key: 'opponent', label: 'India vs' },
+          { key: 'venue', label: 'Venue' },
+          { key: 'result', label: 'Result' }
+        ], 'matches', 'Matches');
+      },
+      getRows: function () {
+        return (window.ADC_CRICSHEET && window.ADC_CRICSHEET.matches) || [];
+      },
+      searchHay: function (m) {
+        return [m.matchId, m.date, m.format, m.event, m.opponent, m.venue, m.result].join(' ');
+      },
+      unit: 'matches'
+    }
+  };
+
+  CRIC_FORMATS.forEach(function (fmt) {
+    var batKey = 'bat-' + fmt.toLowerCase();
+    var bowlKey = 'bowl-' + fmt.toLowerCase();
+    DATA_VIEWS[batKey] = {
+      label: fmt + ' Batting',
+      footnote: fmt + ' batting stats from Cricsheet ball-by-ball (2010+). Average = Runs / Dismissals. Strike Rate = Runs / Balls × 100.',
+      showLegend: false,
+      getGroups: function () {
+        return buildFlatColumns(
+          [{ key: 'player', label: 'Player' }].concat(BAT_FIELDS),
+          fmt.toLowerCase() + '-bat',
+          fmt + ' Batting'
+        );
+      },
+      getRows: function () {
+        return (window.ADC_CRICSHEET && window.ADC_CRICSHEET.batting && window.ADC_CRICSHEET.batting[fmt]) || [];
+      },
+      searchHay: function (r) { return r.player || ''; },
+      unit: 'players'
+    };
+    DATA_VIEWS[bowlKey] = {
+      label: fmt + ' Bowling',
+      footnote: fmt + ' bowling stats from Cricsheet ball-by-ball (2010+). Average = Runs / Wickets. Economy = Runs / Overs.',
+      showLegend: false,
+      getGroups: function () {
+        return buildFlatColumns(
+          [{ key: 'player', label: 'Player' }].concat(BOWL_FIELDS),
+          fmt.toLowerCase() + '-bowl',
+          fmt + ' Bowling'
+        );
+      },
+      getRows: function () {
+        return (window.ADC_CRICSHEET && window.ADC_CRICSHEET.bowling && window.ADC_CRICSHEET.bowling[fmt]) || [];
+      },
+      searchHay: function (r) { return r.player || ''; },
+      unit: 'players'
+    };
+  });
+
+  function dataCellValue(row, col) {
+    var raw = col.resolve ? col.resolve(row) : row[col.key];
     if (raw === undefined || raw === null || raw === '') return 'NA';
     if (typeof raw === 'boolean') return raw ? 'Yes' : 'No';
     return String(raw);
   }
 
-  function getDataAthletes() {
-    if (!window.ADC_DATA || typeof window.ADC_DATA.getAthletes !== 'function') return [];
-    return window.ADC_DATA.getAthletes({}).slice().sort(function (a, b) {
-      return (a.rank || a.id || 0) - (b.rank || b.id || 0);
-    });
+  function renderDataViewTabs() {
+    var tabsEl = document.getElementById('data-view-tabs');
+    if (!tabsEl) return;
+    var order = ['scoring', 'cricsheet', 'matches', 'bat-test', 'bowl-test', 'bat-odi', 'bowl-odi', 'bat-t20i', 'bowl-t20i'];
+    tabsEl.innerHTML = order.map(function (key) {
+      var view = DATA_VIEWS[key];
+      if (!view) return '';
+      var active = key === dataViewState.view ? ' data-view-tab--active' : '';
+      return '<button type="button" class="data-view-tab' + active + '" role="tab" data-data-view="' + key + '" aria-selected="' +
+        (key === dataViewState.view ? 'true' : 'false') + '">' + escapeHtml(view.label) + '</button>';
+    }).join('');
   }
 
   function renderDataTable(opts) {
     opts = opts || {};
+    if (opts.view) dataViewState.view = opts.view;
+    var view = DATA_VIEWS[dataViewState.view] || DATA_VIEWS.scoring;
     var headEl = document.getElementById('data-table-head');
     var bodyEl = document.getElementById('data-table-body');
     var countEl = document.getElementById('data-count');
     var searchEl = document.getElementById('data-search');
+    var legendEl = document.getElementById('data-engine-legend');
+    var footnoteEl = document.getElementById('data-footnote');
     if (!headEl || !bodyEl) return;
 
+    renderDataViewTabs();
+    if (legendEl) legendEl.hidden = !view.showLegend;
+    if (footnoteEl) footnoteEl.textContent = view.footnote;
+
+    var groups = view.getGroups();
     var q = (opts.query != null ? opts.query : (searchEl && searchEl.value) || '').trim().toLowerCase();
-    var athletes = getDataAthletes().filter(function (a) {
+    var allRows = view.getRows();
+    var rows = allRows.filter(function (row) {
       if (!q) return true;
-      var hay = [a.name, a.team, a.teamShort, a.role, a.sport, a.league, a.region, a.growth, a.budget]
-        .join(' ').toLowerCase();
-      return hay.indexOf(q) !== -1;
+      return view.searchHay(row).toLowerCase().indexOf(q) !== -1;
     });
 
-    var groupRow = DATA_COLUMN_GROUPS.map(function (g) {
+    var groupRow = groups.map(function (g) {
       return '<th class="data-th-group data-th-group--' + g.id + '" colspan="' + g.columns.length + '">' +
         escapeHtml(g.label) + '</th>';
     }).join('');
 
-    var colRow = DATA_COLUMN_GROUPS.map(function (g) {
+    var colRow = groups.map(function (g) {
       return g.columns.map(function (col) {
         return '<th class="data-th data-th--' + g.id + '" title="' + escapeHtml(col.label) + '">' +
           escapeHtml(col.label) + '</th>';
@@ -499,14 +684,14 @@
 
     headEl.innerHTML = '<tr class="data-group-row">' + groupRow + '</tr><tr class="data-col-row">' + colRow + '</tr>';
 
-    if (!athletes.length) {
-      var colCount = DATA_COLUMN_GROUPS.reduce(function (n, g) { return n + g.columns.length; }, 0);
-      bodyEl.innerHTML = '<tr><td class="data-empty" colspan="' + colCount + '">No athletes match this search.</td></tr>';
+    if (!rows.length) {
+      var colCount = groups.reduce(function (n, g) { return n + g.columns.length; }, 0);
+      bodyEl.innerHTML = '<tr><td class="data-empty" colspan="' + colCount + '">No rows match this search.</td></tr>';
     } else {
-      bodyEl.innerHTML = athletes.map(function (a) {
-        return '<tr>' + DATA_COLUMN_GROUPS.map(function (g) {
+      bodyEl.innerHTML = rows.map(function (row) {
+        return '<tr>' + groups.map(function (g) {
           return g.columns.map(function (col) {
-            var val = dataCellValue(a, col);
+            var val = dataCellValue(row, col);
             var na = val === 'NA' ? ' data-na' : '';
             return '<td class="data-td data-td--' + g.id + '"' + na + '>' + escapeHtml(val) + '</td>';
           }).join('');
@@ -515,10 +700,9 @@
     }
 
     if (countEl) {
-      var total = getDataAthletes().length;
-      countEl.textContent = athletes.length === total
-        ? (total + ' athletes')
-        : (athletes.length + ' of ' + total + ' athletes');
+      countEl.textContent = rows.length === allRows.length
+        ? (allRows.length + ' ' + view.unit)
+        : (rows.length + ' of ' + allRows.length + ' ' + view.unit);
     }
   }
 
@@ -695,6 +879,12 @@
   }
 
   function handleNavClick(e) {
+    var dataViewBtn = e.target.closest('[data-data-view]');
+    if (dataViewBtn) {
+      e.preventDefault();
+      renderDataTable({ view: dataViewBtn.getAttribute('data-data-view') });
+      return;
+    }
     var target = e.target.closest('[data-nav]');
     if (!target) return;
     e.preventDefault();
