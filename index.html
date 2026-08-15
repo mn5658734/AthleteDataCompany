@@ -22,6 +22,7 @@
         </a>
         <nav class="landing-nav">
           <a href="/deck" class="nav-btn-deck" id="nav-deck-link">DECK</a>
+          <a href="#/data" class="nav-btn-data nav-top-pill" id="nav-data-link" data-nav="data">DATA</a>
           <a href="/login.html" class="nav-btn-login" id="nav-login-link">LOGIN</a>
         </nav>
       </header>
@@ -388,6 +389,38 @@
   <!-- Persona side navigation (populated by app.js) -->
   <aside class="journey-sidebar" id="journey-sidebar" aria-label="Persona navigation"></aside>
   <div class="journey-sidebar-scrim" id="journey-sidebar-scrim" hidden></div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- DATA — scoring-engine data points for all athletes -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="screen-data" class="screen journey-screen">
+    <div class="screen-inner data-screen">
+      <div class="data-screen-header">
+        <div>
+          <h1>Athlete Scoring Data</h1>
+          <p class="screen-desc">All player data points aligned to ADC scoring engines. Missing values show as <strong>NA</strong>.</p>
+        </div>
+        <div class="data-screen-tools">
+          <label class="data-search-label" for="data-search">Search</label>
+          <input type="search" id="data-search" class="data-search" placeholder="Name, team, role…" autocomplete="off" />
+          <span class="data-count" id="data-count"></span>
+        </div>
+      </div>
+      <div class="data-engine-legend" aria-label="Scoring engines">
+        <span class="data-engine-pill data-engine-pill--identity">Player</span>
+        <span class="data-engine-pill data-engine-pill--perf">1. Performance Engine</span>
+        <span class="data-engine-pill data-engine-pill--social">2. Social &amp; Fan Signal</span>
+        <span class="data-engine-pill data-engine-pill--brand">3. Brand Matching</span>
+      </div>
+      <div class="data-table-wrap">
+        <table class="data-table" id="data-table">
+          <thead id="data-table-head"></thead>
+          <tbody id="data-table-body"></tbody>
+        </table>
+      </div>
+      <p class="data-footnote">Performance Score = POM impact (38%) + team win rate (32%) + availability (30%). Social Score = performance + POM visibility + star recognition. Brand Fit = (Perf + Social) / 20. Source: IPL 2026 match CSV via scoring engine.</p>
+    </div>
+  </section>
 
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <!-- ATHLETE JOURNEY -->

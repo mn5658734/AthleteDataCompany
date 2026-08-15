@@ -7,6 +7,7 @@
   var PERSONA_START = { athlete: 'athlete-register', brand: 'brand-register', admin: 'admin-login', creator: 'creator-register' };
   var PERSONA_LABELS = { athlete: 'Athlete', brand: 'Brand / Agency', admin: 'Admin', creator: 'Sports Content Creator' };
   var BREADCRUMBS = {
+    'data': 'Scoring Data',
     'athlete-register': 'Registration', 'athlete-profile': 'Profile', 'athlete-dashboard': 'Dashboard', 'athlete-requests': 'Sponsorship requests',
     'creator-register': 'Registration', 'creator-profile': 'Profile', 'creator-dashboard': 'Dashboard', 'creator-requests': 'Brand requests',
     'brand-register': 'Registration', 'brand-discovery': 'Discovery', 'brand-athlete-profile': 'Athlete profile',
@@ -384,6 +385,143 @@
     });
   }
 
+  /** Scoring-engine column schema. Missing values render as NA. */
+  var DATA_COLUMN_GROUPS = [
+    {
+      id: 'identity',
+      label: 'Player',
+      columns: [
+        { key: 'rank', label: 'Rank' },
+        { key: 'id', label: 'ID' },
+        { key: 'name', label: 'Name' },
+        { key: 'initials', label: 'Initials' },
+        { key: 'sport', label: 'Sport' },
+        { key: 'league', label: 'League' },
+        { key: 'role', label: 'Role' },
+        { key: 'age', label: 'Age' },
+        { key: 'region', label: 'Region' },
+        { key: 'gender', label: 'Gender' },
+        { key: 'team', label: 'Team' },
+        { key: 'teamShort', label: 'Team Short' }
+      ]
+    },
+    {
+      id: 'perf',
+      label: '1. Performance Engine',
+      columns: [
+        { key: 'matches', label: 'Match & Season Stats (Matches)' },
+        { key: 'pom', label: 'POM Awards' },
+        { key: 'wins', label: 'Team Wins' },
+        { key: 'winRate', label: 'Win Rate %' },
+        { key: 'growth', label: 'Consistency & Progression' },
+        { key: 'tournamentLevel', label: 'Tournament & Competition Level', resolve: function (a) { return a.league; } },
+        { key: 'fitnessAvailability', label: 'Fitness & Availability' },
+        { key: 'perf', label: 'Performance Score' }
+      ]
+    },
+    {
+      id: 'social',
+      label: '2. Social & Fan Signal Engine',
+      columns: [
+        { key: 'socialEngagement', label: 'Social Media Engagement' },
+        { key: 'fanFollowingSentiment', label: 'Fan Following & Sentiment' },
+        { key: 'communityInteractions', label: 'Community Interactions' },
+        { key: 'newsMediaMentions', label: 'News & Media Mentions' },
+        { key: 'social', label: 'Social & Fan Score' }
+      ]
+    },
+    {
+      id: 'brand',
+      label: '3. Brand Matching Engine',
+      columns: [
+        { key: 'brandAudienceFit', label: 'Brand & Audience Fit', resolve: function (a) {
+          if (a.perf == null || a.social == null) return null;
+          return ((Number(a.perf) + Number(a.social)) / 20).toFixed(1);
+        }},
+        { key: 'locationSport', label: 'Location & Sport Category', resolve: function (a) {
+          var parts = [a.region, a.sport].filter(function (v) { return v != null && v !== ''; });
+          return parts.length ? parts.join(' · ') : null;
+        }},
+        { key: 'engagementCredibility', label: 'Engagement & Credibility', resolve: function (a) {
+          if (a.verified == null) return null;
+          return a.verified ? 'Verified' : 'Unverified';
+        }},
+        { key: 'sponsorshipReadiness', label: 'Sponsorship Readiness', resolve: function (a) { return a.budget; } },
+        { key: 'brandMatchScore', label: 'Brand Match Score', resolve: function (a) {
+          if (a.perf == null || a.social == null) return null;
+          return ((Number(a.perf) + Number(a.social)) / 20).toFixed(1);
+        }}
+      ]
+    }
+  ];
+
+  function dataCellValue(athlete, col) {
+    var raw = col.resolve ? col.resolve(athlete) : athlete[col.key];
+    if (raw === undefined || raw === null || raw === '') return 'NA';
+    if (typeof raw === 'boolean') return raw ? 'Yes' : 'No';
+    return String(raw);
+  }
+
+  function getDataAthletes() {
+    if (!window.ADC_DATA || typeof window.ADC_DATA.getAthletes !== 'function') return [];
+    return window.ADC_DATA.getAthletes({}).slice().sort(function (a, b) {
+      return (a.rank || a.id || 0) - (b.rank || b.id || 0);
+    });
+  }
+
+  function renderDataTable(opts) {
+    opts = opts || {};
+    var headEl = document.getElementById('data-table-head');
+    var bodyEl = document.getElementById('data-table-body');
+    var countEl = document.getElementById('data-count');
+    var searchEl = document.getElementById('data-search');
+    if (!headEl || !bodyEl) return;
+
+    var q = (opts.query != null ? opts.query : (searchEl && searchEl.value) || '').trim().toLowerCase();
+    var athletes = getDataAthletes().filter(function (a) {
+      if (!q) return true;
+      var hay = [a.name, a.team, a.teamShort, a.role, a.sport, a.league, a.region, a.growth, a.budget]
+        .join(' ').toLowerCase();
+      return hay.indexOf(q) !== -1;
+    });
+
+    var groupRow = DATA_COLUMN_GROUPS.map(function (g) {
+      return '<th class="data-th-group data-th-group--' + g.id + '" colspan="' + g.columns.length + '">' +
+        escapeHtml(g.label) + '</th>';
+    }).join('');
+
+    var colRow = DATA_COLUMN_GROUPS.map(function (g) {
+      return g.columns.map(function (col) {
+        return '<th class="data-th data-th--' + g.id + '" title="' + escapeHtml(col.label) + '">' +
+          escapeHtml(col.label) + '</th>';
+      }).join('');
+    }).join('');
+
+    headEl.innerHTML = '<tr class="data-group-row">' + groupRow + '</tr><tr class="data-col-row">' + colRow + '</tr>';
+
+    if (!athletes.length) {
+      var colCount = DATA_COLUMN_GROUPS.reduce(function (n, g) { return n + g.columns.length; }, 0);
+      bodyEl.innerHTML = '<tr><td class="data-empty" colspan="' + colCount + '">No athletes match this search.</td></tr>';
+    } else {
+      bodyEl.innerHTML = athletes.map(function (a) {
+        return '<tr>' + DATA_COLUMN_GROUPS.map(function (g) {
+          return g.columns.map(function (col) {
+            var val = dataCellValue(a, col);
+            var na = val === 'NA' ? ' data-na' : '';
+            return '<td class="data-td data-td--' + g.id + '"' + na + '>' + escapeHtml(val) + '</td>';
+          }).join('');
+        }).join('') + '</tr>';
+      }).join('');
+    }
+
+    if (countEl) {
+      var total = getDataAthletes().length;
+      countEl.textContent = athletes.length === total
+        ? (total + ' athletes')
+        : (athletes.length + ' of ' + total + ' athletes');
+    }
+  }
+
   function buildRequestCardHtml(req, role) {
     var title = role === 'brand'
       ? (req.athlete || 'Athlete')
@@ -500,6 +638,8 @@
     if (screenId === 'deck') {
       goToDeck();
       return;
+    } else if (screenId === 'data') {
+      renderDataTable();
     } else if (screenId === 'brand-discovery') {
       renderDiscovery();
     } else if (screenId === 'brand-athlete-profile') {
@@ -671,6 +811,12 @@
     if (btnApply) btnApply.addEventListener('click', applyDiscoveryFilters);
     if (searchEl) searchEl.addEventListener('input', function () { renderDiscovery({ resetPage: true }); });
     if (teamEl) teamEl.addEventListener('change', function () { renderDiscovery({ resetPage: true }); });
+    var dataSearch = document.getElementById('data-search');
+    if (dataSearch) {
+      dataSearch.addEventListener('input', function () {
+        renderDataTable({ query: dataSearch.value });
+      });
+    }
   });
 
   window.ADC_APP = {
@@ -681,6 +827,7 @@
     applyDiscoveryFilters: applyDiscoveryFilters,
     goToDiscoveryPage: goToDiscoveryPage,
     renderBrandAthleteProfile: renderBrandAthleteProfile,
+    renderDataTable: renderDataTable,
     getDiscoveryFilters: getDiscoveryFilters,
     goToDeck: goToDeck
   };
