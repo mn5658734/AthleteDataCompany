@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2026-09-06k" />
+  <link rel="stylesheet" href="styles.css?v=2026-09-06n" />
 </head>
 <body>
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -1235,11 +1235,12 @@
       <div class="discovery-header">
         <div>
           <h1>Discovery Assistant</h1>
-          <p class="screen-desc">Tell ADC what you’re trying to achieve. We’ll ask only for missing brief details, then recommend athletes with match %, fee, and a portfolio plan.</p>
+          <p class="screen-desc">Share a campaign brief below. If anything is missing, ADC asks for it — then returns ranked athletes with match %, fee, and a portfolio plan.</p>
+          <p class="discovery-example-line"><span>Example</span> Campaign: New sports nutrition product · Budget: ₹20L · Market: Karnataka + Maharashtra · Audience: 18–30 · Objective: Awareness + sales</p>
         </div>
       </div>
 
-      <details class="discovery-filter-reference" id="discovery-filter-reference">
+      <details class="discovery-filter-reference discovery-filter-reference--flat" id="discovery-filter-reference">
         <summary>
           <span class="discovery-filter-reference-tag">Discovery Filter reference</span>
         </summary>
@@ -1295,13 +1296,8 @@
         </div>
       </details>
 
-      <div class="discovery-chat-discover" id="discovery-chat-discover">
-        <div class="discovery-chat-discover-messages" id="discovery-chat-discover-messages">
-          <div class="chat-msg chat-msg-bot">
-            <p>Share a campaign brief to get athlete recommendations and a portfolio plan.</p>
-            <p><strong>Example:</strong> Campaign: New sports nutrition product · Budget: ₹20L · Market: Karnataka + Maharashtra · Audience: 18–30 · Objective: Awareness + sales</p>
-          </div>
-        </div>
+      <div class="discovery-chat-discover discovery-chat-discover--simple" id="discovery-chat-discover">
+        <div class="discovery-chat-discover-messages" id="discovery-chat-discover-messages" hidden></div>
         <div class="discovery-chat-discover-chips" id="discovery-chat-discover-chips">
           <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Campaign: New sports nutrition product&#10;Budget: ₹20L&#10;Market: Karnataka + Maharashtra&#10;Audience: 18–30&#10;Objective: Awareness + sales">Sports nutrition · ₹20L brief</button>
           <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Campaign: Beverage brand refresh&#10;Budget: ₹12L&#10;Market: PAN India&#10;Audience: Gen Z&#10;Objective: Brand Awareness">Beverage · PAN India</button>
@@ -1338,6 +1334,11 @@
 
   <section id="screen-brand-athlete-profile" class="screen journey-screen">
     <div class="screen-inner profile-view-screen athlete-home">
+      <div class="discovery-back-bar" id="brand-profile-back-bar" hidden>
+        <button type="button" class="btn-secondary btn-sm" id="btn-back-to-discovery" data-back-to-discovery>
+          ← Back to search results
+        </button>
+      </div>
       <div class="profile-view-header" id="brand-profile-header">
         <div class="profile-view-avatar" id="brand-profile-avatar">--</div>
         <div class="profile-view-meta">
@@ -1717,7 +1718,7 @@
   <script src="data.js?v=2026-09-06d"></script>
   <script src="cricsheet-stats.js"></script>
   <script src="ipl-assistant.js"></script>
-  <script src="app.js?v=2026-09-06j"></script>
+  <script src="app.js?v=2026-09-06l"></script>
   <script src="demo-request.js?v=2026-09-05f"></script>
   <script>
   (function () {
@@ -1843,7 +1844,11 @@
             if (viewBtn) viewBtn.addEventListener('click', function () {
               overlay.hidden = true;
               document.body.classList.remove('ai-overlay-open');
-              if (window.ADC_APP) { window.ADC_APP.state.selectedAthleteId = id; window.ADC_APP.showScreen('brand-athlete-profile'); }
+              if (window.ADC_APP) {
+                if (typeof window.ADC_APP.saveDiscoveryCache === 'function') window.ADC_APP.saveDiscoveryCache();
+                window.ADC_APP.state.selectedAthleteId = id;
+                window.ADC_APP.showScreen('brand-athlete-profile');
+              }
             });
           }
         });

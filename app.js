@@ -101,6 +101,7 @@
   var journeyBreadcrumb = document.getElementById('journey-breadcrumb');
 
   var state = { selectedAthleteId: null };
+  var DISCOVERY_CACHE_KEY = 'adc_discovery_last_query';
   var discoveryState = {
     filteredList: [],
     recommendations: [],
@@ -110,7 +111,9 @@
     hasSearched: false,
     chatFilters: {},
     pendingQuestion: null,
-    chatBusy: false
+    chatBusy: false,
+    lastQueryText: '',
+    restoredFromCache: false
   };
 
   var CAMPAIGN_BRIEF_FIELDS = [
@@ -150,6 +153,159 @@
       required: true
     }
   ];
+
+  function getDiscoveryChatMessagesHtml() {
+    var box = document.getElementById('discovery-chat-discover-messages');
+    return box ? box.innerHTML : '';
+  }
+
+  function getDiscoveryInputValue() {
+    var input = document.getElementById('discovery-chat-discover-input');
+    return input ? input.value : '';
+  }
+
+  function serializeDiscoveryRecommendations(list) {
+    return (list || []).map(function (a) {
+      return {
+        id: a.id,
+        matchPct: a.matchPct,
+        feeLakhs: a.feeLakhs,
+        feeLabel: a.feeLabel,
+        recRole: a.recRole
+      };
+    });
+  }
+
+  function serializeDiscoveryPortfolio(portfolio) {
+    if (!portfolio) return null;
+    return {
+      athleteIds: (portfolio.athletes || []).map(function (a) { return a.id; }),
+      total: portfolio.total,
+      label: portfolio.label,
+      note: portfolio.note
+    };
+  }
+
+  function saveDiscoveryCache() {
+    if (!discoveryState.hasSearched) return;
+    try {
+      var payload = {
+        version: 1,
+        savedAt: Date.now(),
+        chatFilters: discoveryState.chatFilters || {},
+        hasSearched: true,
+        currentPage: discoveryState.currentPage || 1,
+        lastQueryText: discoveryState.lastQueryText || '',
+        pendingQuestion: discoveryState.pendingQuestion || null,
+        recommendations: serializeDiscoveryRecommendations(discoveryState.recommendations || discoveryState.filteredList),
+        portfolio: serializeDiscoveryPortfolio(discoveryState.portfolio),
+        messagesHtml: getDiscoveryChatMessagesHtml(),
+        inputValue: getDiscoveryInputValue()
+      };
+      localStorage.setItem(DISCOVERY_CACHE_KEY, JSON.stringify(payload));
+    } catch (err) { /* ignore quota / private mode */ }
+  }
+
+  function readDiscoveryCache() {
+    try {
+      var raw = localStorage.getItem(DISCOVERY_CACHE_KEY);
+      if (!raw) return null;
+      var data = JSON.parse(raw);
+      if (!data || !data.hasSearched) return null;
+      return data;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function hydrateAthletesFromCache(recs) {
+    if (!window.ADC_DATA || !recs || !recs.length) return [];
+    return recs.map(function (rec) {
+      var base = window.ADC_DATA.getAthleteById(rec.id);
+      if (!base) return null;
+      return Object.assign({}, base, {
+        matchPct: rec.matchPct,
+        feeLakhs: rec.feeLakhs,
+        feeLabel: rec.feeLabel || (rec.feeLakhs != null ? ('₹' + rec.feeLakhs + 'L') : null),
+        recRole: rec.recRole
+      });
+    }).filter(Boolean);
+  }
+
+  function hydratePortfolioFromCache(cachedPortfolio, list) {
+    if (!cachedPortfolio) return null;
+    var byId = {};
+    (list || []).forEach(function (a) { byId[a.id] = a; });
+    var athletes = (cachedPortfolio.athleteIds || []).map(function (id) { return byId[id]; }).filter(Boolean);
+    if (!athletes.length) return null;
+    return {
+      athletes: athletes,
+      total: cachedPortfolio.total,
+      label: cachedPortfolio.label || athletes.map(function (a) { return a.name; }).join(' + '),
+      note: cachedPortfolio.note || ''
+    };
+  }
+
+  function restoreDiscoveryUiFromCache(cache) {
+    if (!cache) return;
+    var box = document.getElementById('discovery-chat-discover-messages');
+    if (box && cache.messagesHtml) {
+      box.innerHTML = cache.messagesHtml;
+      box.hidden = !String(cache.messagesHtml).trim();
+    }
+    var input = document.getElementById('discovery-chat-discover-input');
+    if (input && cache.inputValue != null) input.value = cache.inputValue;
+    renderActiveCriteriaTags();
+    setDiscoveryQuestionChips(null);
+  }
+
+  function applyDiscoveryCacheToState(cache) {
+    if (!cache) return false;
+    discoveryState.chatFilters = Object.assign(emptyDiscoveryChatFilters(), cache.chatFilters || {});
+    discoveryState.hasSearched = true;
+    discoveryState.currentPage = cache.currentPage || 1;
+    discoveryState.lastQueryText = cache.lastQueryText || '';
+    discoveryState.pendingQuestion = cache.pendingQuestion || null;
+    var list = hydrateAthletesFromCache(cache.recommendations);
+    if (!list.length && cache.chatFilters) {
+      var rebuilt = buildRecommendations(discoveryState.chatFilters);
+      list = rebuilt.list;
+      discoveryState.portfolio = rebuilt.portfolio;
+    } else {
+      discoveryState.portfolio = hydratePortfolioFromCache(cache.portfolio, list);
+    }
+    discoveryState.recommendations = list;
+    discoveryState.filteredList = list;
+    discoveryState.restoredFromCache = true;
+    return true;
+  }
+
+  function restoreDiscoveryFromCache() {
+    var cache = readDiscoveryCache();
+    if (!cache) return false;
+    if (!applyDiscoveryCacheToState(cache)) return false;
+    restoreDiscoveryUiFromCache(cache);
+    return true;
+  }
+
+  function hasCachedDiscoveryResults() {
+    var cache = readDiscoveryCache();
+    return !!(cache && cache.hasSearched && ((cache.recommendations && cache.recommendations.length) || cache.chatFilters));
+  }
+
+  function updateBackToDiscoveryButton() {
+    var bar = document.getElementById('brand-profile-back-bar');
+    if (!bar) return;
+    bar.hidden = !(discoveryState.hasSearched || hasCachedDiscoveryResults());
+  }
+
+  function goBackToDiscoveryResults() {
+    if (!discoveryState.hasSearched) restoreDiscoveryFromCache();
+    showScreen('brand-discovery', { restoreResults: true });
+    setTimeout(function () {
+      scrollDiscoveryResultsIntoView('results');
+    }, 60);
+  }
 
   function isHomePath() {
     var path = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
@@ -492,6 +648,7 @@
   function appendDiscoveryChatMessage(role, html) {
     var box = document.getElementById('discovery-chat-discover-messages');
     if (!box) return;
+    box.hidden = false;
     var div = document.createElement('div');
     div.className = 'chat-msg chat-msg-' + (role === 'user' ? 'user' : 'bot');
     div.innerHTML = html;
@@ -762,6 +919,7 @@
     if (input) input.value = '';
 
     appendDiscoveryChatMessage('user', '<p>' + text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</p>');
+    discoveryState.lastQueryText = text;
 
     if (/^skip remaining/i.test(text) || /^skip$/i.test(text)) {
       runDiscoveryFromChat();
@@ -946,27 +1104,36 @@
     if (options.resetPage) discoveryState.currentPage = 1;
 
     if (!options.skipGate && !discoveryState.hasSearched) {
-      container.innerHTML = '';
-      if (countEl) countEl.textContent = '';
-      if (portfolioEl) { portfolioEl.hidden = true; portfolioEl.innerHTML = ''; }
-      renderDiscoveryPagination(0, 1, discoveryState.pageSize);
-      discoveryState.filteredList = [];
-      discoveryState.recommendations = [];
-      discoveryState.portfolio = null;
-      return;
+      if (restoreDiscoveryFromCache()) {
+        options.skipGate = true;
+      } else {
+        container.innerHTML = '';
+        if (countEl) countEl.textContent = '';
+        if (portfolioEl) { portfolioEl.hidden = true; portfolioEl.innerHTML = ''; }
+        renderDiscoveryPagination(0, 1, discoveryState.pageSize);
+        discoveryState.filteredList = [];
+        discoveryState.recommendations = [];
+        discoveryState.portfolio = null;
+        return;
+      }
     }
 
     var brief = getDiscoveryFilters();
-    var built = buildRecommendations(brief);
-    var list = built.list;
+    var list;
+    if (options.fromSearch || !discoveryState.recommendations || !discoveryState.recommendations.length) {
+      var built = buildRecommendations(brief);
+      list = built.list;
+      discoveryState.portfolio = built.portfolio;
+    } else {
+      list = discoveryState.recommendations;
+    }
     discoveryState.recommendations = list;
     discoveryState.filteredList = list;
-    discoveryState.portfolio = built.portfolio;
 
     if (portfolioEl) {
-      if (built.portfolio) {
+      if (discoveryState.portfolio) {
         portfolioEl.hidden = false;
-        portfolioEl.innerHTML = formatPortfolioHtml(built.portfolio, built.budget);
+        portfolioEl.innerHTML = formatPortfolioHtml(discoveryState.portfolio, brief.budgetAmount != null ? brief.budgetAmount : null);
       } else {
         portfolioEl.hidden = true;
         portfolioEl.innerHTML = '';
@@ -993,6 +1160,7 @@
     }
 
     renderDiscoveryPagination(list.length, discoveryState.currentPage, pageSize);
+    if (discoveryState.hasSearched) saveDiscoveryCache();
 
     if (options.scrollToResults) {
       scrollDiscoveryResultsIntoView('results');
@@ -1084,14 +1252,18 @@
     discoveryState.currentPage = page;
     discoveryState.hasSearched = true;
     renderDiscovery({ skipGate: true, scrollToResults: true });
+    saveDiscoveryCache();
   }
 
   function applyDiscoveryFilters(done) {
     var sendBtn = document.getElementById('discovery-chat-discover-send');
     if (sendBtn) sendBtn.disabled = true;
+    discoveryState.recommendations = [];
+    discoveryState.filteredList = [];
     runDiscoverySearchAnimation(function () {
       discoveryState.hasSearched = true;
-      renderDiscovery({ resetPage: true, skipGate: true, scrollToResults: true });
+      renderDiscovery({ resetPage: true, skipGate: true, fromSearch: true, scrollToResults: true });
+      saveDiscoveryCache();
       if (sendBtn) sendBtn.disabled = false;
       if (typeof done === 'function') done();
     });
@@ -1267,6 +1439,7 @@
         renderBrandAthleteProfile(athleteId);
       };
     }
+    updateBackToDiscoveryButton();
 
     var scores = deriveBrandProfileScores(athlete);
     var perfEl = document.getElementById('pv-perf');
@@ -1974,10 +2147,17 @@
     } else if (screenId === 'athlete-profile' || screenId === 'athlete-dashboard') {
       updateAthleteProfileCompletion();
     } else if (screenId === 'brand-discovery') {
-      renderDiscovery();
+      if (params.restoreResults || !discoveryState.hasSearched) {
+        restoreDiscoveryFromCache();
+      }
+      renderDiscovery({
+        skipGate: discoveryState.hasSearched,
+        scrollToResults: !!params.restoreResults
+      });
     } else if (screenId === 'brand-athlete-profile') {
       var id = params.athleteId != null ? params.athleteId : state.selectedAthleteId;
       renderBrandAthleteProfile(id);
+      updateBackToDiscoveryButton();
     } else if (screenId === 'brand-inquiry' && state.selectedAthleteId) {
       renderBrandAthleteProfile(state.selectedAthleteId);
     } else if (screenId === 'brand-proposal') {
@@ -2067,6 +2247,12 @@
   }
 
   function handleCardClick(e) {
+    var backBtn = e.target.closest('[data-back-to-discovery]');
+    if (backBtn) {
+      e.preventDefault();
+      goBackToDiscoveryResults();
+      return;
+    }
     var pageBtn = e.target.closest('.discovery-page-btn[data-page]');
     if (pageBtn) {
       if (pageBtn.hasAttribute('disabled') || pageBtn.disabled) return;
@@ -2084,7 +2270,11 @@
     var card = e.target.closest('.athlete-card[data-athlete-id]');
     if (!card) return;
     var id = card.getAttribute('data-athlete-id');
-    if (id) { state.selectedAthleteId = parseInt(id, 10); showScreen('brand-athlete-profile'); }
+    if (id) {
+      saveDiscoveryCache();
+      state.selectedAthleteId = parseInt(id, 10);
+      showScreen('brand-athlete-profile', { athleteId: state.selectedAthleteId });
+    }
   }
 
   function handleProposalSubmit(e) {
@@ -2183,6 +2373,9 @@
     renderBrandAthleteProfile: renderBrandAthleteProfile,
     renderDataTable: renderDataTable,
     getDiscoveryFilters: getDiscoveryFilters,
+    saveDiscoveryCache: saveDiscoveryCache,
+    restoreDiscoveryFromCache: restoreDiscoveryFromCache,
+    goBackToDiscoveryResults: goBackToDiscoveryResults,
     goToDeck: goToDeck,
     openDiscoveryAssistant: null,
     closeDiscoveryAssistant: null,
