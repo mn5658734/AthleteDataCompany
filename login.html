@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2026-08-02b" />
-  <link rel="stylesheet" href="login.css" />
+  <link rel="stylesheet" href="styles.css?v=2026-09-06g" />
+  <link rel="stylesheet" href="login.css?v=2026-09-06a" />
 </head>
 <body class="login-page">
   <header class="landing-header login-header">
@@ -16,8 +16,7 @@
       <img src="assets/adc-logo.png" alt="ADC — Athlete Data Company" class="logo-img" width="180" height="60" />
     </a>
     <nav class="landing-nav">
-      <a href="/deck" class="nav-btn-deck" id="nav-deck-link">DECK</a>
-      <a href="/login.html" class="nav-btn-login nav-btn-login--active" aria-current="page">LOGIN</a>
+      <a href="#request-demo" class="nav-btn-demo" id="nav-demo-link" role="button">REQUEST DEMO</a>
     </nav>
   </header>
 
@@ -36,21 +35,9 @@
           <span class="login-persona-icon">🎯</span>
           <span class="login-persona-label">Brand</span>
         </button>
-        <button type="button" class="login-persona login-persona--creator" data-persona="creator" role="radio" aria-checked="false">
-          <span class="login-persona-icon">🎬</span>
-          <span class="login-persona-label">Creator</span>
-        </button>
-        <button type="button" class="login-persona login-persona--fan" data-persona="fan" role="radio" aria-checked="false">
-          <span class="login-persona-icon">📈</span>
-          <span class="login-persona-label">Fan</span>
-        </button>
-        <button type="button" class="login-persona login-persona--admin" data-persona="admin" role="radio" aria-checked="false">
-          <span class="login-persona-icon">🛡</span>
-          <span class="login-persona-label">Admin</span>
-        </button>
       </div>
 
-      <p class="login-persona-hint" id="login-persona-hint">You'll go to your athlete dashboard after sign-in.</p>
+      <p class="login-persona-hint" id="login-persona-hint">You'll go to your athlete overview after sign-in.</p>
 
       <form class="login-form proto-form" id="login-form" novalidate>
         <div class="form-row">
@@ -62,8 +49,9 @@
           <input type="password" id="login-password" name="password" placeholder="••••••••" autocomplete="current-password" required />
         </div>
         <p class="login-error" id="login-error" hidden></p>
-        <div class="form-actions">
+        <div class="form-actions login-form-actions">
           <button type="submit" class="btn-primary btn-login-submit" id="login-submit-btn">Login</button>
+          <button type="button" class="btn-primary btn-login-submit btn-signup-submit" id="signup-submit-btn">Signup</button>
         </div>
       </form>
 
@@ -71,6 +59,44 @@
     </div>
   </main>
 
-  <script src="login.js"></script>
+  <!-- Request Demo modal -->
+  <div id="demo-modal" class="demo-modal" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="demo-modal-title">
+    <div class="demo-modal-backdrop" data-close-demo tabindex="-1"></div>
+    <div class="demo-modal-dialog">
+      <button type="button" class="demo-modal-close" data-close-demo aria-label="Close">×</button>
+      <div id="demo-modal-form-wrap">
+        <p class="demo-modal-kicker">Book a walkthrough</p>
+        <h2 id="demo-modal-title" class="demo-modal-title">Request a demo</h2>
+        <p class="demo-modal-desc">Tell us a bit about you and we’ll schedule a short product walkthrough.</p>
+        <form id="demo-request-form" class="demo-modal-form">
+          <label class="demo-field">
+            <span>Name</span>
+            <input type="text" id="demo-name" name="name" autocomplete="name" required placeholder="Your full name" />
+          </label>
+          <label class="demo-field">
+            <span>Email</span>
+            <input type="email" id="demo-email" name="email" autocomplete="email" required placeholder="you@company.com" />
+          </label>
+          <label class="demo-field">
+            <span>Phone</span>
+            <input type="tel" id="demo-phone" name="phone" autocomplete="tel" required placeholder="+91 98765 43210" />
+          </label>
+          <label class="demo-field">
+            <span>Purpose of demo</span>
+            <textarea id="demo-purpose" name="purpose" rows="3" required placeholder="e.g. Brand sponsorship discovery, federation data partnership…"></textarea>
+          </label>
+          <button type="submit" class="demo-modal-submit">Submit</button>
+        </form>
+      </div>
+      <div id="demo-modal-success" class="demo-modal-success" hidden>
+        <h2 class="demo-modal-title">Request received</h2>
+        <p class="demo-modal-desc">Thanks — our team will reach out shortly to schedule your demo.</p>
+        <button type="button" class="demo-modal-submit" data-close-demo>Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="login.js?v=2026-09-06a"></script>
+  <script src="demo-request.js?v=2026-09-05e"></script>
 </body>
 </html>

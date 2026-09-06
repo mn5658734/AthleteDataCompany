@@ -80,19 +80,24 @@
 
 .login-personas {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 140px));
+  gap: 0.75rem;
+  justify-content: center;
+  margin: 0 auto 0.75rem;
+  width: 100%;
 }
 
 .login-persona {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.65rem 0.35rem;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  min-height: 96px;
+  padding: 1rem 0.75rem;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--bg-elevated);
   color: var(--text-muted);
   font-family: var(--font);
@@ -101,12 +106,12 @@
 }
 
 .login-persona-icon {
-  font-size: 1.15rem;
+  font-size: 1.35rem;
   line-height: 1;
 }
 
 .login-persona-label {
-  font-size: 0.65rem;
+  font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -124,15 +129,13 @@
 }
 
 .login-persona--brand.active { border-color: var(--accent-brand); background: rgba(108, 159, 255, 0.1); }
-.login-persona--creator.active { border-color: var(--accent-creator); background: rgba(192, 132, 252, 0.1); }
-.login-persona--fan.active { border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
-.login-persona--admin.active { border-color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
 
 .login-persona-hint {
   margin: 0 0 1.25rem;
   font-size: 0.85rem;
   color: var(--text-muted);
   line-height: 1.45;
+  text-align: center;
 }
 
 .login-form .form-row {
@@ -143,7 +146,17 @@
   margin-top: 0.25rem;
 }
 
+.login-form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
 .btn-login-submit {
+  width: 100%;
+}
+
+.btn-signup-submit {
   width: 100%;
 }
 
@@ -162,12 +175,7 @@
 
 @media (max-width: 560px) {
   .login-personas {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .login-persona--admin,
-  .login-persona--fan {
-    grid-column: span 1;
+    grid-template-columns: repeat(2, minmax(0, 120px));
   }
 
   .login-card {

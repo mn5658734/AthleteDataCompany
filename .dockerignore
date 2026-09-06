@@ -1,0 +1,8 @@
+.git
+.gitignore
+.DS_Store
+**/node_modules
+**/.DS_Store
+.pydeps
+*.md
+!README.md

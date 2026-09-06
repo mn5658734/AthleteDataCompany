@@ -1,7 +1,7 @@
 {
   "name": "athlete-data-company",
   "version": "1.1.0",
-  "description": "AI-Powered Athlete Discovery & Intelligence Marketplace",
+  "description": "AI-Powered Athlete Discovery & Intelligence Platform",
   "private": true,
   "scripts": {
     "start": "npx serve . -p 3000",

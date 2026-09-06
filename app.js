@@ -4,11 +4,11 @@
  */
 
 (function () {
-  var PERSONA_START = { athlete: 'athlete-register', brand: 'brand-register', admin: 'admin-login', creator: 'creator-register' };
+  var PERSONA_START = { athlete: 'athlete-profile', brand: 'brand-register', admin: 'admin-login', creator: 'creator-register' };
   var PERSONA_LABELS = { athlete: 'Athlete', brand: 'Brand / Agency', admin: 'Admin', creator: 'Sports Content Creator' };
   var BREADCRUMBS = {
     'data': 'Scoring Data',
-    'athlete-register': 'Registration', 'athlete-profile': 'Profile', 'athlete-dashboard': 'Dashboard', 'athlete-requests': 'Sponsorship requests',
+    'athlete-register': 'Profile', 'athlete-profile': 'Edit profile', 'athlete-dashboard': 'Overview', 'athlete-requests': 'Sponsorship requests',
     'creator-register': 'Registration', 'creator-profile': 'Profile', 'creator-dashboard': 'Dashboard', 'creator-requests': 'Brand requests',
     'brand-register': 'Registration', 'brand-discovery': 'Discovery', 'brand-athlete-profile': 'Athlete profile',
     'brand-inquiry': 'Send inquiry', 'brand-proposal': 'Create proposal', 'brand-requests': 'Sponsorship requests', 'brand-shortlist': 'Shortlist',
@@ -20,10 +20,9 @@
     athlete: {
       label: 'Athlete',
       items: [
-        { icon: '📊', label: 'Dashboard', screen: 'athlete-dashboard' },
-        { icon: '👤', label: 'My Profile', screen: 'athlete-profile' },
-        { icon: '🤝', label: 'Sponsorship Requests', screen: 'athlete-requests', badge: 'athlete-requests' },
-        { icon: '📝', label: 'Registration', screen: 'athlete-register' }
+        { icon: '📊', label: 'Overview', screen: 'athlete-dashboard' },
+        { icon: '👤', label: 'Profile', screen: 'athlete-profile' },
+        { icon: '🤝', label: 'Sponsorship Requests', screen: 'athlete-requests', badge: 'athlete-requests' }
       ]
     },
     creator: {
@@ -102,7 +101,7 @@
   var journeyBreadcrumb = document.getElementById('journey-breadcrumb');
 
   var state = { selectedAthleteId: null };
-  var discoveryState = { filteredList: [], currentPage: 1, pageSize: 10 };
+  var discoveryState = { filteredList: [], currentPage: 1, pageSize: 10, hasSearched: false };
 
   function isHomePath() {
     var path = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
@@ -121,15 +120,72 @@
 
     function renderRolesForSport(sport) {
       var roles = ATHLETE_SPORT_ROLES[sport] || ['NA'];
-      roleSelect.innerHTML = roles.map(function (r) {
+      var current = roleSelect.value;
+      roleSelect.innerHTML = '<option value="">Select role</option>' + roles.map(function (r) {
         return '<option>' + r + '</option>';
       }).join('');
+      if (current && roles.indexOf(current) !== -1) roleSelect.value = current;
     }
 
     renderRolesForSport(sportSelect.value || 'Cricket');
     sportSelect.addEventListener('change', function () {
-      renderRolesForSport(sportSelect.value);
+      renderRolesForSport(sportSelect.value || 'Cricket');
+      updateAthleteProfileCompletion();
     });
+  }
+
+  function updateAthleteProfileCompletion() {
+    var form = document.getElementById('form-athlete-profile');
+    if (!form) return 0;
+    var filled = 0;
+    var total = 0;
+
+    form.querySelectorAll('[data-profile-field]').forEach(function (el) {
+      total += 1;
+      if ((el.value || '').toString().trim()) filled += 1;
+    });
+    form.querySelectorAll('[data-profile-file]').forEach(function (el) {
+      total += 1;
+      if (el.files && el.files.length) filled += 1;
+    });
+    form.querySelectorAll('[data-profile-check]').forEach(function (el) {
+      total += 1;
+      if (el.checked) filled += 1;
+    });
+
+    var pct = total ? Math.round((filled / total) * 100) : 0;
+    if (pct < 50) pct = 50;
+    var valueEl = document.getElementById('athlete-profile-completion-value');
+    var fillEl = document.getElementById('athlete-profile-completion-fill');
+    var barEl = document.getElementById('athlete-profile-completion-bar');
+    var dashEl = document.getElementById('dashboard-profile-completion');
+    if (valueEl) valueEl.textContent = pct + '%';
+    if (fillEl) fillEl.style.width = pct + '%';
+    if (barEl) barEl.setAttribute('aria-valuenow', String(pct));
+    if (dashEl) dashEl.textContent = pct + '%';
+    return pct;
+  }
+
+  function initAthleteProfileForm() {
+    var form = document.getElementById('form-athlete-profile');
+    if (!form || form.getAttribute('data-profile-bound')) return;
+    form.setAttribute('data-profile-bound', '1');
+
+    form.addEventListener('input', updateAthleteProfileCompletion);
+    form.addEventListener('change', updateAthleteProfileCompletion);
+
+    var methodGroup = document.getElementById('athlete-login-method');
+    if (methodGroup) {
+      methodGroup.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-login-method]');
+        if (!btn) return;
+        methodGroup.querySelectorAll('[data-login-method]').forEach(function (b) {
+          b.classList.toggle('is-selected', b === btn);
+        });
+      });
+    }
+
+    updateAthleteProfileCompletion();
   }
 
   function getPersonaForScreen(screenId) {
@@ -150,20 +206,31 @@
     var social = (socialEl && socialEl.value) ? socialEl.value.trim().split(/\s*[-–]\s*/) : [];
     return {
       sport: document.getElementById('filter-sport') && document.getElementById('filter-sport').value,
-      role: document.getElementById('filter-role') && document.getElementById('filter-role').value,
-      team: document.getElementById('filter-team') && document.getElementById('filter-team').value,
-      ageMin: age[0] ? parseInt(age[0], 10) : null,
-      ageMax: age[1] ? parseInt(age[1], 10) : null,
-      region: document.getElementById('filter-location') && document.getElementById('filter-location').value,
+      campaignObjective: document.getElementById('filter-campaign-objective') && document.getElementById('filter-campaign-objective').value,
+      targetAudience: document.getElementById('filter-target-audience') && document.getElementById('filter-target-audience').value,
+      targetGeography: document.getElementById('filter-target-geography') && document.getElementById('filter-target-geography').value,
+      budget: document.getElementById('filter-budget') && document.getElementById('filter-budget').value,
+      brandCategory: document.getElementById('filter-brand-category') && document.getElementById('filter-brand-category').value,
       perfMin: perf[0] ? parseInt(perf[0], 10) : null,
       perfMax: perf[1] ? parseInt(perf[1], 10) : null,
+      growth: document.getElementById('filter-growth') && document.getElementById('filter-growth').value,
+      commercialValue: document.getElementById('filter-commercial-value') && document.getElementById('filter-commercial-value').value,
+      brandMatch: document.getElementById('filter-brand-match') && document.getElementById('filter-brand-match').value,
+      verifiedOnly: document.getElementById('filter-verified') ? document.getElementById('filter-verified').checked : false,
+      ageMin: age[0] ? parseInt(age[0], 10) : null,
+      ageMax: age[1] ? parseInt(age[1], 10) : null,
+      gender: document.getElementById('filter-gender') && document.getElementById('filter-gender').value,
+      region: document.getElementById('filter-location') && document.getElementById('filter-location').value,
+      competition: document.getElementById('filter-competition') && document.getElementById('filter-competition').value,
+      role: document.getElementById('filter-role') && document.getElementById('filter-role').value,
+      audienceSize: document.getElementById('filter-audience-size') && document.getElementById('filter-audience-size').value,
+      engagement: document.getElementById('filter-engagement') && document.getElementById('filter-engagement').value,
       socialMin: social[0] ? parseInt(social[0], 10) : null,
       socialMax: social[1] ? parseInt(social[1], 10) : null,
-      gender: document.getElementById('filter-gender') && document.getElementById('filter-gender').value,
-      growth: document.getElementById('filter-growth') && document.getElementById('filter-growth').value,
-      budget: document.getElementById('filter-budget') && document.getElementById('filter-budget').value,
-      verifiedOnly: document.getElementById('filter-verified') ? document.getElementById('filter-verified').checked : false,
-      searchQuery: document.getElementById('discovery-search') ? document.getElementById('discovery-search').value.trim() : ''
+      perfTrend: document.getElementById('filter-perf-trend') && document.getElementById('filter-perf-trend').value,
+      fanDemand: document.getElementById('filter-fan-demand') && document.getElementById('filter-fan-demand').value,
+      brandSafety: document.getElementById('filter-brand-safety') && document.getElementById('filter-brand-safety').value,
+      availability: document.getElementById('filter-availability') && document.getElementById('filter-availability').value
     };
   }
 
@@ -178,7 +245,7 @@
           '<span>' + leagueLabel + (a.role || '') + (teamLabel ? ' · ' + teamLabel : '') + '</span>' +
           '<div class="athlete-card-scores">' +
             '<span>Perf: ' + (a.perf != null ? a.perf : '—') + '</span>' +
-            '<span>Social: ' + (a.social != null ? a.social : '—') + '</span>' +
+            '<span class="athlete-card-social-score">Social Score: ' + (a.social != null ? a.social : '—') + '</span>' +
             (a.pom != null ? '<span>POM: ' + a.pom + '</span>' : '') +
             (a.verified ? ' <span class="verified">✓ Verified</span>' : '') +
           '</div>' +
@@ -222,27 +289,98 @@
 
     if (options.resetPage) discoveryState.currentPage = 1;
 
+    if (!options.skipGate && !discoveryState.hasSearched) {
+      container.innerHTML = '<p class="discovery-empty">Set filters and click Apply filters to discover athletes.</p>';
+      if (countEl) countEl.textContent = '';
+      renderDiscoveryPagination(0, 1, discoveryState.pageSize);
+      discoveryState.filteredList = [];
+      return;
+    }
+
     var filters = getDiscoveryFilters();
     var list = window.ADC_DATA.getAthletes(filters);
     discoveryState.filteredList = list;
 
     var pageSize = discoveryState.pageSize;
-    var totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+    var totalPages = Math.max(1, Math.ceil(list.length / pageSize) || 1);
+    if (list.length === 0) totalPages = 1;
     if (discoveryState.currentPage > totalPages) discoveryState.currentPage = totalPages;
     if (discoveryState.currentPage < 1) discoveryState.currentPage = 1;
 
     var startIdx = (discoveryState.currentPage - 1) * pageSize;
     var pageList = list.slice(startIdx, startIdx + pageSize);
 
-    container.innerHTML = pageList.map(buildAthleteCardHtml).join('');
+    container.innerHTML = pageList.length
+      ? pageList.map(buildAthleteCardHtml).join('')
+      : '<p class="discovery-empty">No athletes matched these filters.</p>';
 
     if (countEl) {
-      var meta = window.ADC_DATA.IPL_META;
-      var suffix = meta ? ' · IPL ' + meta.season + ' dataset' : '';
-      countEl.textContent = list.length + ' athlete' + (list.length !== 1 ? 's' : '') + ' found' + suffix;
+      countEl.textContent = list.length + ' athlete' + (list.length !== 1 ? 's' : '') + ' found';
     }
 
     renderDiscoveryPagination(list.length, discoveryState.currentPage, pageSize);
+  }
+
+  function runDiscoverySearchAnimation(done) {
+    var anim = document.getElementById('discovery-search-anim');
+    var linesEl = document.getElementById('discovery-search-anim-lines');
+    var cards = document.getElementById('discovery-athlete-cards');
+    var countEl = document.getElementById('discovery-results-count');
+    var filters = getDiscoveryFilters();
+    if (!anim || !linesEl) {
+      if (done) done();
+      return;
+    }
+    if (cards) cards.innerHTML = '';
+    if (countEl) countEl.textContent = 'Scanning…';
+    anim.hidden = false;
+    linesEl.innerHTML = '';
+
+    var sport = filters.sport || 'All';
+    var steps = [
+      '> load filter matrix · sport=' + sport,
+      '> apply age/gender/location constraints',
+      '> compute perf ∩ social bands · Δt=' + (22 + Math.floor(Math.random() * 35)) + 'ms',
+      '> budget + growth + commercial intelligence join',
+      '> verified identity check · hash=' + Math.abs(sport.split('').reduce(function (a, c) { return ((a << 5) - a) + c.charCodeAt(0); }, 0)).toString(16).slice(0, 6),
+      '> rank candidates · sort(perf, social, fit)',
+      '> assemble discovery payload…'
+    ];
+
+    var started = Date.now();
+    var duration = 5000;
+    var i = 0;
+
+    function tick() {
+      var elapsed = Date.now() - started;
+      if (i < steps.length) {
+        var line = document.createElement('div');
+        line.className = 'discovery-search-anim-line';
+        line.textContent = steps[i];
+        linesEl.appendChild(line);
+        linesEl.scrollTop = linesEl.scrollHeight;
+        i += 1;
+      } else if (elapsed < duration) {
+        var calc = document.createElement('div');
+        calc.className = 'discovery-search-anim-line';
+        calc.textContent = '> calc fit_score=' + (Math.random() * 10).toFixed(2) +
+          ' · roi_idx=' + (0.4 + Math.random() * 0.55).toFixed(3) +
+          ' · t+' + Math.floor(elapsed) + 'ms';
+        linesEl.appendChild(calc);
+        while (linesEl.children.length > 10) linesEl.removeChild(linesEl.firstChild);
+        linesEl.scrollTop = linesEl.scrollHeight;
+      }
+
+      if (elapsed >= duration) {
+        anim.hidden = true;
+        if (done) done();
+        return;
+      }
+      var remaining = duration - elapsed;
+      var delay = i < steps.length ? Math.min(520, Math.floor(remaining / Math.max(1, steps.length - i + 1))) : 380;
+      setTimeout(tick, delay);
+    }
+    tick();
   }
 
   function goToDiscoveryPage(page) {
@@ -250,13 +388,158 @@
     page = parseInt(page, 10);
     if (isNaN(page) || page < 1 || page > totalPages) return;
     discoveryState.currentPage = page;
-    renderDiscovery();
+    renderDiscovery({ skipGate: true });
     var cards = document.getElementById('discovery-athlete-cards');
     if (cards) cards.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   function applyDiscoveryFilters() {
-    renderDiscovery({ resetPage: true });
+    var btn = document.getElementById('btn-apply-filters');
+    if (btn) btn.disabled = true;
+    runDiscoverySearchAnimation(function () {
+      discoveryState.hasSearched = true;
+      renderDiscovery({ resetPage: true, skipGate: true });
+      if (btn) btn.disabled = false;
+    });
+  }
+
+  function starRatingHtml(score, ariaLabel) {
+    var s = Math.max(0, Math.min(5, Number(score) || 0));
+    var full = Math.floor(s);
+    var hasHalf = s - full >= 0.4 && s - full < 0.9;
+    if (s - full >= 0.9) full += 1;
+    var html = '';
+    var i;
+    for (i = 0; i < 5; i++) {
+      if (i < full) html += '<span class="star filled">★</span>';
+      else if (i === full && hasHalf) html += '<span class="star half">★</span>';
+      else html += '<span class="star empty">★</span>';
+    }
+    return { html: html, label: (ariaLabel || 'Rating') + ' ' + s + ' out of 5', value: s };
+  }
+
+  function deriveBrandProfileScores(athlete) {
+    var perf = athlete.perf != null ? Number(athlete.perf) : 0;
+    var social = athlete.social != null ? Number(athlete.social) : 0;
+    var matches = athlete.matches != null ? Number(athlete.matches) : 0;
+    var brandFit = (perf && social) ? ((perf + social) / 20).toFixed(1) : '—';
+    var expert = Math.round(Math.max(3, Math.min(5, perf / 18 + social / 40)) * 2) / 2;
+    var fitness = matches >= 14 ? 5 : matches >= 10 ? 4.5 : matches >= 6 ? 4 : 3.5;
+    var roi = (perf >= 60 && social >= 70) ? 'High' : (perf >= 50 && social >= 50) ? 'Medium' : 'Low';
+    return { brandFit: brandFit, expert: expert, fitness: fitness, roi: roi };
+  }
+
+  function buildCareerEvents(athlete) {
+    var matches = athlete.matches != null ? Number(athlete.matches) : 10;
+    var perf = athlete.perf != null ? Number(athlete.perf) : 50;
+    var isRising = /suryavanshi|sooryavanshi/i.test(athlete.name || '');
+    if (isRising) {
+      return [
+        { label: 'U19', matches: 4, perf: Math.min(100, perf + 12) },
+        { label: 'Ranji', matches: 8, perf: Math.max(40, perf - 8) },
+        { label: 'SMAT', matches: 6, perf: Math.min(100, perf + 6) },
+        { label: 'IPL', matches: matches, perf: perf },
+        { label: 'Duleep', matches: 3, perf: Math.min(100, perf + 18) }
+      ];
+    }
+    return [
+      { label: 'Domestic', matches: Math.max(2, Math.round(matches * 0.45)), perf: Math.max(40, perf - 6) },
+      { label: 'League', matches: Math.max(2, Math.round(matches * 0.7)), perf: Math.max(42, perf - 2) },
+      { label: 'IPL', matches: matches, perf: perf },
+      { label: 'Playoffs', matches: Math.max(1, Math.round(matches * 0.2)), perf: Math.min(100, perf + 4) },
+      { label: 'Recent', matches: Math.max(1, Math.round(matches * 0.35)), perf: Math.min(100, perf + 8) }
+    ];
+  }
+
+  function buildCareerGraphSvg(events) {
+    var maxM = Math.max.apply(null, events.map(function (e) { return e.matches; })) || 1;
+    var xs = [110, 214, 318, 422, 526];
+    var bars = '';
+    var points = [];
+    var circles = '';
+    var labels = '';
+    events.forEach(function (e, i) {
+      var x = xs[i];
+      var barH = Math.max(8, (e.matches / maxM) * 150);
+      var barY = 178 - barH;
+      bars += '<rect x="' + (x - 18) + '" y="' + barY + '" width="36" height="' + barH + '" rx="4"/>';
+      var py = 178 - (e.perf / 100) * 150;
+      points.push(x + ',' + py);
+      circles += '<circle cx="' + x + '" cy="' + py + '" r="5"/>';
+      labels += '<text x="' + x + '" y="200">' + e.label + '</text>';
+    });
+    return (
+      '<svg class="career-graph-svg" viewBox="0 0 640 240" xmlns="http://www.w3.org/2000/svg">' +
+        '<defs><linearGradient id="perfLineGradBrand" x1="0%" y1="0%" x2="100%" y2="0%">' +
+          '<stop offset="0%" stop-color="#00d4aa"/><stop offset="100%" stop-color="#6c9fff"/>' +
+        '</linearGradient></defs>' +
+        '<g stroke="#2a3544" stroke-width="1">' +
+          '<line x1="56" y1="28" x2="600" y2="28"/><line x1="56" y1="78" x2="600" y2="78"/>' +
+          '<line x1="56" y1="128" x2="600" y2="128"/><line x1="56" y1="178" x2="600" y2="178"/>' +
+        '</g>' +
+        '<line x1="56" y1="20" x2="56" y2="178" stroke="#8b9cad" stroke-width="1.5"/>' +
+        '<line x1="56" y1="178" x2="608" y2="178" stroke="#8b9cad" stroke-width="1.5"/>' +
+        '<g fill="#8b9cad" font-size="10" font-family="Outfit,sans-serif" text-anchor="end">' +
+          '<text x="48" y="32">100</text><text x="48" y="82">75</text><text x="48" y="132">50</text><text x="48" y="182">25</text>' +
+        '</g>' +
+        '<g fill="rgba(108,159,255,0.35)">' + bars + '</g>' +
+        '<polyline fill="none" stroke="url(#perfLineGradBrand)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="' + points.join(' ') + '"/>' +
+        '<g fill="#00d4aa">' + circles + '</g>' +
+        '<g fill="#8b9cad" font-size="11" font-family="Outfit,sans-serif" text-anchor="middle">' + labels + '</g>' +
+        '<g font-family="Outfit,sans-serif" font-size="11">' +
+          '<rect x="56" y="214" width="12" height="12" rx="2" fill="rgba(108,159,255,0.35)"/>' +
+          '<text x="74" y="224" fill="#8b9cad">Matches / inns</text>' +
+          '<circle cx="180" cy="220" r="4" fill="#00d4aa"/>' +
+          '<text x="190" y="224" fill="#8b9cad">Performance score</text>' +
+        '</g>' +
+      '</svg>'
+    );
+  }
+
+  function buildEventStatsTableHtml(athlete) {
+    var matches = athlete.matches != null ? Number(athlete.matches) : 10;
+    var perf = athlete.perf != null ? Number(athlete.perf) : 50;
+    var isRising = /suryavanshi|sooryavanshi/i.test(athlete.name || '');
+    var rows;
+    if (isRising) {
+      rows = [
+        ['Duleep Trophy 2026/27', 'First-class', '3', '140', '92', '46.7', '107.7', 'Youngest Duleep fifty · SF 92 & 40'],
+        ['IPL 2026', 'T20', String(matches), String(Math.round(matches * 26.5)), '67', '26.5', '168.2', 'Impact opener · high six rate'],
+        ['Ranji Trophy 2025/26', 'First-class', '8', '207', '93', '25.9', '61.4', 'Plate league · Bihar'],
+        ['Syed Mushtaq Ali 2025/26', 'T20', '6', '184', '72', '30.7', '154.6', 'Domestic T20 form spike'],
+        ['India U19 bilateral', 'Youth ODI', '4', '156', '81', '39.0', '98.1', 'Youth pathway continuity']
+      ];
+    } else {
+      var inns = matches;
+      var runs = Math.round(inns * (18 + perf / 5));
+      var hs = Math.round(40 + perf / 3);
+      var avg = (runs / Math.max(1, inns - 1)).toFixed(1);
+      var sr = (120 + perf).toFixed(1);
+      rows = [
+        ['IPL 2026', 'T20', String(inns), String(runs), String(hs), avg, sr, (athlete.teamShort || athlete.team || 'Franchise') + ' · POM ' + (athlete.pom != null ? athlete.pom : '—')],
+        ['Domestic T20', 'T20', String(Math.max(2, Math.round(matches * 0.5))), String(Math.round(runs * 0.55)), String(Math.round(hs * 0.9)), (avg * 0.95).toFixed ? (Number(avg) * 0.95).toFixed(1) : avg, (Number(sr) * 0.92).toFixed(1), 'State / league form'],
+        ['First-class', 'FC', String(Math.max(2, Math.round(matches * 0.4))), String(Math.round(runs * 0.7)), String(Math.round(hs * 1.1)), (Number(avg) * 1.05).toFixed(1), (Number(sr) * 0.55).toFixed(1), 'Long-format exposure'],
+        ['Recent series', 'Mixed', String(Math.max(1, Math.round(matches * 0.3))), String(Math.round(runs * 0.35)), String(Math.round(hs * 0.85)), avg, sr, 'Last 12 months']
+      ];
+    }
+    var body = rows.map(function (r) {
+      return '<tr>' +
+        '<td><strong>' + escapeHtml(r[0]) + '</strong></td>' +
+        '<td>' + escapeHtml(r[1]) + '</td>' +
+        '<td>' + escapeHtml(r[2]) + '</td>' +
+        '<td>' + escapeHtml(r[3]) + '</td>' +
+        '<td>' + escapeHtml(r[4]) + '</td>' +
+        '<td>' + escapeHtml(r[5]) + '</td>' +
+        '<td>' + escapeHtml(r[6]) + '</td>' +
+        '<td>' + escapeHtml(r[7]) + '</td>' +
+        '</tr>';
+    }).join('');
+    return (
+      '<table class="event-stats-table">' +
+        '<thead><tr><th>Event</th><th>Format</th><th>Inns</th><th>Runs</th><th>HS</th><th>Avg</th><th>SR</th><th>Notes</th></tr></thead>' +
+        '<tbody>' + body + '</tbody>' +
+      '</table>'
+    );
   }
 
   function renderBrandAthleteProfile(athleteId) {
@@ -290,36 +573,49 @@
         renderBrandAthleteProfile(athleteId);
       };
     }
+
+    var scores = deriveBrandProfileScores(athlete);
     var perfEl = document.getElementById('pv-perf');
-    var perfMeta = document.getElementById('pv-perf-meta');
     var socialEl = document.getElementById('pv-social');
-    var socialMeta = document.getElementById('pv-social-meta');
     var fitEl = document.getElementById('pv-fit');
     var roiEl = document.getElementById('pv-roi');
-    var injuryEl = document.getElementById('pv-injury');
+    var expertEl = document.getElementById('pv-expert-stars');
+    var fitnessEl = document.getElementById('pv-fitness-stars');
     if (perfEl) perfEl.textContent = athlete.perf != null ? athlete.perf : '—';
-    if (perfMeta) perfMeta.textContent = (athlete.perf >= 85 ? 'Tier A' : athlete.perf >= 75 ? 'Tier B' : 'Tier C');
     if (socialEl) socialEl.textContent = athlete.social != null ? athlete.social : '—';
-    if (socialMeta) socialMeta.textContent = '↑ ' + (athlete.social >= 80 ? 15 : athlete.social >= 70 ? 10 : 5) + '%';
-    if (fitEl) fitEl.textContent = (athlete.perf && athlete.social) ? ((athlete.perf + athlete.social) / 20).toFixed(1) : '—';
-    if (roiEl) roiEl.textContent = (athlete.perf >= 80 && athlete.social >= 75) ? 'High' : (athlete.perf >= 70 ? 'Medium' : 'Low');
-    if (injuryEl) injuryEl.textContent = athlete.matches >= 12 ? 'Low' : (athlete.matches >= 8 ? 'Moderate' : 'Monitor');
-    var statsEl = document.getElementById('brand-profile-ipl-stats');
-    if (statsEl) {
-      statsEl.innerHTML =
-        '<p><strong>IPL 2026 season stats</strong> (from match dataset)</p>' +
-        '<ul class="ipl-stats-list">' +
-          '<li>Matches played: <strong>' + (athlete.matches != null ? athlete.matches : '—') + '</strong></li>' +
-          '<li>Player of the Match: <strong>' + (athlete.pom != null ? athlete.pom : '—') + '</strong></li>' +
-          '<li>Team wins when selected: <strong>' + (athlete.wins != null ? athlete.wins : '—') + '</strong></li>' +
-          '<li>Win rate: <strong>' + (athlete.winRate != null ? athlete.winRate + '%' : '—') + '</strong></li>' +
-          '<li>Franchise: <strong>' + (athlete.teamShort || athlete.team || '—') + '</strong></li>' +
-          '<li>Discovery rank: <strong>#' + (athlete.rank || '—') + '</strong></li>' +
-        '</ul>' +
-        '<p class="ipl-stats-note">Scores combine POM impact (38%), team win rate (32%), and squad availability (30%). Social score adds POM visibility and star recognition.</p>';
+    if (fitEl) fitEl.textContent = scores.brandFit;
+    if (roiEl) roiEl.textContent = scores.roi;
+    if (expertEl) {
+      var expert = starRatingHtml(scores.expert, 'Expert rating');
+      expertEl.innerHTML = expert.html;
+      expertEl.setAttribute('aria-label', expert.label);
     }
+    if (fitnessEl) {
+      var fitness = starRatingHtml(scores.fitness, 'Fitness score');
+      fitnessEl.innerHTML = fitness.html;
+      fitnessEl.setAttribute('aria-label', fitness.label);
+    }
+
+    var snapMatches = document.getElementById('pv-snap-matches');
+    var snapPom = document.getElementById('pv-snap-pom');
+    var snapWins = document.getElementById('pv-snap-wins');
+    var snapWinrate = document.getElementById('pv-snap-winrate');
+    if (snapMatches) snapMatches.textContent = athlete.matches != null ? athlete.matches : '—';
+    if (snapPom) snapPom.textContent = athlete.pom != null ? athlete.pom : '—';
+    if (snapWins) snapWins.textContent = athlete.wins != null ? athlete.wins : '—';
+    if (snapWinrate) snapWinrate.textContent = athlete.winRate != null ? athlete.winRate + '%' : '—';
+
+    var events = buildCareerEvents(athlete);
+    var graphEl = document.getElementById('brand-career-graph');
+    if (graphEl) graphEl.innerHTML = buildCareerGraphSvg(events);
+
+    var eventStatsEl = document.getElementById('brand-event-stats');
+    if (eventStatsEl) eventStatsEl.innerHTML = buildEventStatsTableHtml(athlete);
+
     var inquiryTo = document.getElementById('inquiry-to-athlete');
     if (inquiryTo) inquiryTo.value = athlete.name + ' (' + (athlete.teamShort || athlete.team || athlete.sport) + ' · ' + athlete.role + ')';
+    var proposalAthlete = document.getElementById('proposal-athlete');
+    if (proposalAthlete) proposalAthlete.value = athlete.name;
   }
 
   function getBadgeCount(key) {
@@ -345,7 +641,8 @@
       return;
     }
     sidebar.classList.add('journey-sidebar--visible');
-    var html = '<div class="journey-sidebar-group-label">' + menu.label + '</div>';
+    var html = '<div class="journey-sidebar-main">';
+    html += '<div class="journey-sidebar-group-label">' + menu.label + '</div>';
     html += menu.items.map(function (item) {
       var active = item.screen === screenId ? ' journey-nav-item--active' : '';
       var badge = '';
@@ -358,6 +655,25 @@
         '<span class="journey-nav-text">' + item.label + '</span>' + badge +
         '</button>';
     }).join('');
+    html += '</div>';
+
+    if (persona === 'brand') {
+      html +=
+        '<div class="journey-sidebar-footer">' +
+          '<button type="button" class="journey-nav-item journey-nav-assistant" data-open-discovery-assistant title="Open Discovery Assistant" aria-label="Open Discovery Assistant">' +
+            '<span class="journey-nav-icon journey-nav-assistant-icon" aria-hidden="true">' +
+              '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' +
+                '<circle cx="9" cy="10" r="1.5" fill="currentColor"/>' +
+                '<circle cx="15" cy="10" r="1.5" fill="currentColor"/>' +
+                '<path d="M8 14c.5.8 1.5 1.5 2.5 1.5s2-.7 2.5-1.5"/>' +
+              '</svg>' +
+            '</span>' +
+            '<span class="journey-nav-text">Discovery Assistant</span>' +
+          '</button>' +
+        '</div>';
+    }
+
     sidebar.innerHTML = html;
   }
 
@@ -894,6 +1210,10 @@
     var reqs = window.ADC_DATA.getSponsorshipRequests();
     if (filterTarget) reqs = reqs.filter(function (r) { return (r.target || 'athlete') === filterTarget; });
     if (!reqs.length) {
+      if (role === 'athlete') {
+        container.innerHTML = '';
+        return;
+      }
       var empty = role === 'brand'
         ? 'No sponsorship requests yet. Send a proposal from an athlete profile in Discovery and it will appear here.'
         : 'No requests yet. When a brand sends you a proposal, it will show up here.';
@@ -946,6 +1266,7 @@
   function showScreen(screenId, params) {
     params = params || {};
     if (!screenId) return;
+    if (screenId === 'athlete-register') screenId = 'athlete-profile';
     var isLanding = screenId === 'landing';
     document.querySelectorAll('.screen').forEach(function (el) {
       el.classList.toggle('active', el.id === 'screen-' + screenId);
@@ -973,6 +1294,8 @@
       return;
     } else if (screenId === 'data') {
       renderDataTable();
+    } else if (screenId === 'athlete-profile' || screenId === 'athlete-dashboard') {
+      updateAthleteProfileCompletion();
     } else if (screenId === 'brand-discovery') {
       renderDiscovery();
     } else if (screenId === 'brand-athlete-profile') {
@@ -1032,6 +1355,17 @@
     if (dataViewBtn) {
       e.preventDefault();
       renderDataTable({ view: dataViewBtn.getAttribute('data-data-view') });
+      return;
+    }
+    var assistantBtn = e.target.closest('[data-open-discovery-assistant]');
+    if (assistantBtn) {
+      e.preventDefault();
+      setMobileSidebarOpen(false);
+      if (window.ADC_APP && typeof window.ADC_APP.toggleDiscoveryAssistant === 'function') {
+        window.ADC_APP.toggleDiscoveryAssistant();
+      } else if (window.ADC_APP && typeof window.ADC_APP.openDiscoveryAssistant === 'function') {
+        window.ADC_APP.openDiscoveryAssistant();
+      }
       return;
     }
     var target = e.target.closest('[data-nav]');
@@ -1136,6 +1470,7 @@
       showScreen(parseRoute());
     }
     initAthleteRegistrationSportRole();
+    initAthleteProfileForm();
     initHeroScroll();
     var menuToggle = document.getElementById('journey-menu-toggle');
     var scrim = document.getElementById('journey-sidebar-scrim');
@@ -1145,11 +1480,17 @@
     });
     if (scrim) scrim.addEventListener('click', function () { setMobileSidebarOpen(false); });
     var btnApply = document.getElementById('btn-apply-filters');
-    var searchEl = document.getElementById('discovery-search');
-    var teamEl = document.getElementById('filter-team');
     if (btnApply) btnApply.addEventListener('click', applyDiscoveryFilters);
-    if (searchEl) searchEl.addEventListener('input', function () { renderDiscovery({ resetPage: true }); });
-    if (teamEl) teamEl.addEventListener('change', function () { renderDiscovery({ resetPage: true }); });
+    var advBtn = document.getElementById('btn-advanced-filters');
+    var advPanel = document.getElementById('discovery-advanced-panel');
+    if (advBtn && advPanel) {
+      advBtn.addEventListener('click', function () {
+        var open = advPanel.hidden;
+        advPanel.hidden = !open;
+        advBtn.classList.toggle('is-open', open);
+        advBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    }
     var dataSearch = document.getElementById('data-search');
     if (dataSearch) {
       dataSearch.addEventListener('input', function () {
@@ -1168,6 +1509,9 @@
     renderBrandAthleteProfile: renderBrandAthleteProfile,
     renderDataTable: renderDataTable,
     getDiscoveryFilters: getDiscoveryFilters,
-    goToDeck: goToDeck
+    goToDeck: goToDeck,
+    openDiscoveryAssistant: null,
+    closeDiscoveryAssistant: null,
+    toggleDiscoveryAssistant: null
   };
 })();

@@ -64,6 +64,36 @@
 
   function getAthletes(filters) {
     filters = filters || {};
+
+    function fitTier(a) {
+      var fit = (a.perf != null && a.social != null) ? (a.perf + a.social) / 20 : 0;
+      return fit >= 7 ? 'High' : fit >= 5 ? 'Medium' : 'Low';
+    }
+
+    function socialTier(a) {
+      return a.social >= 70 ? 'High' : a.social >= 50 ? 'Medium' : 'Low';
+    }
+
+    function audienceSizeFromSocial(a) {
+      if (a.social >= 75) return 'Mega';
+      if (a.social >= 60) return 'Macro';
+      if (a.social >= 45) return 'Mid';
+      return 'Micro';
+    }
+
+    function trendFromGrowth(a) {
+      if (a.growth === 'Rising' || a.growth === 'Emerging') return 'Up';
+      if (a.growth === 'Stable') return 'Flat';
+      return 'Down';
+    }
+
+    function availabilityFromMatches(a) {
+      if (a.matches == null) return 'Available';
+      if (a.matches >= 14) return 'Limited';
+      if (a.matches >= 8) return 'Available';
+      return 'Booked';
+    }
+
     var list = ATHLETES.filter(function (a) {
       if (filters.sport && filters.sport !== 'All' && a.sport !== filters.sport) return false;
       if (filters.role && filters.role !== 'All' && a.role !== filters.role) return false;
@@ -71,6 +101,14 @@
       if (filters.ageMin != null && a.age < filters.ageMin) return false;
       if (filters.ageMax != null && a.age > filters.ageMax) return false;
       if (filters.region && filters.region !== 'Any' && filters.region !== '' && a.region.toLowerCase().indexOf((filters.region || '').toLowerCase()) === -1) return false;
+      if (filters.targetGeography && filters.targetGeography !== 'Any') {
+        var geo = filters.targetGeography;
+        if (geo === 'PAN India' && a.region !== 'PAN India' && (a.region || '').indexOf('India') === -1) {
+          /* allow regional athletes for pan-india campaigns */
+        } else if (geo !== 'PAN India' && geo !== 'Metro Cities') {
+          if ((a.region || '').toLowerCase().indexOf(geo.replace(' India', '').toLowerCase()) === -1 && a.region !== 'PAN India') return false;
+        }
+      }
       if (filters.perfMin != null && a.perf < filters.perfMin) return false;
       if (filters.perfMax != null && a.perf > filters.perfMax) return false;
       if (filters.socialMin != null && a.social < filters.socialMin) return false;
@@ -79,11 +117,34 @@
       if (filters.gender && filters.gender !== 'All' && (a.gender || '') !== filters.gender) return false;
       if (filters.growth && filters.growth !== 'Any' && a.growth !== filters.growth) return false;
       if (filters.budget && filters.budget !== 'Any' && a.budget !== filters.budget) return false;
+      if (filters.competition && filters.competition !== 'Any') {
+        var league = (a.league || '').toLowerCase();
+        if (filters.competition === 'IPL 2026' && league.indexOf('ipl') === -1) return false;
+        if (filters.competition === 'Domestic' && league.indexOf('ipl') !== -1) return false;
+      }
+      var commercial = filters.commercialValue || filters.commercial;
+      if (commercial && commercial !== 'Any' && fitTier(a) !== commercial) return false;
+      if (filters.brandMatch && filters.brandMatch !== 'Any' && fitTier(a) !== filters.brandMatch) return false;
+      if (filters.engagement && filters.engagement !== 'Any' && socialTier(a) !== filters.engagement) return false;
+      if (filters.fanDemand && filters.fanDemand !== 'Any' && socialTier(a) !== filters.fanDemand) return false;
+      if (filters.audienceSize && filters.audienceSize !== 'Any' && audienceSizeFromSocial(a) !== filters.audienceSize) return false;
+      if (filters.perfTrend && filters.perfTrend !== 'Any' && trendFromGrowth(a) !== filters.perfTrend) return false;
+      if (filters.brandSafety && filters.brandSafety !== 'Any') {
+        if (filters.brandSafety === 'Clear' && !a.verified) return false;
+        if (filters.brandSafety === 'Risk' && a.verified) return false;
+      }
+      if (filters.availability && filters.availability !== 'Any' && availabilityFromMatches(a) !== filters.availability) return false;
       if (filters.searchQuery) {
         var q = (filters.searchQuery || '').toLowerCase();
         if (!q) return true;
-        var match = (a.name + ' ' + a.sport + ' ' + a.role + ' ' + a.region + ' ' + a.team + ' ' + a.teamShort + ' ' + a.league).toLowerCase().indexOf(q) !== -1;
-        if (!match) return false;
+        if (filters.nameOrSportOnly) {
+          var nameMatch = (a.name || '').toLowerCase().indexOf(q) !== -1;
+          var sportMatch = (a.sport || '').toLowerCase().indexOf(q) !== -1;
+          if (!nameMatch && !sportMatch) return false;
+        } else {
+          var match = (a.name + ' ' + a.sport + ' ' + a.role + ' ' + a.region + ' ' + a.team + ' ' + a.teamShort + ' ' + a.league).toLowerCase().indexOf(q) !== -1;
+          if (!match) return false;
+        }
       }
       return true;
     });

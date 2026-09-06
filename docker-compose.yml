@@ -1,0 +1,10 @@
+services:
+  adc:
+    image: adc-v1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    container_name: ADC-V1
+    restart: unless-stopped

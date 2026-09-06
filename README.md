@@ -1,8 +1,28 @@
 # Athlete Data Company – Web Application
 
-India’s largest **AI-powered Athlete Discovery & Intelligence Marketplace** – full web application with routing, live data, and working discovery flows.
+India’s largest **AI-powered Athlete Discovery & Intelligence Platform** – full web application with routing, live data, and working discovery flows.
 
 ## How to run
+
+### Docker (ADC-V1)
+
+Docker image names must be lowercase, so the image is tagged **`adc-v1`** with label `ADC-V1`. A portable archive is also saved as `ADC-V1.tar`.
+
+```bash
+# Build
+docker build -t adc-v1 .
+
+# Run (http://localhost:3000)
+docker run --rm -p 3000:80 --name ADC-V1 adc-v1
+
+# Or via Compose
+docker compose up --build
+
+# Load from saved tarball
+docker load -i ADC-V1.tar
+```
+
+### Local static server
 
 Open `index.html` in a browser (double-click or use a local server):
 

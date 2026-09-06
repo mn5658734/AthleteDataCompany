@@ -4,15 +4,8 @@
  */
 (function () {
   var PERSONA_REDIRECTS = {
-    athlete: { type: 'internal', hash: '#/athlete/dashboard', hint: "You'll go to your athlete dashboard after sign-in." },
-    brand: { type: 'internal', hash: '#/brand/discovery', hint: "You'll go to brand discovery after sign-in." },
-    creator: { type: 'internal', hash: '#/creator/dashboard', hint: "You'll go to your creator dashboard after sign-in." },
-    admin: { type: 'internal', hash: '#/admin/athlete/governance', hint: "You'll go to the admin console after sign-in." },
-    fan: {
-      type: 'external',
-      url: 'https://sportstrade.world/',
-      hint: 'SportsTrade opens in a new browser tab — invest in your favourite athletes.'
-    }
+    athlete: { type: 'internal', hash: '#/athlete/dashboard', hint: "You'll go to your athlete overview after sign-in." },
+    brand: { type: 'internal', hash: '#/brand/discovery', hint: "You'll go to brand discovery after sign-in." }
   };
 
   var selectedPersona = 'athlete';
@@ -21,6 +14,7 @@
   var form = document.getElementById('login-form');
   var errorEl = document.getElementById('login-error');
   var submitBtn = document.getElementById('login-submit-btn');
+  var signupBtn = document.getElementById('signup-submit-btn');
   var deckLink = document.getElementById('nav-deck-link');
 
   function setPersona(persona) {
@@ -35,7 +29,10 @@
     }
     if (hintEl) hintEl.textContent = PERSONA_REDIRECTS[persona].hint;
     if (submitBtn) {
-      submitBtn.textContent = persona === 'fan' ? 'Login & open SportsTrade →' : 'Login →';
+      submitBtn.textContent = 'Login';
+    }
+    if (signupBtn) {
+      signupBtn.hidden = persona !== 'athlete';
     }
     if (errorEl) errorEl.hidden = true;
   }
@@ -44,6 +41,34 @@
     if (!errorEl) return;
     errorEl.textContent = msg;
     errorEl.hidden = !msg;
+  }
+
+  function handleSignup(e) {
+    e.preventDefault();
+    if (selectedPersona !== 'athlete') return;
+    var emailEl = document.getElementById('login-email');
+    var passEl = document.getElementById('login-password');
+    var email = emailEl && emailEl.value ? emailEl.value.trim() : '';
+    var password = passEl && passEl.value ? passEl.value.trim() : '';
+
+    if (!email) {
+      showError('Please enter your email.');
+      if (emailEl) emailEl.focus();
+      return;
+    }
+    if (!password) {
+      showError('Please enter your password.');
+      if (passEl) passEl.focus();
+      return;
+    }
+
+    showError('');
+    try {
+      sessionStorage.setItem('adc_login_persona', 'athlete');
+      sessionStorage.setItem('adc_login_email', email);
+    } catch (err) { /* ignore */ }
+
+    window.location.href = '/#/athlete/profile';
   }
 
   function handleLogin(e) {
@@ -94,6 +119,7 @@
   }
 
   if (form) form.addEventListener('submit', handleLogin);
+  if (signupBtn) signupBtn.addEventListener('click', handleSignup);
 
   if (deckLink) {
     deckLink.addEventListener('click', function (e) {
