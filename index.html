@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2026-09-06g" />
+  <link rel="stylesheet" href="styles.css?v=2026-09-06k" />
 </head>
 <body>
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -358,7 +358,7 @@
     </div>
     <div class="discovery-chat-messages" id="discovery-chat-messages">
       <div class="chat-msg chat-msg-bot" id="discovery-welcome-msg">
-        <p>Ask about any IPL 2026 athlete's performance — e.g. <em>How is V Kohli performing?</em> or <em>Top POM winners</em>. Click <strong>AI suggestion</strong> for tailored picks.</p>
+        <p>Tell ADC what you’re trying to achieve — campaign, budget, market, audience, objective. Missing fields? I’ll ask. Or open <strong>Athlete Discovery</strong> for full recommendation + portfolio intelligence.</p>
       </div>
       <div class="discovery-thinking" id="discovery-thinking" hidden>
         <div class="thinking-dots"><span></span><span></span><span></span></div>
@@ -551,7 +551,7 @@
           </div>
           <div class="form-row two-cols">
             <div><label>Location</label><input type="text" name="location" data-profile-field placeholder="City, State" /></div>
-            <div><label>Current team</label><input type="text" name="team" data-profile-field placeholder="Team / Academy" /></div>
+            <div><label>Managed by</label><input type="text" name="managedBy" data-profile-field placeholder="Optional — Agent / Manager / Agency" /></div>
           </div>
           <div class="form-row">
             <label>Bio</label>
@@ -1232,233 +1232,94 @@
 
   <section id="screen-brand-discovery" class="screen journey-screen">
     <div class="screen-inner discovery-screen">
-      <div class="discovery-filters-bar">
-        <div class="filter-bar-inner filter-bar-row filter-bar-row--primary">
-          <div class="filter-bar-item">
-            <label>Sport</label>
-            <select id="filter-sport">
-              <option>All</option>
-              <option selected>Cricket</option>
-              <option>Badminton</option>
-              <option>Boxing</option>
-              <option>Volley Ball</option>
-              <option>Athletic (25)</option>
-              <option>Hockey</option>
-              <option>Football</option>
-              <option>Kabaddi</option>
-              <option>Kho Kho</option>
-              <option>Tennis</option>
-              <option>TT</option>
-              <option>Swimming</option>
-            </select>
-          </div>
-          <div class="filter-bar-item">
-            <label>Campaign Objective</label>
-            <select id="filter-campaign-objective">
-              <option>Any</option>
-              <option>Brand Awareness</option>
-              <option>Product Launch</option>
-              <option>Performance Marketing</option>
-              <option>Community Engagement</option>
-              <option>Athlete Endorsement</option>
-            </select>
-          </div>
-          <div class="filter-bar-item">
-            <label>Target Audience</label>
-            <select id="filter-target-audience">
-              <option>Any</option>
-              <option>Gen Z</option>
-              <option>Millennials</option>
-              <option>Families</option>
-              <option>Sports Fans</option>
-              <option>Premium Affluent</option>
-            </select>
-          </div>
-          <div class="filter-bar-item">
-            <label>Target Geography</label>
-            <select id="filter-target-geography">
-              <option>Any</option>
-              <option>PAN India</option>
-              <option>North India</option>
-              <option>South India</option>
-              <option>East India</option>
-              <option>West India</option>
-              <option>Metro Cities</option>
-            </select>
-          </div>
-          <div class="filter-bar-item">
-            <label>Budget</label>
-            <select id="filter-budget">
-              <option>Any</option>
-              <option>₹1–5L</option>
-              <option>₹5–20L</option>
-              <option>₹20L+</option>
-            </select>
-          </div>
-          <div class="filter-bar-item">
-            <label>Brand Category</label>
-            <select id="filter-brand-category">
-              <option>Any</option>
-              <option>Sportswear</option>
-              <option>FMCG</option>
-              <option>Beverage</option>
-              <option>Fintech</option>
-              <option>Automotive</option>
-              <option>Wellness</option>
-              <option>Tech</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="filter-bar-inner filter-bar-row filter-bar-row--secondary">
-          <div class="filter-bar-item">
-            <label>Performance</label>
-            <input type="text" id="filter-perf" placeholder="e.g. 50–99" value="" />
-          </div>
-          <div class="filter-bar-item">
-            <label>Growth</label>
-            <select id="filter-growth">
-              <option>Any</option>
-              <option>Rising</option>
-              <option>Stable</option>
-              <option>Emerging</option>
-            </select>
-          </div>
-          <div class="filter-bar-item">
-            <label>Commercial Value</label>
-            <select id="filter-commercial-value">
-              <option>Any</option>
-              <option>High</option>
-              <option>Medium</option>
-              <option>Low</option>
-            </select>
-          </div>
-          <div class="filter-bar-item">
-            <label>Brand Match</label>
-            <select id="filter-brand-match">
-              <option>Any</option>
-              <option>High</option>
-              <option>Medium</option>
-              <option>Low</option>
-            </select>
-          </div>
-          <div class="filter-bar-actions">
-            <label class="checkbox-label filter-verified-label">
-              <input type="checkbox" id="filter-verified" checked />
-              <span>Verified</span>
-            </label>
-            <button type="button" class="discovery-advanced-toggle" id="btn-advanced-filters" aria-expanded="false">
-              Advanced Filters <span class="discovery-advanced-caret" aria-hidden="true">▾</span>
-            </button>
-            <button type="button" class="btn-primary btn-apply-filters" id="btn-apply-filters">Apply filters</button>
-          </div>
-        </div>
-
-        <div class="discovery-advanced-panel" id="discovery-advanced-panel" hidden>
-          <div class="filter-bar-inner filter-bar-row">
-            <div class="filter-bar-item">
-              <label>Age</label>
-              <input type="text" id="filter-age" placeholder="e.g. 22–30" value="" />
-            </div>
-            <div class="filter-bar-item">
-              <label>Gender</label>
-              <select id="filter-gender">
-                <option value="All">All</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-              </select>
-            </div>
-            <div class="filter-bar-item">
-              <label>Athlete Location</label>
-              <input type="text" id="filter-location" placeholder="Region / city" />
-            </div>
-            <div class="filter-bar-item">
-              <label>Competition</label>
-              <select id="filter-competition">
-                <option>Any</option>
-                <option>IPL 2026</option>
-                <option>Domestic</option>
-                <option>International</option>
-                <option>Youth / U19</option>
-              </select>
-            </div>
-            <div class="filter-bar-item">
-              <label>Role</label>
-              <select id="filter-role">
-                <option>All</option>
-                <option>Batsman</option>
-                <option>Bowler</option>
-                <option>All-rounder</option>
-                <option>Wicketkeeper</option>
-              </select>
-            </div>
-            <div class="filter-bar-item">
-              <label>Audience Size</label>
-              <select id="filter-audience-size">
-                <option>Any</option>
-                <option>Micro</option>
-                <option>Mid</option>
-                <option>Macro</option>
-                <option>Mega</option>
-              </select>
-            </div>
-            <div class="filter-bar-item">
-              <label>Engagement Rate</label>
-              <select id="filter-engagement">
-                <option>Any</option>
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
-              </select>
-            </div>
-            <div class="filter-bar-item">
-              <label>Social Score</label>
-              <input type="text" id="filter-social" placeholder="e.g. 45–99" value="" />
-            </div>
-            <div class="filter-bar-item">
-              <label>Performance Trend</label>
-              <select id="filter-perf-trend">
-                <option>Any</option>
-                <option>Up</option>
-                <option>Flat</option>
-                <option>Down</option>
-              </select>
-            </div>
-            <div class="filter-bar-item">
-              <label>Fan Demand</label>
-              <select id="filter-fan-demand">
-                <option>Any</option>
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
-              </select>
-            </div>
-            <div class="filter-bar-item">
-              <label>Brand Safety</label>
-              <select id="filter-brand-safety">
-                <option>Any</option>
-                <option>Clear</option>
-                <option>Monitor</option>
-                <option>Risk</option>
-              </select>
-            </div>
-            <div class="filter-bar-item">
-              <label>Availability</label>
-              <select id="filter-availability">
-                <option>Any</option>
-                <option>Available</option>
-                <option>Limited</option>
-                <option>Booked</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
       <div class="discovery-header">
         <div>
-          <h1>Athlete Discovery</h1>
+          <h1>Discovery Assistant</h1>
+          <p class="screen-desc">Tell ADC what you’re trying to achieve. We’ll ask only for missing brief details, then recommend athletes with match %, fee, and a portfolio plan.</p>
         </div>
       </div>
+
+      <details class="discovery-filter-reference" id="discovery-filter-reference">
+        <summary>
+          <span class="discovery-filter-reference-tag">Discovery Filter reference</span>
+        </summary>
+        <div class="discovery-filter-reference-body">
+          <div class="discovery-ref-group">
+            <span class="discovery-ref-label">Campaign brief</span>
+            <div class="discovery-ref-tags">
+              <span>Campaign</span>
+              <span>Budget</span>
+              <span>Market</span>
+              <span>Audience</span>
+              <span>Objective</span>
+            </div>
+          </div>
+          <div class="discovery-ref-group">
+            <span class="discovery-ref-label">Primary</span>
+            <div class="discovery-ref-tags">
+              <span>Sport</span>
+              <span>Campaign Objective</span>
+              <span>Target Audience</span>
+              <span>Target Geography</span>
+              <span>Budget</span>
+              <span>Brand Category</span>
+            </div>
+          </div>
+          <div class="discovery-ref-group">
+            <span class="discovery-ref-label">Scoring</span>
+            <div class="discovery-ref-tags">
+              <span>Performance</span>
+              <span>Growth</span>
+              <span>Commercial Value</span>
+              <span>Brand Match</span>
+              <span>Verified</span>
+            </div>
+          </div>
+          <div class="discovery-ref-group">
+            <span class="discovery-ref-label">Advanced</span>
+            <div class="discovery-ref-tags">
+              <span>Age</span>
+              <span>Gender</span>
+              <span>Athlete Location</span>
+              <span>Competition</span>
+              <span>Role</span>
+              <span>Audience Size</span>
+              <span>Engagement Rate</span>
+              <span>Social Score</span>
+              <span>Performance Trend</span>
+              <span>Fan Demand</span>
+              <span>Brand Safety</span>
+              <span>Availability</span>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <div class="discovery-chat-discover" id="discovery-chat-discover">
+        <div class="discovery-chat-discover-messages" id="discovery-chat-discover-messages">
+          <div class="chat-msg chat-msg-bot">
+            <p>Share a campaign brief to get athlete recommendations and a portfolio plan.</p>
+            <p><strong>Example:</strong> Campaign: New sports nutrition product · Budget: ₹20L · Market: Karnataka + Maharashtra · Audience: 18–30 · Objective: Awareness + sales</p>
+          </div>
+        </div>
+        <div class="discovery-chat-discover-chips" id="discovery-chat-discover-chips">
+          <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Campaign: New sports nutrition product&#10;Budget: ₹20L&#10;Market: Karnataka + Maharashtra&#10;Audience: 18–30&#10;Objective: Awareness + sales">Sports nutrition · ₹20L brief</button>
+          <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Campaign: Beverage brand refresh&#10;Budget: ₹12L&#10;Market: PAN India&#10;Audience: Gen Z&#10;Objective: Brand Awareness">Beverage · PAN India</button>
+          <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Campaign: Sportswear endorsement&#10;Budget: ₹8L&#10;Market: Metro Cities&#10;Audience: 18–25&#10;Objective: Product Launch">Sportswear · Metros</button>
+        </div>
+        <div class="discovery-chat-discover-input-wrap">
+          <div class="discovery-brief-field">
+            <label class="discovery-brief-label" for="discovery-chat-discover-input">Campaign brief</label>
+            <textarea id="discovery-chat-discover-input" class="discovery-chat-input discovery-chat-textarea" placeholder="Campaign: … · Budget: … · Market: … · Audience: … · Objective: …" rows="4"></textarea>
+          </div>
+          <button type="button" class="btn-primary discovery-brief-submit" id="discovery-chat-discover-send">Recommend</button>
+        </div>
+        <div class="discovery-active-criteria" id="discovery-active-criteria" hidden>
+          <span class="discovery-active-criteria-label">Captured brief</span>
+          <div class="discovery-active-criteria-tags" id="discovery-active-criteria-tags"></div>
+        </div>
+      </div>
+
       <div class="discovery-layout">
         <div class="results-area">
           <div class="results-toolbar">
@@ -1467,7 +1328,8 @@
           <div class="discovery-search-anim" id="discovery-search-anim" hidden aria-live="polite">
             <div class="discovery-search-anim-lines" id="discovery-search-anim-lines"></div>
           </div>
-          <div class="athlete-cards" id="discovery-athlete-cards"></div>
+          <div class="discovery-portfolio" id="discovery-portfolio" hidden></div>
+          <div class="athlete-cards athlete-cards--recommend" id="discovery-athlete-cards"></div>
           <nav class="discovery-pagination" id="discovery-pagination" aria-label="Athlete results pages"></nav>
         </div>
       </div>
@@ -1855,7 +1717,7 @@
   <script src="data.js?v=2026-09-06d"></script>
   <script src="cricsheet-stats.js"></script>
   <script src="ipl-assistant.js"></script>
-  <script src="app.js?v=2026-09-06d"></script>
+  <script src="app.js?v=2026-09-06j"></script>
   <script src="demo-request.js?v=2026-09-05f"></script>
   <script>
   (function () {
@@ -1991,17 +1853,18 @@
     if (aiBtn) aiBtn.addEventListener('click', showThinking);
     document.querySelectorAll('.chat-suggestion-chip').forEach(function(chip) {
       chip.addEventListener('click', function() {
-        var sport = document.getElementById('filter-sport');
-        var verified = document.getElementById('filter-verified');
-        var growth = document.getElementById('filter-growth');
-        var commercial = document.getElementById('filter-commercial-value');
         var d = chip.getAttribute('data-chip');
         if (!d) return;
-        if (sport) sport.value = 'Cricket';
-        if (verified) verified.checked = true;
-        if (d === 'ipl-top-pom' && commercial) commercial.value = 'High';
-        if (d === 'ipl-rcb' && growth) growth.value = 'Stable';
-        if (d === 'ipl-bowlers' && commercial) commercial.value = 'Medium';
+        if (window.ADC_APP && window.ADC_APP.discoveryState) {
+          var f = window.ADC_APP.getDiscoveryFilters ? window.ADC_APP.getDiscoveryFilters() : {};
+          window.ADC_APP.discoveryState.chatFilters = Object.assign({}, f, {
+            sport: 'Cricket',
+            verifiedOnly: true
+          });
+          if (d === 'ipl-top-pom') window.ADC_APP.discoveryState.chatFilters.commercialValue = 'High';
+          if (d === 'ipl-rcb') window.ADC_APP.discoveryState.chatFilters.growth = 'Stable';
+          if (d === 'ipl-bowlers') window.ADC_APP.discoveryState.chatFilters.commercialValue = 'Medium';
+        }
         if (window.ADC_APP && window.ADC_APP.applyDiscoveryFilters) window.ADC_APP.applyDiscoveryFilters();
         showThinking();
       });

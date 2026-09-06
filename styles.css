@@ -2683,143 +2683,397 @@ body.has-sidebar .journey-screen.active { padding-left: 236px; }
   box-sizing: border-box;
 }
 
-/* Filter bar below ← Home Brand/Agency */
-.discovery-filters-bar {
+/* Discovery Filter reference + chat discovery */
+.discovery-filter-reference {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin: 0 0 1rem;
+  padding: 0.65rem 1rem 0.75rem;
+}
+
+.discovery-filter-reference > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.discovery-filter-reference > summary::-webkit-details-marker {
+  display: none;
+}
+
+.discovery-filter-reference-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 212, 170, 0.45);
+  background: rgba(0, 212, 170, 0.1);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.discovery-filter-reference-note {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.discovery-filter-reference-body {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.discovery-ref-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.discovery-ref-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.discovery-ref-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.discovery-ref-tags span {
+  display: inline-block;
+  padding: 0.22rem 0.55rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.75rem;
+}
+
+.discovery-chat-discover {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 12px;
   margin: 0 0 1.25rem;
-  padding: 0.85rem 1rem;
-}
-
-.filter-bar-inner {
+  padding: 1rem;
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
+  flex-direction: column;
   gap: 0.75rem;
 }
 
-.filter-bar-row--secondary {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border);
-  align-items: flex-end;
-}
-
-.filter-bar-row--primary .filter-bar-item,
-.filter-bar-row--secondary .filter-bar-item {
-  flex: 1 1 140px;
-  min-width: 120px;
-  max-width: 220px;
-}
-
-.filter-bar-row--secondary .filter-bar-item select,
-.filter-bar-row--primary .filter-bar-item select {
-  min-width: 0;
-}
-
-.filter-bar-actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 1rem;
-  margin-left: auto;
-  flex-shrink: 0;
-  flex-wrap: nowrap;
-  min-height: 2.1rem;
-}
-
-.filter-verified-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin: 0;
-  white-space: nowrap;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--text);
-  cursor: pointer;
-}
-
-.filter-verified-label input[type="checkbox"] {
-  width: 1rem;
-  height: 1rem;
-  margin: 0;
-  flex-shrink: 0;
-  accent-color: var(--accent);
-}
-
-.discovery-advanced-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: none;
-  border: none;
-  padding: 0;
-  color: var(--accent);
-  font-family: var(--font);
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  white-space: nowrap;
-  line-height: 1;
-}
-
-.discovery-advanced-toggle:hover {
-  color: #33e0be;
-}
-
-.discovery-advanced-caret {
-  display: inline-block;
-  transition: transform 0.2s ease;
-}
-
-.discovery-advanced-toggle.is-open .discovery-advanced-caret {
-  transform: rotate(180deg);
-}
-
-.discovery-advanced-panel {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border);
-}
-
-.discovery-advanced-panel .filter-bar-item {
-  flex: 1 1 130px;
-  min-width: 120px;
-  max-width: 200px;
-}
-
-.filter-bar-item {
+.discovery-chat-discover-messages {
+  max-height: 280px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.65rem;
+  padding-right: 0.25rem;
 }
 
-.filter-bar-item label {
+.discovery-chat-discover .chat-msg-bot {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 0.9rem;
+  max-width: 92%;
+}
+
+.discovery-chat-discover .chat-msg-user {
+  align-self: flex-end;
+  background: rgba(0, 212, 170, 0.12);
+  border: 1px solid rgba(0, 212, 170, 0.35);
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+  max-width: 85%;
+}
+
+.discovery-chat-discover .chat-msg p {
+  margin: 0 0 0.45rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.discovery-chat-discover .chat-msg p:last-child {
+  margin-bottom: 0;
+}
+
+.discovery-q-ref {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.discovery-q-hint {
+  color: var(--text-muted) !important;
+  font-size: 0.8rem !important;
+}
+
+.discovery-chat-discover-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.discovery-chat-discover-input-wrap {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  padding: 0.85rem;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 212, 170, 0.35);
+  background: linear-gradient(165deg, rgba(0, 212, 170, 0.08) 0%, rgba(18, 25, 34, 0.95) 55%);
+  box-shadow: inset 0 0 0 1px rgba(0, 212, 170, 0.06);
+}
+
+.discovery-brief-field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.discovery-brief-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.discovery-chat-textarea {
+  resize: vertical;
+  min-height: 5.5rem;
+  line-height: 1.45;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(0, 212, 170, 0.28);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-family: var(--font);
+}
+
+.discovery-chat-textarea::placeholder {
+  color: #7a8b9c;
+  opacity: 1;
+}
+
+.discovery-chat-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.18);
+}
+
+.discovery-brief-submit {
+  flex-shrink: 0;
+  align-self: flex-end;
+  min-height: 2.75rem;
+  padding: 0.7rem 1.25rem;
+  font-weight: 700;
+}
+
+.discovery-chat-discover .chat-msg-bot ul {
+  margin: 0.45rem 0 0.65rem;
+  padding-left: 1.1rem;
+}
+
+.discovery-chat-discover .chat-msg-bot li {
+  margin-bottom: 0.2rem;
+  font-size: 0.86rem;
+}
+
+.discovery-rec-list {
+  margin: 0.4rem 0 0.75rem;
+  padding-left: 1.2rem;
+}
+
+.discovery-rec-list li {
+  margin-bottom: 0.55rem;
+  font-size: 0.9rem;
+}
+
+.discovery-rec-role {
+  color: var(--accent);
+  font-size: 0.8rem;
+}
+
+.discovery-portfolio {
+  margin: 0 0 1rem;
+}
+
+.discovery-portfolio-card {
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 212, 170, 0.4);
+  background: linear-gradient(135deg, rgba(0, 212, 170, 0.12) 0%, rgba(18, 25, 34, 0.9) 100%);
+}
+
+.discovery-portfolio-kicker {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.35rem;
+}
+
+.discovery-portfolio-main {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.discovery-portfolio-budget {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.discovery-portfolio-note {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.athlete-cards--recommend {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  .athlete-cards--recommend { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  .athlete-cards--recommend { grid-template-columns: 1fr; }
+}
+
+.athlete-card--recommend {
+  position: relative;
+  min-height: 210px;
+}
+
+.athlete-card-letter {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.75rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 212, 170, 0.15);
+  border: 1px solid rgba(0, 212, 170, 0.45);
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.athlete-card-rec-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.35rem 0 0.2rem;
+}
+
+.athlete-match-pct {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 0.85rem;
+}
+
+.athlete-fee {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.athlete-rec-role {
+  margin: 0.15rem 0 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.discovery-chat-discover-input-wrap .discovery-chat-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: var(--font);
+}
+
+.discovery-chat-discover-input-wrap .discovery-chat-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.discovery-chat-discover-input-wrap .btn-primary {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.discovery-active-criteria {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--border);
+}
+
+.discovery-active-criteria-label {
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
 }
 
-.filter-bar-item input,
-.filter-bar-item select {
-  min-width: 0;
-  width: 100%;
-  padding: 0.35rem 0.5rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--bg);
-  color: var(--text);
-  font-size: 0.8125rem;
+.discovery-active-criteria-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
-.filter-bar-item input { min-width: 70px; }
-.filter-bar-item select { min-width: 80px; }
+.discovery-criteria-tag {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--text);
+}
 
-.discovery-filters-bar .btn-apply-filters {
-  flex-shrink: 0;
+.discovery-criteria-tag em {
+  font-style: normal;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .discovery-header {
@@ -2873,6 +3127,12 @@ body.has-sidebar .journey-screen.active { padding-left: 236px; }
   overflow: hidden;
 }
 
+.discovery-search-anim.is-active {
+  border-color: rgba(0, 212, 170, 0.55);
+  box-shadow: 0 0 0 1px rgba(0, 212, 170, 0.15), 0 8px 28px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(180deg, rgba(0, 212, 170, 0.08) 0%, rgba(0, 0, 0, 0.4) 100%);
+}
+
 .discovery-search-anim-lines {
   max-height: 120px;
   overflow-y: auto;
@@ -2888,6 +3148,27 @@ body.has-sidebar .journey-screen.active { padding-left: 236px; }
 @keyframes discoveryAnimFade {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 0.95; transform: translateY(0); }
+}
+
+.discovery-chat-discover.is-searching {
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.discovery-chat-discover.is-searching .discovery-chat-discover-messages {
+  max-height: 140px;
+}
+
+.results-area.is-searching .athlete-cards {
+  min-height: 120px;
+}
+
+.discovery-pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.2rem;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
 }
 
 .discovery-empty {

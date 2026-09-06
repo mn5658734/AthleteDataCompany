@@ -101,7 +101,55 @@
   var journeyBreadcrumb = document.getElementById('journey-breadcrumb');
 
   var state = { selectedAthleteId: null };
-  var discoveryState = { filteredList: [], currentPage: 1, pageSize: 10, hasSearched: false };
+  var discoveryState = {
+    filteredList: [],
+    recommendations: [],
+    portfolio: null,
+    currentPage: 1,
+    pageSize: 6,
+    hasSearched: false,
+    chatFilters: {},
+    pendingQuestion: null,
+    chatBusy: false
+  };
+
+  var CAMPAIGN_BRIEF_FIELDS = [
+    {
+      key: 'campaign',
+      label: 'Campaign',
+      question: 'What is the campaign? (product / brand / initiative)',
+      chips: ['Sports nutrition launch', 'Beverage brand refresh', 'Sportswear endorsement', 'Fintech awareness'],
+      required: true
+    },
+    {
+      key: 'budgetAmount',
+      label: 'Budget',
+      question: 'What is the total campaign budget? (e.g. ₹20L)',
+      chips: ['₹5L', '₹8L', '₹12L', '₹20L', '₹35L'],
+      required: true
+    },
+    {
+      key: 'market',
+      label: 'Market',
+      question: 'Which markets should we prioritize?',
+      chips: ['Karnataka + Maharashtra', 'PAN India', 'Metro Cities', 'South India', 'West India'],
+      required: true
+    },
+    {
+      key: 'audienceLabel',
+      label: 'Audience',
+      question: 'Who is the target audience? (age range or segment)',
+      chips: ['18–30', 'Gen Z', 'Millennials', 'Sports Fans', '18–25'],
+      required: true
+    },
+    {
+      key: 'campaignObjective',
+      label: 'Objective',
+      question: 'What is the campaign objective?',
+      chips: ['Awareness + sales', 'Brand Awareness', 'Product Launch', 'Performance Marketing', 'Athlete Endorsement'],
+      required: true
+    }
+  ];
 
   function isHomePath() {
     var path = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
@@ -197,72 +245,664 @@
     return null;
   }
 
-  function getDiscoveryFilters() {
-    var ageEl = document.getElementById('filter-age');
-    var perfEl = document.getElementById('filter-perf');
-    var socialEl = document.getElementById('filter-social');
-    var age = (ageEl && ageEl.value) ? ageEl.value.trim().split(/\s*[-–]\s*/) : [];
-    var perf = (perfEl && perfEl.value) ? perfEl.value.trim().split(/\s*[-–]\s*/) : [];
-    var social = (socialEl && socialEl.value) ? socialEl.value.trim().split(/\s*[-–]\s*/) : [];
+  function emptyDiscoveryChatFilters() {
     return {
-      sport: document.getElementById('filter-sport') && document.getElementById('filter-sport').value,
-      campaignObjective: document.getElementById('filter-campaign-objective') && document.getElementById('filter-campaign-objective').value,
-      targetAudience: document.getElementById('filter-target-audience') && document.getElementById('filter-target-audience').value,
-      targetGeography: document.getElementById('filter-target-geography') && document.getElementById('filter-target-geography').value,
-      budget: document.getElementById('filter-budget') && document.getElementById('filter-budget').value,
-      brandCategory: document.getElementById('filter-brand-category') && document.getElementById('filter-brand-category').value,
-      perfMin: perf[0] ? parseInt(perf[0], 10) : null,
-      perfMax: perf[1] ? parseInt(perf[1], 10) : null,
-      growth: document.getElementById('filter-growth') && document.getElementById('filter-growth').value,
-      commercialValue: document.getElementById('filter-commercial-value') && document.getElementById('filter-commercial-value').value,
-      brandMatch: document.getElementById('filter-brand-match') && document.getElementById('filter-brand-match').value,
-      verifiedOnly: document.getElementById('filter-verified') ? document.getElementById('filter-verified').checked : false,
-      ageMin: age[0] ? parseInt(age[0], 10) : null,
-      ageMax: age[1] ? parseInt(age[1], 10) : null,
-      gender: document.getElementById('filter-gender') && document.getElementById('filter-gender').value,
-      region: document.getElementById('filter-location') && document.getElementById('filter-location').value,
-      competition: document.getElementById('filter-competition') && document.getElementById('filter-competition').value,
-      role: document.getElementById('filter-role') && document.getElementById('filter-role').value,
-      audienceSize: document.getElementById('filter-audience-size') && document.getElementById('filter-audience-size').value,
-      engagement: document.getElementById('filter-engagement') && document.getElementById('filter-engagement').value,
-      socialMin: social[0] ? parseInt(social[0], 10) : null,
-      socialMax: social[1] ? parseInt(social[1], 10) : null,
-      perfTrend: document.getElementById('filter-perf-trend') && document.getElementById('filter-perf-trend').value,
-      fanDemand: document.getElementById('filter-fan-demand') && document.getElementById('filter-fan-demand').value,
-      brandSafety: document.getElementById('filter-brand-safety') && document.getElementById('filter-brand-safety').value,
-      availability: document.getElementById('filter-availability') && document.getElementById('filter-availability').value
+      campaign: '',
+      budgetAmount: null,
+      budgetLabel: '',
+      market: '',
+      audienceLabel: '',
+      sport: 'Cricket',
+      campaignObjective: 'Any',
+      targetAudience: 'Any',
+      targetGeography: 'Any',
+      budget: 'Any',
+      brandCategory: 'Any',
+      perfMin: null,
+      perfMax: null,
+      growth: 'Any',
+      commercialValue: 'Any',
+      brandMatch: 'Any',
+      verifiedOnly: true,
+      ageMin: null,
+      ageMax: null,
+      gender: 'All',
+      region: '',
+      competition: 'Any',
+      role: 'All',
+      audienceSize: 'Any',
+      engagement: 'Any',
+      socialMin: null,
+      socialMax: null,
+      perfTrend: 'Any',
+      fanDemand: 'Any',
+      brandSafety: 'Any',
+      availability: 'Any'
     };
   }
 
-  function buildAthleteCardHtml(a) {
+  function getDiscoveryFilters() {
+    var f = discoveryState.chatFilters || {};
+    var base = emptyDiscoveryChatFilters();
+    Object.keys(base).forEach(function (k) {
+      if (f[k] !== undefined && f[k] !== null && f[k] !== '') base[k] = f[k];
+    });
+    return base;
+  }
+
+  function ensureChatFilters() {
+    if (!discoveryState.chatFilters || !Object.keys(discoveryState.chatFilters).length) {
+      discoveryState.chatFilters = emptyDiscoveryChatFilters();
+    }
+    return discoveryState.chatFilters;
+  }
+
+  function mergeParsedIntoFilters(parsed) {
+    var f = ensureChatFilters();
+    Object.keys(parsed).forEach(function (k) {
+      f[k] = parsed[k];
+    });
+    syncBriefToFilters(f);
+  }
+
+  function syncBriefToFilters(f) {
+    if (f.budgetAmount != null) {
+      if (f.budgetAmount <= 5) f.budget = '₹1–5L';
+      else if (f.budgetAmount <= 20) f.budget = '₹5–20L';
+      else f.budget = '₹20L+';
+      f.budgetLabel = '₹' + f.budgetAmount + 'L';
+    }
+    if (f.market) {
+      var m = f.market.toLowerCase();
+      if (m.indexOf('pan india') !== -1) f.targetGeography = 'PAN India';
+      else if (m.indexOf('metro') !== -1) f.targetGeography = 'Metro Cities';
+      else if (m.indexOf('south') !== -1 || m.indexOf('karnataka') !== -1) f.targetGeography = 'South India';
+      else if (m.indexOf('west') !== -1 || m.indexOf('maharashtra') !== -1) f.targetGeography = 'West India';
+      else if (m.indexOf('north') !== -1) f.targetGeography = 'North India';
+      else if (m.indexOf('east') !== -1) f.targetGeography = 'East India';
+      else f.region = f.market;
+    }
+    if (f.audienceLabel) {
+      var a = f.audienceLabel.toLowerCase();
+      if (a.indexOf('gen z') !== -1 || /\b18\s*[-–]\s*2[05]\b/.test(a)) f.targetAudience = 'Gen Z';
+      else if (a.indexOf('millennial') !== -1) f.targetAudience = 'Millennials';
+      else if (a.indexOf('sport') !== -1) f.targetAudience = 'Sports Fans';
+      else if (/\b18\s*[-–]\s*30\b/.test(a) || /\b20\s*[-–]\s*35\b/.test(a)) f.targetAudience = 'Gen Z';
+    }
+    if (f.campaign) {
+      var c = f.campaign.toLowerCase();
+      if (c.indexOf('nutrition') !== -1 || c.indexOf('wellness') !== -1 || c.indexOf('fitness') !== -1) f.brandCategory = 'Wellness';
+      else if (c.indexOf('beverage') !== -1 || c.indexOf('drink') !== -1) f.brandCategory = 'Beverage';
+      else if (c.indexOf('sportswear') !== -1 || c.indexOf('apparel') !== -1) f.brandCategory = 'Sportswear';
+      else if (c.indexOf('fintech') !== -1 || c.indexOf('bank') !== -1) f.brandCategory = 'Fintech';
+      else if (c.indexOf('fmcg') !== -1) f.brandCategory = 'FMCG';
+      else if (c.indexOf('auto') !== -1) f.brandCategory = 'Automotive';
+      else if (c.indexOf('tech') !== -1) f.brandCategory = 'Tech';
+    }
+    if (f.campaignObjective && /awareness/i.test(f.campaignObjective) && /sale/i.test(f.campaignObjective)) {
+      f._dualObjective = true;
+    }
+  }
+
+  function parseBudgetLakhs(text) {
+    var lower = (text || '').toLowerCase().replace(/,/g, '');
+    var m = lower.match(/₹?\s*(\d+(?:\.\d+)?)\s*l(?:akh)?s?\+?/);
+    if (m) return Math.round(parseFloat(m[1]));
+    m = lower.match(/₹\s*(\d+(?:\.\d+)?)\s*(?:cr|crore)/);
+    if (m) return Math.round(parseFloat(m[1]) * 100);
+    m = lower.match(/\bbudget\s*[:\-]?\s*₹?\s*(\d+(?:\.\d+)?)/);
+    if (m) return Math.round(parseFloat(m[1]));
+    return null;
+  }
+
+  function parseDiscoveryQuery(raw) {
+    var text = (raw || '').trim();
+    var lower = text.toLowerCase();
+    var parsed = {};
+    if (!text) return parsed;
+
+    var lineCampaign = text.match(/campaign\s*[:\-]\s*(.+)/i);
+    var lineBudget = text.match(/budget\s*[:\-]\s*(.+)/i);
+    var lineMarket = text.match(/market\s*[:\-]\s*(.+)/i);
+    var lineAudience = text.match(/audience\s*[:\-]\s*(.+)/i);
+    var lineObjective = text.match(/objective\s*[:\-]\s*(.+)/i);
+
+    if (lineCampaign) parsed.campaign = lineCampaign[1].split(/\n/)[0].trim();
+    if (lineBudget) {
+      var bAmt = parseBudgetLakhs(lineBudget[1]);
+      if (bAmt != null) parsed.budgetAmount = bAmt;
+      parsed.budgetLabel = lineBudget[1].split(/\n/)[0].trim();
+    }
+    if (lineMarket) parsed.market = lineMarket[1].split(/\n/)[0].trim();
+    if (lineAudience) parsed.audienceLabel = lineAudience[1].split(/\n/)[0].trim();
+    if (lineObjective) parsed.campaignObjective = lineObjective[1].split(/\n/)[0].trim();
+
+    if (!parsed.budgetAmount) {
+      var amt = parseBudgetLakhs(text);
+      if (amt != null) parsed.budgetAmount = amt;
+    }
+
+    if (!parsed.campaign) {
+      if (/sports nutrition|nutrition product|supplement/i.test(text)) parsed.campaign = 'New sports nutrition product';
+      else if (/beverage/i.test(text)) parsed.campaign = 'Beverage brand campaign';
+      else if (/sportswear/i.test(text)) parsed.campaign = 'Sportswear endorsement';
+    }
+
+    if (!parsed.market) {
+      if (/karnataka/.test(lower) && /maharashtra/.test(lower)) parsed.market = 'Karnataka + Maharashtra';
+      else if (/pan india/.test(lower)) parsed.market = 'PAN India';
+      else if (/metro/.test(lower)) parsed.market = 'Metro Cities';
+      else if (/south india/.test(lower)) parsed.market = 'South India';
+      else if (/west india/.test(lower)) parsed.market = 'West India';
+      else if (/karnataka/.test(lower)) parsed.market = 'Karnataka';
+      else if (/maharashtra/.test(lower)) parsed.market = 'Maharashtra';
+    }
+
+    if (!parsed.audienceLabel) {
+      var ageMatch = lower.match(/\b(\d{2})\s*[-–to]+\s*(\d{2})\b/);
+      if (ageMatch) {
+        parsed.audienceLabel = ageMatch[1] + '–' + ageMatch[2];
+        parsed.ageMin = parseInt(ageMatch[1], 10);
+        parsed.ageMax = parseInt(ageMatch[2], 10);
+      } else if (/gen z|genz/.test(lower)) parsed.audienceLabel = 'Gen Z';
+      else if (/millennial/.test(lower)) parsed.audienceLabel = 'Millennials';
+      else if (/sports fans?/.test(lower)) parsed.audienceLabel = 'Sports Fans';
+    } else {
+      var ageFromLabel = parsed.audienceLabel.match(/(\d{2})\s*[-–]\s*(\d{2})/);
+      if (ageFromLabel) {
+        parsed.ageMin = parseInt(ageFromLabel[1], 10);
+        parsed.ageMax = parseInt(ageFromLabel[2], 10);
+      }
+    }
+
+    if (!parsed.campaignObjective) {
+      if (/awareness\s*\+\s*sales|awareness and sales|sales \+ awareness/.test(lower)) {
+        parsed.campaignObjective = 'Awareness + sales';
+      } else if (/brand awareness|awareness/.test(lower)) parsed.campaignObjective = 'Brand Awareness';
+      else if (/product launch|launch/.test(lower)) parsed.campaignObjective = 'Product Launch';
+      else if (/performance marketing|conversion|sales/.test(lower)) parsed.campaignObjective = 'Performance Marketing';
+      else if (/endorsement/.test(lower)) parsed.campaignObjective = 'Athlete Endorsement';
+    }
+
+    var sports = [
+      'Cricket', 'Badminton', 'Boxing', 'Volley Ball', 'Athletic (25)', 'Hockey',
+      'Football', 'Kabaddi', 'Kho Kho', 'Tennis', 'TT', 'Swimming'
+    ];
+    sports.forEach(function (s) {
+      if (lower.indexOf(s.toLowerCase()) !== -1) parsed.sport = s;
+    });
+
+    if (discoveryState.pendingQuestion && Object.keys(parsed).length === 0) {
+      var key = discoveryState.pendingQuestion;
+      if (key === 'budgetAmount') {
+        var pendingAmt = parseBudgetLakhs(text);
+        if (pendingAmt != null) parsed.budgetAmount = pendingAmt;
+        else if (/^\d+(\.\d+)?$/.test(text.trim())) parsed.budgetAmount = Math.round(parseFloat(text.trim()));
+      } else if (key === 'campaign' || key === 'market' || key === 'audienceLabel' || key === 'campaignObjective') {
+        parsed[key] = text.replace(/^["']|["']$/g, '');
+      }
+      var fieldDef = CAMPAIGN_BRIEF_FIELDS.filter(function (q) { return q.key === key; })[0];
+      if (fieldDef && fieldDef.chips) {
+        fieldDef.chips.forEach(function (chip) {
+          if (lower === chip.toLowerCase() || lower.indexOf(chip.toLowerCase()) !== -1) {
+            if (key === 'budgetAmount') {
+              var chipAmt = parseBudgetLakhs(chip);
+              if (chipAmt != null) parsed.budgetAmount = chipAmt;
+            } else {
+              parsed[key] = chip;
+            }
+          }
+        });
+      }
+    }
+
+    return parsed;
+  }
+
+  function isBriefFieldAnswered(key, filters) {
+    filters = filters || discoveryState.chatFilters || {};
+    if (key === 'budgetAmount') return filters.budgetAmount != null && filters.budgetAmount > 0;
+    var val = filters[key];
+    return !!(val && String(val).trim() && val !== 'Any' && val !== 'All');
+  }
+
+  function nextBriefQuestion(filters) {
+    filters = filters || discoveryState.chatFilters || {};
+    for (var i = 0; i < CAMPAIGN_BRIEF_FIELDS.length; i++) {
+      var q = CAMPAIGN_BRIEF_FIELDS[i];
+      if (!isBriefFieldAnswered(q.key, filters)) return q;
+    }
+    return null;
+  }
+
+  function countBriefAnswered(filters) {
+    filters = filters || discoveryState.chatFilters || {};
+    var n = 0;
+    CAMPAIGN_BRIEF_FIELDS.forEach(function (q) {
+      if (isBriefFieldAnswered(q.key, filters)) n += 1;
+    });
+    return n;
+  }
+
+  function wantsShowResults(text) {
+    var lower = (text || '').toLowerCase();
+    return /\b(show|find|search|discover|recommend|go ahead|that'?s enough|looks good|run|apply|results|portfolio)\b/.test(lower);
+  }
+
+  function appendDiscoveryChatMessage(role, html) {
+    var box = document.getElementById('discovery-chat-discover-messages');
+    if (!box) return;
+    var div = document.createElement('div');
+    div.className = 'chat-msg chat-msg-' + (role === 'user' ? 'user' : 'bot');
+    div.innerHTML = html;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function setDiscoveryQuestionChips(questionDef) {
+    var wrap = document.getElementById('discovery-chat-discover-chips');
+    if (!wrap) return;
+    if (!questionDef || !questionDef.chips || !questionDef.chips.length) {
+      wrap.innerHTML = '';
+      return;
+    }
+    wrap.innerHTML = questionDef.chips.map(function (c) {
+      return '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="' +
+        String(c).replace(/"/g, '&quot;') + '">' + c + '</button>';
+    }).join('');
+  }
+
+  function renderActiveCriteriaTags() {
+    var wrap = document.getElementById('discovery-active-criteria');
+    var tags = document.getElementById('discovery-active-criteria-tags');
+    if (!wrap || !tags) return;
+    var f = discoveryState.chatFilters || {};
+    var items = [];
+    function add(label, val) {
+      if (val === undefined || val === null || val === '' || val === 'Any' || val === 'All') return;
+      items.push('<span class="discovery-criteria-tag"><em>' + label + '</em> ' + val + '</span>');
+    }
+    add('Campaign', f.campaign);
+    add('Budget', f.budgetLabel || (f.budgetAmount != null ? ('₹' + f.budgetAmount + 'L') : ''));
+    add('Market', f.market);
+    add('Audience', f.audienceLabel);
+    add('Objective', f.campaignObjective);
+    add('Sport', f.sport !== 'All' ? f.sport : '');
+    add('Category', f.brandCategory);
+    tags.innerHTML = items.join('');
+    wrap.hidden = items.length === 0;
+  }
+
+  function summarizeCaptured(parsed) {
+    var labels = {
+      campaign: 'Campaign', budgetAmount: 'Budget', budgetLabel: 'Budget', market: 'Market',
+      audienceLabel: 'Audience', campaignObjective: 'Objective', sport: 'Sport', brandCategory: 'Category'
+    };
+    var parts = [];
+    Object.keys(parsed).forEach(function (k) {
+      if (!labels[k]) return;
+      if (k === 'budgetLabel' && parsed.budgetAmount != null) return;
+      var val = parsed[k];
+      if (k === 'budgetAmount') val = '₹' + val + 'L';
+      parts.push('<strong>' + labels[k] + '</strong>: ' + val);
+    });
+    return parts.length ? '<p>Captured — ' + parts.join(' · ') + '</p>' : '';
+  }
+
+  function askNextDiscoveryQuestion() {
+    var next = nextBriefQuestion(discoveryState.chatFilters);
+    if (!next) {
+      discoveryState.pendingQuestion = null;
+      appendDiscoveryChatMessage('bot',
+        '<p>Brief looks complete. Ready to generate athlete recommendations and a portfolio plan?</p>');
+      setDiscoveryQuestionChips(null);
+      return;
+    }
+    discoveryState.pendingQuestion = next.key;
+    appendDiscoveryChatMessage('bot',
+      '<p><span class="discovery-q-ref">Discovery Filter reference · ' + next.label + '</span></p>' +
+      '<p>' + next.question + '</p>' +
+      '<p class="discovery-q-hint">Answer specifically, or say <em>recommend athletes</em> with what we have.</p>');
+    setDiscoveryQuestionChips(next);
+  }
+
+  function estimateAthleteFeeLakhs(a) {
+    var base = 3;
+    base += Math.max(0, (a.social || 40) - 40) * 0.18;
+    base += Math.max(0, (a.perf || 45) - 45) * 0.12;
+    if ((a.rank || 99) <= 5) base += 4;
+    else if ((a.rank || 99) <= 15) base += 2;
+    if (a.growth === 'Emerging' || a.growth === 'Rising') base *= 0.85;
+    return Math.max(3, Math.min(18, Math.round(base)));
+  }
+
+  function scoreAthleteForBrief(a, brief) {
+    var score = 55;
+    score += Math.min(22, ((a.perf || 0) / 100) * 22);
+    score += Math.min(18, ((a.social || 0) / 100) * 18);
+    if (a.verified) score += 3;
+    if (a.growth === 'Emerging' || a.growth === 'Rising') score += 4;
+    if (brief.brandCategory === 'Wellness' || brief.brandCategory === 'Beverage' || brief.brandCategory === 'Sportswear') {
+      if ((a.social || 0) >= 55) score += 3;
+    }
+    var obj = (brief.campaignObjective || '').toLowerCase();
+    if (obj.indexOf('sale') !== -1 || obj.indexOf('performance') !== -1) {
+      score += Math.min(6, (a.pom || 0) * 1.5);
+    }
+    if (obj.indexOf('awareness') !== -1) {
+      score += Math.min(6, ((a.social || 0) - 45) * 0.2);
+    }
+    if (brief.ageMin != null && a.age != null) {
+      if (a.age >= brief.ageMin && a.age <= (brief.ageMax || 99)) score += 4;
+      else score -= 3;
+    }
+    var fee = estimateAthleteFeeLakhs(a);
+    if (brief.budgetAmount != null && fee > brief.budgetAmount * 0.7) score -= 8;
+    if (brief.budgetAmount != null && fee <= brief.budgetAmount * 0.45) score += 3;
+    return Math.max(72, Math.min(97, Math.round(score)));
+  }
+
+  function assignRecommendationRole(a, usedRoles) {
+    var conversionScore = (a.pom || 0) * 3 + (a.winRate || 0) * 0.15 + (a.perf || 0) * 0.2;
+    var reachScore = (a.social || 0) + (a.rank <= 10 ? 8 : 0);
+    var valueScore = (a.growth === 'Emerging' || a.growth === 'Rising' ? 20 : 0) + (100 - estimateAthleteFeeLakhs(a) * 3) + (a.social || 0) * 0.3;
+
+    var candidates = [
+      { role: 'Best for conversion', score: conversionScore, key: 'conversion' },
+      { role: 'Best for reach', score: reachScore, key: 'reach' },
+      { role: 'Best emerging/value athlete', score: valueScore, key: 'value' }
+    ].sort(function (x, y) { return y.score - x.score; });
+
+    for (var i = 0; i < candidates.length; i++) {
+      if (!usedRoles[candidates[i].key]) {
+        usedRoles[candidates[i].key] = true;
+        return candidates[i].role;
+      }
+    }
+    return candidates[0].role;
+  }
+
+  function buildRecommendations(brief) {
+    brief = brief || getDiscoveryFilters();
+    var softFilters = {
+      sport: brief.sport && brief.sport !== 'All' ? brief.sport : 'Cricket',
+      verifiedOnly: true
+    };
+    var list = (window.ADC_DATA && window.ADC_DATA.getAthletes(softFilters)) || [];
+    var usedRoles = {};
+    var scored = list.map(function (a) {
+      var fee = estimateAthleteFeeLakhs(a);
+      var matchPct = scoreAthleteForBrief(a, brief);
+      return Object.assign({}, a, {
+        matchPct: matchPct,
+        feeLakhs: fee,
+        feeLabel: '₹' + fee + 'L'
+      });
+    }).sort(function (x, y) {
+      return (y.matchPct - x.matchPct) || (x.feeLakhs - y.feeLakhs);
+    });
+
+    var top = scored.slice(0, 8).map(function (a, idx) {
+      if (idx < 3) a.recRole = assignRecommendationRole(a, usedRoles);
+      else {
+        if ((a.social || 0) >= 65) a.recRole = 'Strong reach option';
+        else if (a.growth === 'Emerging' || a.growth === 'Rising') a.recRole = 'Value / emerging option';
+        else a.recRole = 'Solid campaign fit';
+      }
+      return a;
+    });
+
+    var budget = brief.budgetAmount != null ? brief.budgetAmount : 20;
+    var portfolio = pickPortfolio(top, budget);
+    return { list: top, portfolio: portfolio, budget: budget };
+  }
+
+  function pickPortfolio(list, budget) {
+    if (!list || !list.length) return null;
+    var conversion = list.filter(function (a) { return a.recRole === 'Best for conversion'; })[0] || list[0];
+    var value = list.filter(function (a) { return a.recRole === 'Best emerging/value athlete'; })[0];
+    if (!value || value.id === conversion.id) {
+      value = list.filter(function (a) { return a.id !== conversion.id; })[0] || null;
+    }
+    if (!value) {
+      return {
+        athletes: [conversion],
+        total: conversion.feeLakhs,
+        label: conversion.name,
+        note: 'Single-athlete plan within budget'
+      };
+    }
+    var total = conversion.feeLakhs + value.feeLakhs;
+    if (total > budget) {
+      var cheaperPair = null;
+      var i, j;
+      for (i = 0; i < Math.min(list.length, 6); i++) {
+        for (j = i + 1; j < Math.min(list.length, 6); j++) {
+          var sum = list[i].feeLakhs + list[j].feeLakhs;
+          if (sum <= budget && (!cheaperPair || sum > cheaperPair.total)) {
+            cheaperPair = { athletes: [list[i], list[j]], total: sum };
+          }
+        }
+      }
+      if (cheaperPair) {
+        return {
+          athletes: cheaperPair.athletes,
+          total: cheaperPair.total,
+          label: cheaperPair.athletes.map(function (a) { return a.name; }).join(' + '),
+          note: 'Optimized for budget while balancing conversion + value'
+        };
+      }
+      return {
+        athletes: [conversion],
+        total: conversion.feeLakhs,
+        label: conversion.name,
+        note: 'Portfolio trimmed to stay inside ₹' + budget + 'L'
+      };
+    }
+    return {
+      athletes: [conversion, value],
+      total: total,
+      label: conversion.name + ' + ' + value.name,
+      note: 'Balances conversion + emerging/value within ₹' + budget + 'L'
+    };
+  }
+
+  function formatPortfolioHtml(portfolio, budget) {
+    if (!portfolio) return '';
+    var letters = ['A', 'B', 'C'];
+    var names = portfolio.athletes.map(function (a, i) {
+      return '<strong>' + (letters[i] || String(i + 1)) + '</strong> ' + a.name + ' (₹' + a.feeLakhs + 'L)';
+    }).join(' + ');
+    return '<div class="discovery-portfolio-card">' +
+      '<span class="discovery-portfolio-kicker">Recommended portfolio</span>' +
+      '<p class="discovery-portfolio-main">' + names + ' = <strong>₹' + portfolio.total + 'L</strong>' +
+      (budget != null ? ' <span class="discovery-portfolio-budget">of ₹' + budget + 'L</span>' : '') + '</p>' +
+      '<p class="discovery-portfolio-note">' + (portfolio.note || '') + '</p>' +
+      '</div>';
+  }
+
+  function runDiscoveryFromChat() {
+    if (discoveryState.chatBusy) return;
+    discoveryState.chatBusy = true;
+    appendDiscoveryChatMessage('bot', '<p>Building marketing decision intelligence from your brief…</p>');
+    setDiscoveryQuestionChips(null);
+    applyDiscoveryFilters(function () {
+      discoveryState.chatBusy = false;
+      var recs = discoveryState.recommendations || [];
+      var portfolio = discoveryState.portfolio;
+      var html = '<p>Top recommendations for your campaign:</p><ol class="discovery-rec-list">';
+      recs.slice(0, 3).forEach(function (a, i) {
+        html += '<li><strong>' + a.name + '</strong> — ' + a.matchPct + '% Match — ' + a.feeLabel +
+          '<br><span class="discovery-rec-role">' + a.recRole + '</span></li>';
+      });
+      html += '</ol>';
+      if (portfolio) {
+        html += '<p><strong>Recommended portfolio:</strong> ' +
+          portfolio.athletes.map(function (a) { return a.name; }).join(' + ') +
+          ' = ₹' + portfolio.total + 'L</p>';
+      }
+      html += '<p><button type="button" class="btn-secondary btn-sm" id="discovery-jump-results">Jump to recommendations</button></p>';
+      appendDiscoveryChatMessage('bot', html);
+      setDiscoveryQuestionChips(null);
+      var jump = document.getElementById('discovery-jump-results');
+      if (jump) {
+        jump.addEventListener('click', function () {
+          scrollDiscoveryResultsIntoView('results');
+        });
+      }
+      scrollDiscoveryResultsIntoView('results');
+    });
+  }
+
+  function handleDiscoveryChatSubmit(rawText) {
+    var text = (rawText || '').trim();
+    if (!text || discoveryState.chatBusy) return;
+
+    var input = document.getElementById('discovery-chat-discover-input');
+    if (input) input.value = '';
+
+    appendDiscoveryChatMessage('user', '<p>' + text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</p>');
+
+    if (/^skip remaining/i.test(text) || /^skip$/i.test(text)) {
+      runDiscoveryFromChat();
+      return;
+    }
+
+    var parsed = parseDiscoveryQuery(text);
+    if (Object.keys(parsed).length) {
+      mergeParsedIntoFilters(parsed);
+      if (discoveryState.pendingQuestion && (
+        parsed[discoveryState.pendingQuestion] !== undefined ||
+        (discoveryState.pendingQuestion === 'budgetAmount' && parsed.budgetAmount != null)
+      )) {
+        discoveryState.pendingQuestion = null;
+      }
+      renderActiveCriteriaTags();
+      var summary = summarizeCaptured(parsed);
+      if (summary) appendDiscoveryChatMessage('bot', summary);
+    } else if (!wantsShowResults(text)) {
+      appendDiscoveryChatMessage('bot',
+        '<p>I need campaign brief details. Share <strong>Campaign</strong>, <strong>Budget</strong>, <strong>Market</strong>, <strong>Audience</strong>, and <strong>Objective</strong> — or answer the next question.</p>');
+      askNextDiscoveryQuestion();
+      return;
+    }
+
+    var missing = nextBriefQuestion(discoveryState.chatFilters);
+    var answered = countBriefAnswered();
+
+    if (wantsShowResults(text) && answered >= 2) {
+      runDiscoveryFromChat();
+      return;
+    }
+    if (!missing && answered >= 5) {
+      runDiscoveryFromChat();
+      return;
+    }
+    if (answered >= 5) {
+      runDiscoveryFromChat();
+      return;
+    }
+
+    askNextDiscoveryQuestion();
+  }
+
+  function initDiscoveryChat() {
+    var sendBtn = document.getElementById('discovery-chat-discover-send');
+    var input = document.getElementById('discovery-chat-discover-input');
+    var chips = document.getElementById('discovery-chat-discover-chips');
+    if (sendBtn && !sendBtn.getAttribute('data-bound')) {
+      sendBtn.setAttribute('data-bound', '1');
+      sendBtn.addEventListener('click', function () {
+        handleDiscoveryChatSubmit(input && input.value);
+      });
+    }
+    if (input && !input.getAttribute('data-bound')) {
+      input.setAttribute('data-bound', '1');
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey && input.tagName === 'INPUT') {
+          e.preventDefault();
+          handleDiscoveryChatSubmit(input.value);
+        }
+        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+          e.preventDefault();
+          handleDiscoveryChatSubmit(input.value);
+        }
+      });
+    }
+    if (chips && !chips.getAttribute('data-bound')) {
+      chips.setAttribute('data-bound', '1');
+      chips.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-discovery-prompt]');
+        if (!btn) return;
+        handleDiscoveryChatSubmit(btn.getAttribute('data-discovery-prompt'));
+      });
+    }
+  }
+
+  function buildAthleteCardHtml(a, index) {
     var teamLabel = a.teamShort || a.team || '';
     var leagueLabel = a.league ? a.league + ' · ' : '';
-    return '<article class="athlete-card" data-athlete-id="' + a.id + '">' +
+    var letter = index != null && index < 3 ? String.fromCharCode(65 + index) : null;
+    var matchPct = a.matchPct != null ? a.matchPct : null;
+    var feeLabel = a.feeLabel || null;
+    var recRole = a.recRole || null;
+    return '<article class="athlete-card athlete-card--recommend" data-athlete-id="' + a.id + '">' +
+      (letter ? '<span class="athlete-card-letter">' + letter + '</span>' : '') +
       '<div class="athlete-card-top">' +
         '<div class="athlete-card-avatar">' + (a.initials || '') + '</div>' +
         '<div class="athlete-card-info">' +
-          '<strong>#' + (a.rank || '—') + ' ' + (a.name || '') + '</strong>' +
+          '<strong>' + (a.name || '') + '</strong>' +
           '<span>' + leagueLabel + (a.role || '') + (teamLabel ? ' · ' + teamLabel : '') + '</span>' +
+          '<div class="athlete-card-rec-meta">' +
+            (matchPct != null ? '<span class="athlete-match-pct">' + matchPct + '% Match</span>' : '') +
+            (feeLabel ? '<span class="athlete-fee">' + feeLabel + '</span>' : '') +
+          '</div>' +
+          (recRole ? '<p class="athlete-rec-role">' + recRole + '</p>' : '') +
           '<div class="athlete-card-scores">' +
             '<span>Perf: ' + (a.perf != null ? a.perf : '—') + '</span>' +
-            '<span class="athlete-card-social-score">Social Score: ' + (a.social != null ? a.social : '—') + '</span>' +
-            (a.pom != null ? '<span>POM: ' + a.pom + '</span>' : '') +
+            '<span class="athlete-card-social-score">Social: ' + (a.social != null ? a.social : '—') + '</span>' +
             (a.verified ? ' <span class="verified">✓ Verified</span>' : '') +
           '</div>' +
-          (a.matches != null ? '<span class="athlete-card-meta">Matches: ' + a.matches + ' · Win rate: ' + (a.winRate != null ? a.winRate + '%' : '—') + '</span>' : '') +
         '</div>' +
       '</div>' +
       '<button type="button" class="btn-secondary btn-sm btn-view-athlete">Show profile</button>' +
       '</article>';
   }
 
+  function scrollDiscoveryResultsIntoView(focus) {
+    var target = null;
+    if (focus === 'anim') {
+      target = document.getElementById('discovery-search-anim') ||
+        document.getElementById('discovery-results-count') ||
+        document.querySelector('#screen-brand-discovery .results-area');
+    } else {
+      target = document.getElementById('discovery-athlete-cards') ||
+        document.querySelector('#screen-brand-discovery .results-area');
+    }
+    if (!target) return;
+    requestAnimationFrame(function () {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  function setDiscoverySearchingUi(isSearching) {
+    var chat = document.getElementById('discovery-chat-discover');
+    var results = document.querySelector('#screen-brand-discovery .results-area');
+    var paginationEl = document.getElementById('discovery-pagination');
+    if (chat) chat.classList.toggle('is-searching', !!isSearching);
+    if (results) results.classList.toggle('is-searching', !!isSearching);
+    if (isSearching && paginationEl) paginationEl.innerHTML = '';
+  }
+
   function renderDiscoveryPagination(total, page, pageSize) {
     var paginationEl = document.getElementById('discovery-pagination');
     if (!paginationEl) return;
+    if (total <= 0) {
+      paginationEl.innerHTML = '';
+      return;
+    }
     if (total <= pageSize) {
-      paginationEl.innerHTML = total > 0
-        ? '<span class="discovery-pagination-info">Showing all ' + total + ' athletes</span>'
-        : '';
+      paginationEl.innerHTML = '<span class="discovery-pagination-info">Showing all ' + total + ' athletes</span>';
       return;
     }
     var totalPages = Math.ceil(total / pageSize);
@@ -273,9 +913,24 @@
       '<span class="discovery-pagination-info">Showing ' + start + '–' + end + ' of ' + total + '</span>' +
       '<div class="discovery-pagination-controls">';
     html += '<button type="button" class="discovery-page-btn" data-page="' + (page - 1) + '" ' + (page <= 1 ? 'disabled' : '') + '>← Prev</button>';
-    for (var i = 1; i <= totalPages; i++) {
-      html += '<button type="button" class="discovery-page-btn' + (i === page ? ' discovery-page-btn--active' : '') + '" data-page="' + i + '">' + i + '</button>';
+
+    function pageBtn(i) {
+      return '<button type="button" class="discovery-page-btn' + (i === page ? ' discovery-page-btn--active' : '') + '" data-page="' + i + '">' + i + '</button>';
     }
+    var windowSize = 5;
+    var from = Math.max(1, page - Math.floor(windowSize / 2));
+    var to = Math.min(totalPages, from + windowSize - 1);
+    from = Math.max(1, to - windowSize + 1);
+    if (from > 1) {
+      html += pageBtn(1);
+      if (from > 2) html += '<span class="discovery-pagination-ellipsis">…</span>';
+    }
+    for (var i = from; i <= to; i++) html += pageBtn(i);
+    if (to < totalPages) {
+      if (to < totalPages - 1) html += '<span class="discovery-pagination-ellipsis">…</span>';
+      html += pageBtn(totalPages);
+    }
+
     html += '<button type="button" class="discovery-page-btn" data-page="' + (page + 1) + '" ' + (page >= totalPages ? 'disabled' : '') + '>Next →</button>';
     html += '</div></div>';
     paginationEl.innerHTML = html;
@@ -285,21 +940,38 @@
     options = options || {};
     var container = document.getElementById('discovery-athlete-cards');
     var countEl = document.getElementById('discovery-results-count');
+    var portfolioEl = document.getElementById('discovery-portfolio');
     if (!container || !window.ADC_DATA) return;
 
     if (options.resetPage) discoveryState.currentPage = 1;
 
     if (!options.skipGate && !discoveryState.hasSearched) {
-      container.innerHTML = '<p class="discovery-empty">Set filters and click Apply filters to discover athletes.</p>';
+      container.innerHTML = '';
       if (countEl) countEl.textContent = '';
+      if (portfolioEl) { portfolioEl.hidden = true; portfolioEl.innerHTML = ''; }
       renderDiscoveryPagination(0, 1, discoveryState.pageSize);
       discoveryState.filteredList = [];
+      discoveryState.recommendations = [];
+      discoveryState.portfolio = null;
       return;
     }
 
-    var filters = getDiscoveryFilters();
-    var list = window.ADC_DATA.getAthletes(filters);
+    var brief = getDiscoveryFilters();
+    var built = buildRecommendations(brief);
+    var list = built.list;
+    discoveryState.recommendations = list;
     discoveryState.filteredList = list;
+    discoveryState.portfolio = built.portfolio;
+
+    if (portfolioEl) {
+      if (built.portfolio) {
+        portfolioEl.hidden = false;
+        portfolioEl.innerHTML = formatPortfolioHtml(built.portfolio, built.budget);
+      } else {
+        portfolioEl.hidden = true;
+        portfolioEl.innerHTML = '';
+      }
+    }
 
     var pageSize = discoveryState.pageSize;
     var totalPages = Math.max(1, Math.ceil(list.length / pageSize) || 1);
@@ -311,14 +983,20 @@
     var pageList = list.slice(startIdx, startIdx + pageSize);
 
     container.innerHTML = pageList.length
-      ? pageList.map(buildAthleteCardHtml).join('')
-      : '<p class="discovery-empty">No athletes matched these filters.</p>';
+      ? pageList.map(function (a, i) { return buildAthleteCardHtml(a, startIdx + i); }).join('')
+      : '<p class="discovery-empty">No recommendations matched this brief.</p>';
 
     if (countEl) {
-      countEl.textContent = list.length + ' athlete' + (list.length !== 1 ? 's' : '') + ' found';
+      countEl.textContent = list.length
+        ? list.length + ' recommendation' + (list.length !== 1 ? 's' : '') + ' · ranked by campaign match'
+        : '';
     }
 
     renderDiscoveryPagination(list.length, discoveryState.currentPage, pageSize);
+
+    if (options.scrollToResults) {
+      scrollDiscoveryResultsIntoView('results');
+    }
   }
 
   function runDiscoverySearchAnimation(done) {
@@ -326,25 +1004,38 @@
     var linesEl = document.getElementById('discovery-search-anim-lines');
     var cards = document.getElementById('discovery-athlete-cards');
     var countEl = document.getElementById('discovery-results-count');
+    var portfolioEl = document.getElementById('discovery-portfolio');
     var filters = getDiscoveryFilters();
     if (!anim || !linesEl) {
       if (done) done();
       return;
     }
-    if (cards) cards.innerHTML = '';
-    if (countEl) countEl.textContent = 'Scanning…';
-    anim.hidden = false;
-    linesEl.innerHTML = '';
 
-    var sport = filters.sport || 'All';
+    setDiscoverySearchingUi(true);
+    if (cards) {
+      cards.innerHTML = '';
+      cards.setAttribute('aria-busy', 'true');
+    }
+    if (portfolioEl) { portfolioEl.hidden = true; portfolioEl.innerHTML = ''; }
+    if (countEl) countEl.textContent = 'Scoring campaign fit…';
+    anim.hidden = false;
+    anim.classList.add('is-active');
+    linesEl.innerHTML = '';
+    scrollDiscoveryResultsIntoView('anim');
+
+    var campaign = filters.campaign || 'open brief';
+    var budget = filters.budgetAmount != null ? ('₹' + filters.budgetAmount + 'L') : (filters.budget || 'open');
+    var market = filters.market || filters.targetGeography || 'open';
+    var obj = filters.campaignObjective && filters.campaignObjective !== 'Any' ? filters.campaignObjective : 'open';
     var steps = [
-      '> load filter matrix · sport=' + sport,
-      '> apply age/gender/location constraints',
-      '> compute perf ∩ social bands · Δt=' + (22 + Math.floor(Math.random() * 35)) + 'ms',
-      '> budget + growth + commercial intelligence join',
-      '> verified identity check · hash=' + Math.abs(sport.split('').reduce(function (a, c) { return ((a << 5) - a) + c.charCodeAt(0); }, 0)).toString(16).slice(0, 6),
-      '> rank candidates · sort(perf, social, fit)',
-      '> assemble discovery payload…'
+      '> ingest campaign brief · ' + campaign,
+      '> constrain budget envelope · ' + budget,
+      '> map market affinity · ' + market,
+      '> objective weights · ' + obj,
+      '> score athletes · match% = f(perf, social, growth, fee)',
+      '> assign roles · conversion / reach / emerging-value',
+      '> optimize portfolio under budget · knapsack≈greedy',
+      '> assemble recommendation payload…'
     ];
 
     var started = Date.now();
@@ -363,8 +1054,8 @@
       } else if (elapsed < duration) {
         var calc = document.createElement('div');
         calc.className = 'discovery-search-anim-line';
-        calc.textContent = '> calc fit_score=' + (Math.random() * 10).toFixed(2) +
-          ' · roi_idx=' + (0.4 + Math.random() * 0.55).toFixed(3) +
+        calc.textContent = '> calc match=' + (88 + Math.random() * 9).toFixed(1) + '%' +
+          ' · fee_idx=' + (4 + Math.random() * 10).toFixed(1) + 'L' +
           ' · t+' + Math.floor(elapsed) + 'ms';
         linesEl.appendChild(calc);
         while (linesEl.children.length > 10) linesEl.removeChild(linesEl.firstChild);
@@ -373,6 +1064,9 @@
 
       if (elapsed >= duration) {
         anim.hidden = true;
+        anim.classList.remove('is-active');
+        if (cards) cards.removeAttribute('aria-busy');
+        setDiscoverySearchingUi(false);
         if (done) done();
         return;
       }
@@ -384,22 +1078,22 @@
   }
 
   function goToDiscoveryPage(page) {
-    var totalPages = Math.max(1, Math.ceil(discoveryState.filteredList.length / discoveryState.pageSize));
+    var totalPages = Math.max(1, Math.ceil((discoveryState.filteredList.length || 0) / discoveryState.pageSize));
     page = parseInt(page, 10);
     if (isNaN(page) || page < 1 || page > totalPages) return;
     discoveryState.currentPage = page;
-    renderDiscovery({ skipGate: true });
-    var cards = document.getElementById('discovery-athlete-cards');
-    if (cards) cards.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    discoveryState.hasSearched = true;
+    renderDiscovery({ skipGate: true, scrollToResults: true });
   }
 
-  function applyDiscoveryFilters() {
-    var btn = document.getElementById('btn-apply-filters');
-    if (btn) btn.disabled = true;
+  function applyDiscoveryFilters(done) {
+    var sendBtn = document.getElementById('discovery-chat-discover-send');
+    if (sendBtn) sendBtn.disabled = true;
     runDiscoverySearchAnimation(function () {
       discoveryState.hasSearched = true;
-      renderDiscovery({ resetPage: true, skipGate: true });
-      if (btn) btn.disabled = false;
+      renderDiscovery({ resetPage: true, skipGate: true, scrollToResults: true });
+      if (sendBtn) sendBtn.disabled = false;
+      if (typeof done === 'function') done();
     });
   }
 
@@ -656,23 +1350,6 @@
         '</button>';
     }).join('');
     html += '</div>';
-
-    if (persona === 'brand') {
-      html +=
-        '<div class="journey-sidebar-footer">' +
-          '<button type="button" class="journey-nav-item journey-nav-assistant" data-open-discovery-assistant title="Open Discovery Assistant" aria-label="Open Discovery Assistant">' +
-            '<span class="journey-nav-icon journey-nav-assistant-icon" aria-hidden="true">' +
-              '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-                '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' +
-                '<circle cx="9" cy="10" r="1.5" fill="currentColor"/>' +
-                '<circle cx="15" cy="10" r="1.5" fill="currentColor"/>' +
-                '<path d="M8 14c.5.8 1.5 1.5 2.5 1.5s2-.7 2.5-1.5"/>' +
-              '</svg>' +
-            '</span>' +
-            '<span class="journey-nav-text">Discovery Assistant</span>' +
-          '</button>' +
-        '</div>';
-    }
 
     sidebar.innerHTML = html;
   }
@@ -1391,9 +2068,17 @@
 
   function handleCardClick(e) {
     var pageBtn = e.target.closest('.discovery-page-btn[data-page]');
-    if (pageBtn && !pageBtn.disabled) {
+    if (pageBtn) {
+      if (pageBtn.hasAttribute('disabled') || pageBtn.disabled) return;
       e.preventDefault();
+      e.stopPropagation();
       goToDiscoveryPage(pageBtn.getAttribute('data-page'));
+      return;
+    }
+    var jumpBtn = e.target.closest('#discovery-jump-results');
+    if (jumpBtn) {
+      e.preventDefault();
+      scrollDiscoveryResultsIntoView('results');
       return;
     }
     var card = e.target.closest('.athlete-card[data-athlete-id]');
@@ -1479,18 +2164,7 @@
       setMobileSidebarOpen(!(sidebar && sidebar.classList.contains('journey-sidebar--open')));
     });
     if (scrim) scrim.addEventListener('click', function () { setMobileSidebarOpen(false); });
-    var btnApply = document.getElementById('btn-apply-filters');
-    if (btnApply) btnApply.addEventListener('click', applyDiscoveryFilters);
-    var advBtn = document.getElementById('btn-advanced-filters');
-    var advPanel = document.getElementById('discovery-advanced-panel');
-    if (advBtn && advPanel) {
-      advBtn.addEventListener('click', function () {
-        var open = advPanel.hidden;
-        advPanel.hidden = !open;
-        advBtn.classList.toggle('is-open', open);
-        advBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
-    }
+    initDiscoveryChat();
     var dataSearch = document.getElementById('data-search');
     if (dataSearch) {
       dataSearch.addEventListener('input', function () {
