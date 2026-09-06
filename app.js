@@ -102,6 +102,7 @@
 
   var state = { selectedAthleteId: null };
   var DISCOVERY_CACHE_KEY = 'adc_discovery_last_query';
+  var DISCOVERY_SESSION_FRESH_KEY = 'adc_discovery_session_fresh';
   var discoveryState = {
     filteredList: [],
     recommendations: [],
@@ -113,7 +114,8 @@
     pendingQuestion: null,
     chatBusy: false,
     lastQueryText: '',
-    restoredFromCache: false
+    restoredFromCache: false,
+    sessionStartedFresh: false
   };
 
   var CAMPAIGN_BRIEF_FIELDS = [
@@ -153,6 +155,80 @@
       required: true
     }
   ];
+
+  function clearDiscoveryCache() {
+    try { localStorage.removeItem(DISCOVERY_CACHE_KEY); } catch (err) { /* ignore */ }
+  }
+
+  function resetDiscoveryStarterChips() {
+    var wrap = document.getElementById('discovery-chat-discover-chips');
+    if (!wrap) return;
+    wrap.innerHTML =
+      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Campaign: New sports nutrition product&#10;Budget: ₹20L&#10;Market: Karnataka + Maharashtra&#10;Audience: 18–30&#10;Objective: Awareness + sales">Sports nutrition · ₹20L brief</button>' +
+      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Campaign: Beverage brand refresh&#10;Budget: ₹12L&#10;Market: PAN India&#10;Audience: Gen Z&#10;Objective: Brand Awareness">Beverage · PAN India</button>' +
+      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Campaign: Sportswear endorsement&#10;Budget: ₹8L&#10;Market: Metro Cities&#10;Audience: 18–25&#10;Objective: Product Launch">Sportswear · Metros</button>';
+  }
+
+  function resetDiscoveryChatUi() {
+    var box = document.getElementById('discovery-chat-discover-messages');
+    if (box) {
+      box.innerHTML = '';
+      box.hidden = true;
+    }
+    var input = document.getElementById('discovery-chat-discover-input');
+    if (input) input.value = '';
+    var tags = document.getElementById('discovery-active-criteria-tags');
+    var criteria = document.getElementById('discovery-active-criteria');
+    if (tags) tags.innerHTML = '';
+    if (criteria) criteria.hidden = true;
+    resetDiscoveryStarterChips();
+    var portfolioEl = document.getElementById('discovery-portfolio');
+    if (portfolioEl) {
+      portfolioEl.hidden = true;
+      portfolioEl.innerHTML = '';
+    }
+    var countEl = document.getElementById('discovery-results-count');
+    if (countEl) countEl.textContent = '';
+    var cards = document.getElementById('discovery-athlete-cards');
+    if (cards) cards.innerHTML = '';
+    var pagination = document.getElementById('discovery-pagination');
+    if (pagination) pagination.innerHTML = '';
+    var anim = document.getElementById('discovery-search-anim');
+    if (anim) {
+      anim.hidden = true;
+      anim.classList.remove('is-active');
+    }
+  }
+
+  function startDiscoveryFresh() {
+    discoveryState.filteredList = [];
+    discoveryState.recommendations = [];
+    discoveryState.portfolio = null;
+    discoveryState.currentPage = 1;
+    discoveryState.hasSearched = false;
+    discoveryState.chatFilters = {};
+    discoveryState.pendingQuestion = null;
+    discoveryState.chatBusy = false;
+    discoveryState.lastQueryText = '';
+    discoveryState.restoredFromCache = false;
+    clearDiscoveryCache();
+    resetDiscoveryChatUi();
+  }
+
+  function ensureDiscoveryFreshOnFirstVisit() {
+    if (discoveryState.sessionStartedFresh) return false;
+    var alreadyFresh = false;
+    try {
+      alreadyFresh = !!sessionStorage.getItem(DISCOVERY_SESSION_FRESH_KEY);
+      sessionStorage.setItem(DISCOVERY_SESSION_FRESH_KEY, '1');
+    } catch (err) {
+      alreadyFresh = discoveryState.sessionStartedFresh;
+    }
+    discoveryState.sessionStartedFresh = true;
+    if (alreadyFresh) return false;
+    startDiscoveryFresh();
+    return true;
+  }
 
   function getDiscoveryChatMessagesHtml() {
     var box = document.getElementById('discovery-chat-discover-messages');
@@ -866,9 +942,8 @@
 
   function formatPortfolioHtml(portfolio, budget) {
     if (!portfolio) return '';
-    var letters = ['A', 'B', 'C'];
-    var names = portfolio.athletes.map(function (a, i) {
-      return '<strong>' + (letters[i] || String(i + 1)) + '</strong> ' + a.name + ' (₹' + a.feeLakhs + 'L)';
+    var names = portfolio.athletes.map(function (a) {
+      return '<strong>' + a.name + '</strong> (₹' + a.feeLakhs + 'L)';
     }).join(' + ');
     return '<div class="discovery-portfolio-card">' +
       '<span class="discovery-portfolio-kicker">Recommended portfolio</span>' +
@@ -1104,18 +1179,14 @@
     if (options.resetPage) discoveryState.currentPage = 1;
 
     if (!options.skipGate && !discoveryState.hasSearched) {
-      if (restoreDiscoveryFromCache()) {
-        options.skipGate = true;
-      } else {
-        container.innerHTML = '';
-        if (countEl) countEl.textContent = '';
-        if (portfolioEl) { portfolioEl.hidden = true; portfolioEl.innerHTML = ''; }
-        renderDiscoveryPagination(0, 1, discoveryState.pageSize);
-        discoveryState.filteredList = [];
-        discoveryState.recommendations = [];
-        discoveryState.portfolio = null;
-        return;
-      }
+      container.innerHTML = '';
+      if (countEl) countEl.textContent = '';
+      if (portfolioEl) { portfolioEl.hidden = true; portfolioEl.innerHTML = ''; }
+      renderDiscoveryPagination(0, 1, discoveryState.pageSize);
+      discoveryState.filteredList = [];
+      discoveryState.recommendations = [];
+      discoveryState.portfolio = null;
+      return;
     }
 
     var brief = getDiscoveryFilters();
@@ -2147,13 +2218,18 @@
     } else if (screenId === 'athlete-profile' || screenId === 'athlete-dashboard') {
       updateAthleteProfileCompletion();
     } else if (screenId === 'brand-discovery') {
-      if (params.restoreResults || !discoveryState.hasSearched) {
+      if (params.restoreResults) {
         restoreDiscoveryFromCache();
+        renderDiscovery({
+          skipGate: discoveryState.hasSearched,
+          scrollToResults: true
+        });
+      } else {
+        ensureDiscoveryFreshOnFirstVisit();
+        renderDiscovery({
+          skipGate: discoveryState.hasSearched
+        });
       }
-      renderDiscovery({
-        skipGate: discoveryState.hasSearched,
-        scrollToResults: !!params.restoreResults
-      });
     } else if (screenId === 'brand-athlete-profile') {
       var id = params.athleteId != null ? params.athleteId : state.selectedAthleteId;
       renderBrandAthleteProfile(id);
