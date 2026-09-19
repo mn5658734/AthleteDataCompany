@@ -1271,8 +1271,8 @@
     if (!discoveryState.hasSearched && !options.skipGate) {
       container.innerHTML =
         '<div class="discovery-results-placeholder">' +
-          '<p class="discovery-placeholder-title">Recommendations appear after you run search</p>' +
-          '<p>Complete the campaign brief in chat, then say <strong>recommend athletes</strong> (or Skip remaining). We\'ll animate the scoring pass, then show ranked matches with % Match, fee, and a portfolio plan.</p>' +
+          '<p class="discovery-placeholder-title">Fill the brief, then say <strong>recommend athletes</strong>.</p>' +
+          '<p>We\'ll score matches and show fees + a portfolio plan.</p>' +
         '</div>';
       if (countEl) countEl.textContent = '';
       if (portfolioEl) { portfolioEl.hidden = true; portfolioEl.innerHTML = ''; }

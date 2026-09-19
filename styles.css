@@ -3211,6 +3211,26 @@ body.has-sidebar .journey-screen.active { padding-left: 236px; }
   font-size: 0.92rem;
 }
 
+.discovery-results-placeholder {
+  margin: 0.75rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+
+.discovery-results-placeholder p {
+  margin: 0;
+}
+
+.discovery-placeholder-title {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.discovery-results-placeholder p + p {
+  margin-top: 0.25rem;
+}
+
 .search-input {
   flex: 1;
   min-width: 0;
