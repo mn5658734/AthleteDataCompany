@@ -120,6 +120,13 @@
 
   var CAMPAIGN_BRIEF_FIELDS = [
     {
+      key: 'sport',
+      label: 'Sport',
+      question: 'Which sport should we recommend from?',
+      chips: ['Cricket', 'Boxing', 'Football', 'Hockey', 'Kabaddi', 'Athletics', 'Tennis', 'TT', 'Swimming', 'Kho Kho'],
+      required: true
+    },
+    {
       key: 'campaign',
       label: 'Campaign',
       question: 'What is the campaign? (product / brand / initiative)',
@@ -164,9 +171,9 @@
     var wrap = document.getElementById('discovery-chat-discover-chips');
     if (!wrap) return;
     wrap.innerHTML =
-      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Campaign: New sports nutrition product&#10;Budget: ₹20L&#10;Market: Karnataka + Maharashtra&#10;Audience: 18–30&#10;Objective: Awareness + sales">Sports nutrition · ₹20L brief</button>' +
-      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Campaign: Beverage brand refresh&#10;Budget: ₹12L&#10;Market: PAN India&#10;Audience: Gen Z&#10;Objective: Brand Awareness">Beverage · PAN India</button>' +
-      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Campaign: Sportswear endorsement&#10;Budget: ₹8L&#10;Market: Metro Cities&#10;Audience: 18–25&#10;Objective: Product Launch">Sportswear · Metros</button>';
+      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Sport: Cricket&#10;Campaign: New sports nutrition product&#10;Budget: ₹20L&#10;Market: Karnataka + Maharashtra&#10;Audience: 18–30&#10;Objective: Awareness + sales">Cricket · Nutrition · ₹20L</button>' +
+      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Sport: Boxing&#10;Campaign: Sportswear endorsement&#10;Budget: ₹12L&#10;Market: PAN India&#10;Audience: Gen Z&#10;Objective: Brand Awareness">Boxing · Sportswear</button>' +
+      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Sport: Athletic (25)&#10;Campaign: Beverage brand refresh&#10;Budget: ₹15L&#10;Market: Metro Cities&#10;Audience: 18–30&#10;Objective: Product Launch">Athletics · Beverage</button>';
   }
 
   function resetDiscoveryChatUi() {
@@ -484,7 +491,7 @@
       budgetLabel: '',
       market: '',
       audienceLabel: '',
-      sport: 'Cricket',
+      sport: 'All',
       campaignObjective: 'Any',
       targetAudience: 'Any',
       targetGeography: 'Any',
@@ -657,12 +664,46 @@
     }
 
     var sports = [
-      'Cricket', 'Badminton', 'Boxing', 'Volley Ball', 'Athletic (25)', 'Hockey',
-      'Football', 'Kabaddi', 'Kho Kho', 'Tennis', 'TT', 'Swimming'
+      'Cricket', 'Badminton', 'Boxing', 'Volley Ball', 'Athletic (25)', 'Athletics', 'Hockey',
+      'Football', 'Kabaddi', 'Kho Kho', 'Tennis', 'TT', 'Table Tennis', 'Swimming'
     ];
     sports.forEach(function (s) {
-      if (lower.indexOf(s.toLowerCase()) !== -1) parsed.sport = s;
+      if (lower.indexOf(s.toLowerCase()) !== -1) {
+        if (s === 'Athletics' || s === 'Athletic (25)') parsed.sport = 'Athletic (25)';
+        else if (s === 'Table Tennis' || s === 'TT') parsed.sport = 'TT';
+        else parsed.sport = s;
+      }
     });
+    if (/\btt\b/.test(lower) || lower.indexOf('table tennis') !== -1) parsed.sport = 'TT';
+    if (lower.indexOf('volleyball') !== -1) parsed.sport = 'Volley Ball';
+    if (lower.indexOf('athletics') !== -1) parsed.sport = 'Athletic (25)';
+
+    var lineSport = text.match(/sport\s*[:\-]\s*(.+)/i);
+    if (lineSport) {
+      var sp = lineSport[1].split(/\n/)[0].trim();
+      if (/athletic/i.test(sp)) parsed.sport = 'Athletic (25)';
+      else if (/table tennis|\btt\b/i.test(sp)) parsed.sport = 'TT';
+      else parsed.sport = sp;
+    }
+
+    // Athlete gender from brief language (women / female → Female athletes)
+    if (/\bwpl\b|women'?s?\s+premier\s+league/i.test(lower)) {
+      parsed.gender = 'Female';
+      if (!parsed.sport || parsed.sport === 'All') parsed.sport = 'Cricket';
+    } else if (/\b(women|woman|female|ladies|lady|girls?)\b/i.test(lower) ||
+               /female\s+athlete/i.test(lower)) {
+      parsed.gender = 'Female';
+    } else if (/\b(male|boys?|gentlemen)\b/i.test(lower) ||
+               /(?:^|[^a-z])men(?:'s)?\b/i.test(lower) ||
+               /male\s+athlete/i.test(lower)) {
+      parsed.gender = 'Male';
+    }
+    var lineGender = text.match(/gender\s*[:\-]\s*(.+)/i);
+    if (lineGender) {
+      var g = lineGender[1].split(/\n/)[0].trim().toLowerCase();
+      if (/female|women|woman|ladies|girl/.test(g)) parsed.gender = 'Female';
+      else if (/male|men|man|boy/.test(g)) parsed.gender = 'Male';
+    }
 
     if (discoveryState.pendingQuestion && Object.keys(parsed).length === 0) {
       var key = discoveryState.pendingQuestion;
@@ -670,8 +711,13 @@
         var pendingAmt = parseBudgetLakhs(text);
         if (pendingAmt != null) parsed.budgetAmount = pendingAmt;
         else if (/^\d+(\.\d+)?$/.test(text.trim())) parsed.budgetAmount = Math.round(parseFloat(text.trim()));
-      } else if (key === 'campaign' || key === 'market' || key === 'audienceLabel' || key === 'campaignObjective') {
+      } else if (key === 'campaign' || key === 'market' || key === 'audienceLabel' || key === 'campaignObjective' || key === 'sport') {
         parsed[key] = text.replace(/^["']|["']$/g, '');
+        if (key === 'sport') {
+          if (/athletic/i.test(parsed.sport)) parsed.sport = 'Athletic (25)';
+          else if (/table tennis|\btt\b/i.test(parsed.sport)) parsed.sport = 'TT';
+          else if (/kho\s*kho/i.test(parsed.sport)) parsed.sport = 'Kho Kho';
+        }
       }
       var fieldDef = CAMPAIGN_BRIEF_FIELDS.filter(function (q) { return q.key === key; })[0];
       if (fieldDef && fieldDef.chips) {
@@ -680,6 +726,10 @@
             if (key === 'budgetAmount') {
               var chipAmt = parseBudgetLakhs(chip);
               if (chipAmt != null) parsed.budgetAmount = chipAmt;
+            } else if (key === 'sport') {
+              if (/athletic/i.test(chip)) parsed.sport = 'Athletic (25)';
+              else if (/table tennis|\btt\b/i.test(chip)) parsed.sport = 'TT';
+              else parsed.sport = chip;
             } else {
               parsed[key] = chip;
             }
@@ -755,12 +805,13 @@
       if (val === undefined || val === null || val === '' || val === 'Any' || val === 'All') return;
       items.push('<span class="discovery-criteria-tag"><em>' + label + '</em> ' + val + '</span>');
     }
+    add('Sport', f.sport);
+    add('Gender', f.gender);
     add('Campaign', f.campaign);
     add('Budget', f.budgetLabel || (f.budgetAmount != null ? ('₹' + f.budgetAmount + 'L') : ''));
     add('Market', f.market);
     add('Audience', f.audienceLabel);
     add('Objective', f.campaignObjective);
-    add('Sport', f.sport !== 'All' ? f.sport : '');
     add('Category', f.brandCategory);
     tags.innerHTML = items.join('');
     wrap.hidden = items.length === 0;
@@ -769,7 +820,8 @@
   function summarizeCaptured(parsed) {
     var labels = {
       campaign: 'Campaign', budgetAmount: 'Budget', budgetLabel: 'Budget', market: 'Market',
-      audienceLabel: 'Audience', campaignObjective: 'Objective', sport: 'Sport', brandCategory: 'Category'
+      audienceLabel: 'Audience', campaignObjective: 'Objective', sport: 'Sport', gender: 'Gender',
+      brandCategory: 'Category'
     };
     var parts = [];
     Object.keys(parsed).forEach(function (k) {
@@ -832,6 +884,7 @@
     var fee = estimateAthleteFeeLakhs(a);
     if (brief.budgetAmount != null && fee > brief.budgetAmount * 0.7) score -= 8;
     if (brief.budgetAmount != null && fee <= brief.budgetAmount * 0.45) score += 3;
+    if (brief.gender && brief.gender !== 'All' && a.gender === brief.gender) score += 6;
     return Math.max(72, Math.min(97, Math.round(score)));
   }
 
@@ -857,15 +910,40 @@
 
   function buildRecommendations(brief) {
     brief = brief || getDiscoveryFilters();
+    var wantGender = brief.gender && brief.gender !== 'All' ? brief.gender : null;
+    var wantSport = brief.sport && brief.sport !== 'All' ? brief.sport : null;
+    // Default sport: Cricket — but when filtering women with no sport, search all sports
     var softFilters = {
-      sport: brief.sport && brief.sport !== 'All' ? brief.sport : 'Cricket',
+      sport: wantSport || (wantGender === 'Female' ? 'All' : 'Cricket'),
       verifiedOnly: true
     };
+    if (wantGender) softFilters.gender = wantGender;
+
     var list = (window.ADC_DATA && window.ADC_DATA.getAthletes(softFilters)) || [];
+
+    // Gender-constrained: if the sport cohort is empty, widen to all sports
+    if (wantGender && !list.length) {
+      var widened = Object.assign({}, softFilters, { sport: 'All' });
+      list = (window.ADC_DATA && window.ADC_DATA.getAthletes(widened)) || [];
+    }
+    if (wantGender && !list.length) {
+      softFilters.verifiedOnly = false;
+      softFilters.sport = wantSport || 'All';
+      list = (window.ADC_DATA && window.ADC_DATA.getAthletes(softFilters)) || [];
+      if (!list.length) {
+        list = (window.ADC_DATA && window.ADC_DATA.getAthletes({
+          gender: wantGender,
+          verifiedOnly: false
+        })) || [];
+      }
+    }
+
     var usedRoles = {};
     var scored = list.map(function (a) {
       var fee = estimateAthleteFeeLakhs(a);
       var matchPct = scoreAthleteForBrief(a, brief);
+      // Prefer athletes in the requested sport when we widened the cohort
+      if (wantSport && a.sport === wantSport) matchPct = Math.min(97, matchPct + 3);
       return Object.assign({}, a, {
         matchPct: matchPct,
         feeLakhs: fee,
@@ -953,6 +1031,7 @@
       '</div>';
   }
 
+
   function runDiscoveryFromChat() {
     if (discoveryState.chatBusy) return;
     discoveryState.chatBusy = true;
@@ -963,7 +1042,7 @@
       var recs = discoveryState.recommendations || [];
       var portfolio = discoveryState.portfolio;
       var html = '<p>Top recommendations for your campaign:</p><ol class="discovery-rec-list">';
-      recs.slice(0, 3).forEach(function (a, i) {
+      recs.slice(0, 3).forEach(function (a) {
         html += '<li><strong>' + a.name + '</strong> — ' + a.matchPct + '% Match — ' + a.feeLabel +
           '<br><span class="discovery-rec-role">' + a.recRole + '</span></li>';
       });
@@ -1015,7 +1094,7 @@
       if (summary) appendDiscoveryChatMessage('bot', summary);
     } else if (!wantsShowResults(text)) {
       appendDiscoveryChatMessage('bot',
-        '<p>I need campaign brief details. Share <strong>Campaign</strong>, <strong>Budget</strong>, <strong>Market</strong>, <strong>Audience</strong>, and <strong>Objective</strong> — or answer the next question.</p>');
+        '<p>I need campaign brief details. Share <strong>Sport</strong>, <strong>Campaign</strong>, <strong>Budget</strong>, <strong>Market</strong>, <strong>Audience</strong>, and <strong>Objective</strong> — or answer the next question.</p>');
       askNextDiscoveryQuestion();
       return;
     }
@@ -1075,17 +1154,26 @@
   function buildAthleteCardHtml(a, index) {
     var teamLabel = a.teamShort || a.team || '';
     var leagueLabel = a.league ? a.league + ' · ' : '';
+    var sportLabel = a.sport ? a.sport + ' · ' : '';
     var letter = index != null && index < 3 ? String.fromCharCode(65 + index) : null;
     var matchPct = a.matchPct != null ? a.matchPct : null;
     var feeLabel = a.feeLabel || null;
     var recRole = a.recRole || null;
-    return '<article class="athlete-card athlete-card--recommend" data-athlete-id="' + a.id + '">' +
+    var statsBits = [];
+    if (a.runs != null) statsBits.push('Runs ' + a.runs);
+    if (a.wickets != null) statsBits.push('Wkts ' + a.wickets);
+    if (a.matches != null) statsBits.push('M ' + a.matches);
+    if (a.tier) statsBits.push(a.tier.replace('TIER ', 'T'));
+    var formLine = a.recentForm ? String(a.recentForm) : '';
+    if (formLine.length > 110) formLine = formLine.slice(0, 107) + '…';
+    return '<article class="athlete-card athlete-card--recommend" data-athlete-id="' + a.id + '" data-profile-key="' + (a.profileKey || '') + '">' +
       (letter ? '<span class="athlete-card-letter">' + letter + '</span>' : '') +
       '<div class="athlete-card-top">' +
         '<div class="athlete-card-avatar">' + (a.initials || '') + '</div>' +
         '<div class="athlete-card-info">' +
           '<strong>' + (a.name || '') + '</strong>' +
-          '<span>' + leagueLabel + (a.role || '') + (teamLabel ? ' · ' + teamLabel : '') + '</span>' +
+          (a.profileCode ? '<span class="athlete-profile-code">' + a.profileCode + '</span>' : '') +
+          '<span>' + sportLabel + leagueLabel + (a.role || '') + (teamLabel ? ' · ' + teamLabel : '') + '</span>' +
           '<div class="athlete-card-rec-meta">' +
             (matchPct != null ? '<span class="athlete-match-pct">' + matchPct + '% Match</span>' : '') +
             (feeLabel ? '<span class="athlete-fee">' + feeLabel + '</span>' : '') +
@@ -1096,6 +1184,8 @@
             '<span class="athlete-card-social-score">Social: ' + (a.social != null ? a.social : '—') + '</span>' +
             (a.verified ? ' <span class="verified">✓ Verified</span>' : '') +
           '</div>' +
+          (statsBits.length ? '<span class="athlete-card-meta">' + statsBits.join(' · ') + '</span>' : '') +
+          (formLine ? '<p class="athlete-card-form">' + formLine + '</p>' : '') +
         '</div>' +
       '</div>' +
       '<button type="button" class="btn-secondary btn-sm btn-view-athlete">Show profile</button>' +
@@ -1174,15 +1264,18 @@
     var container = document.getElementById('discovery-athlete-cards');
     var countEl = document.getElementById('discovery-results-count');
     var portfolioEl = document.getElementById('discovery-portfolio');
-    if (!container || !window.ADC_DATA) return;
+    if (!container) return;
 
     if (options.resetPage) discoveryState.currentPage = 1;
 
-    if (!options.skipGate && !discoveryState.hasSearched) {
-      container.innerHTML = '';
+    if (!discoveryState.hasSearched && !options.skipGate) {
+      container.innerHTML =
+        '<div class="discovery-results-placeholder">' +
+          '<p class="discovery-placeholder-title">Recommendations appear after you run search</p>' +
+          '<p>Complete the campaign brief in chat, then say <strong>recommend athletes</strong> (or Skip remaining). We\'ll animate the scoring pass, then show ranked matches with % Match, fee, and a portfolio plan.</p>' +
+        '</div>';
       if (countEl) countEl.textContent = '';
       if (portfolioEl) { portfolioEl.hidden = true; portfolioEl.innerHTML = ''; }
-      renderDiscoveryPagination(0, 1, discoveryState.pageSize);
       discoveryState.filteredList = [];
       discoveryState.recommendations = [];
       discoveryState.portfolio = null;
@@ -1263,11 +1356,15 @@
     scrollDiscoveryResultsIntoView('anim');
 
     var campaign = filters.campaign || 'open brief';
+    var sport = filters.sport && filters.sport !== 'All' ? filters.sport : 'open';
+    var gender = filters.gender && filters.gender !== 'All' ? filters.gender : 'open';
     var budget = filters.budgetAmount != null ? ('₹' + filters.budgetAmount + 'L') : (filters.budget || 'open');
     var market = filters.market || filters.targetGeography || 'open';
     var obj = filters.campaignObjective && filters.campaignObjective !== 'Any' ? filters.campaignObjective : 'open';
     var steps = [
       '> ingest campaign brief · ' + campaign,
+      '> resolve sport cohort · ' + sport,
+      '> apply athlete gender · ' + gender,
       '> constrain budget envelope · ' + budget,
       '> map market affinity · ' + market,
       '> objective weights · ' + obj,
@@ -1367,23 +1464,41 @@
   }
 
   function buildCareerEvents(athlete) {
+    var rows = (athlete.eventStats && athlete.eventStats.length)
+      ? athlete.eventStats
+      : (athlete.events || []);
+    if (rows && rows.length) {
+      return rows.slice(0, 5).map(function (e) {
+        var label = (e.event || 'Event').replace(/Indian Premier League \(IPL\)/i, 'IPL')
+          .replace(/Syed Mushtaq Ali Trophy/i, 'SMAT')
+          .replace(/Pro Kabaddi League/i, 'PKL')
+          .replace(/Hockey India League/i, 'HIL')
+          .replace(/Indian Super League/i, 'ISL')
+          .replace(/Ultimate Table Tennis/i, 'UTT')
+          .replace(/Senior National.*/i, 'Nationals');
+        if (label.length > 14) label = label.slice(0, 12) + '…';
+        var matches = e.matches != null ? Number(e.matches) : (e.inns != null ? Number(e.inns) : 2);
+        var perf = athlete.perf != null ? Number(athlete.perf) : 50;
+        if (e.runs != null) perf = Math.min(100, Math.round(40 + Number(e.runs) / 12));
+        if (e.wickets != null) perf = Math.max(perf, Math.min(100, Math.round(50 + Number(e.wickets) * 2)));
+        return { label: label, matches: Math.max(1, matches), perf: perf, event: e };
+      });
+    }
     var matches = athlete.matches != null ? Number(athlete.matches) : 10;
     var perf = athlete.perf != null ? Number(athlete.perf) : 50;
-    var isRising = /suryavanshi|sooryavanshi/i.test(athlete.name || '');
-    if (isRising) {
-      return [
-        { label: 'U19', matches: 4, perf: Math.min(100, perf + 12) },
-        { label: 'Ranji', matches: 8, perf: Math.max(40, perf - 8) },
-        { label: 'SMAT', matches: 6, perf: Math.min(100, perf + 6) },
-        { label: 'IPL', matches: matches, perf: perf },
-        { label: 'Duleep', matches: 3, perf: Math.min(100, perf + 18) }
-      ];
+    var pathway = (athlete.pathwayEvents || []).slice(0, 5);
+    if (pathway.length) {
+      return pathway.map(function (e, i) {
+        var label = (e.event || 'Event').split(/[–(/]/)[0].trim();
+        if (label.length > 14) label = label.slice(0, 12) + '…';
+        return { label: label, matches: Math.max(1, Math.round(matches * (0.35 + i * 0.1))), perf: Math.max(40, perf - 4 + i * 2), event: e };
+      });
     }
     return [
       { label: 'Domestic', matches: Math.max(2, Math.round(matches * 0.45)), perf: Math.max(40, perf - 6) },
       { label: 'League', matches: Math.max(2, Math.round(matches * 0.7)), perf: Math.max(42, perf - 2) },
-      { label: 'IPL', matches: matches, perf: perf },
-      { label: 'Playoffs', matches: Math.max(1, Math.round(matches * 0.2)), perf: Math.min(100, perf + 4) },
+      { label: 'National', matches: matches, perf: perf },
+      { label: 'Peak', matches: Math.max(1, Math.round(matches * 0.2)), perf: Math.min(100, perf + 4) },
       { label: 'Recent', matches: Math.max(1, Math.round(matches * 0.35)), perf: Math.min(100, perf + 8) }
     ];
   }
@@ -1396,14 +1511,14 @@
     var circles = '';
     var labels = '';
     events.forEach(function (e, i) {
-      var x = xs[i];
+      var x = xs[i] != null ? xs[i] : (110 + i * 104);
       var barH = Math.max(8, (e.matches / maxM) * 150);
       var barY = 178 - barH;
       bars += '<rect x="' + (x - 18) + '" y="' + barY + '" width="36" height="' + barH + '" rx="4"/>';
       var py = 178 - (e.perf / 100) * 150;
       points.push(x + ',' + py);
       circles += '<circle cx="' + x + '" cy="' + py + '" r="5"/>';
-      labels += '<text x="' + x + '" y="200">' + e.label + '</text>';
+      labels += '<text x="' + x + '" y="200">' + escapeHtml(e.label) + '</text>';
     });
     return (
       '<svg class="career-graph-svg" viewBox="0 0 640 240" xmlns="http://www.w3.org/2000/svg">' +
@@ -1434,47 +1549,79 @@
   }
 
   function buildEventStatsTableHtml(athlete) {
+    var rows = (athlete.eventStats && athlete.eventStats.length)
+      ? athlete.eventStats
+      : (athlete.events || []);
+    var sport = athlete.sport || '';
+    var isCricket = sport === 'Cricket';
+
+    if (rows && rows.length) {
+      var body = rows.map(function (e) {
+        var notes = e.notes || e.level || '';
+        if (e.source) notes = (notes ? notes + ' · ' : '') + 'source';
+        if (isCricket) {
+          return '<tr>' +
+            '<td><strong>' + escapeHtml(e.event + (e.season ? ' ' + e.season : '')) + '</strong></td>' +
+            '<td>' + escapeHtml(e.format || 'T20') + '</td>' +
+            '<td>' + escapeHtml(e.inns != null ? e.inns : (e.matches != null ? e.matches : '—')) + '</td>' +
+            '<td>' + escapeHtml(e.runs != null ? e.runs : '—') + '</td>' +
+            '<td>' + escapeHtml(e.highScore != null ? e.highScore : '—') + '</td>' +
+            '<td>' + escapeHtml(e.batAvg != null ? e.batAvg : '—') + '</td>' +
+            '<td>' + escapeHtml(e.strikeRate != null ? e.strikeRate : (e.economy != null ? 'Eco ' + e.economy : '—')) + '</td>' +
+            '<td>' + (e.wickets != null ? ('Wkts ' + e.wickets + (notes ? ' · ' : '')) : '') +
+              (e.source
+                ? '<a class="event-source-link" href="' + escapeHtml(e.source) + '" target="_blank" rel="noopener">' + escapeHtml(notes || 'Open source') + '</a>'
+                : escapeHtml(notes || (e.team || ''))) + '</td>' +
+            '</tr>';
+        }
+        return '<tr>' +
+          '<td><strong>' + escapeHtml(e.event + (e.season ? ' ' + e.season : '')) + '</strong></td>' +
+          '<td>' + escapeHtml(e.format || sport) + '</td>' +
+          '<td>' + escapeHtml(e.matches != null ? e.matches : '—') + '</td>' +
+          '<td colspan="4">' + escapeHtml(e.level || '—') + (e.team ? ' · ' + escapeHtml(e.team) : '') + '</td>' +
+          '<td>' + (e.source
+            ? '<a class="event-source-link" href="' + escapeHtml(e.source) + '" target="_blank" rel="noopener">' + escapeHtml(notes || 'Open source') + '</a>'
+            : escapeHtml(notes || '—')) + '</td>' +
+          '</tr>';
+      }).join('');
+
+      var head = isCricket
+        ? '<thead><tr><th>Event</th><th>Format</th><th>Inns/M</th><th>Runs</th><th>HS</th><th>Avg</th><th>SR/Eco</th><th>Notes</th></tr></thead>'
+        : '<thead><tr><th>Event</th><th>Format</th><th>M</th><th colspan="4">Level / Team</th><th>Notes / Source</th></tr></thead>';
+
+      // Append pathway calendar if measured rows exist
+      var pathway = athlete.pathwayEvents || [];
+      var pathwayHtml = '';
+      if (pathway.length && (athlete.eventStats || []).length) {
+        pathwayHtml = '<p class="event-pathway-label">Sport pathway calendar</p><ul class="event-pathway-list">' +
+          pathway.slice(0, 6).map(function (p) {
+            return '<li><strong>' + escapeHtml(p.event) + '</strong> · ' + escapeHtml(p.level || '') +
+              (p.source ? ' · <a href="' + escapeHtml(p.source) + '" target="_blank" rel="noopener">source</a>' : '') +
+              '</li>';
+          }).join('') + '</ul>';
+      }
+
+      return '<table class="event-stats-table">' + head + '<tbody>' + body + '</tbody></table>' + pathwayHtml;
+    }
+
+    // Fallback synthetic table (legacy)
     var matches = athlete.matches != null ? Number(athlete.matches) : 10;
     var perf = athlete.perf != null ? Number(athlete.perf) : 50;
-    var isRising = /suryavanshi|sooryavanshi/i.test(athlete.name || '');
-    var rows;
-    if (isRising) {
-      rows = [
-        ['Duleep Trophy 2026/27', 'First-class', '3', '140', '92', '46.7', '107.7', 'Youngest Duleep fifty · SF 92 & 40'],
-        ['IPL 2026', 'T20', String(matches), String(Math.round(matches * 26.5)), '67', '26.5', '168.2', 'Impact opener · high six rate'],
-        ['Ranji Trophy 2025/26', 'First-class', '8', '207', '93', '25.9', '61.4', 'Plate league · Bihar'],
-        ['Syed Mushtaq Ali 2025/26', 'T20', '6', '184', '72', '30.7', '154.6', 'Domestic T20 form spike'],
-        ['India U19 bilateral', 'Youth ODI', '4', '156', '81', '39.0', '98.1', 'Youth pathway continuity']
-      ];
-    } else {
-      var inns = matches;
-      var runs = Math.round(inns * (18 + perf / 5));
-      var hs = Math.round(40 + perf / 3);
-      var avg = (runs / Math.max(1, inns - 1)).toFixed(1);
-      var sr = (120 + perf).toFixed(1);
-      rows = [
-        ['IPL 2026', 'T20', String(inns), String(runs), String(hs), avg, sr, (athlete.teamShort || athlete.team || 'Franchise') + ' · POM ' + (athlete.pom != null ? athlete.pom : '—')],
-        ['Domestic T20', 'T20', String(Math.max(2, Math.round(matches * 0.5))), String(Math.round(runs * 0.55)), String(Math.round(hs * 0.9)), (avg * 0.95).toFixed ? (Number(avg) * 0.95).toFixed(1) : avg, (Number(sr) * 0.92).toFixed(1), 'State / league form'],
-        ['First-class', 'FC', String(Math.max(2, Math.round(matches * 0.4))), String(Math.round(runs * 0.7)), String(Math.round(hs * 1.1)), (Number(avg) * 1.05).toFixed(1), (Number(sr) * 0.55).toFixed(1), 'Long-format exposure'],
-        ['Recent series', 'Mixed', String(Math.max(1, Math.round(matches * 0.3))), String(Math.round(runs * 0.35)), String(Math.round(hs * 0.85)), avg, sr, 'Last 12 months']
-      ];
-    }
-    var body = rows.map(function (r) {
-      return '<tr>' +
-        '<td><strong>' + escapeHtml(r[0]) + '</strong></td>' +
-        '<td>' + escapeHtml(r[1]) + '</td>' +
-        '<td>' + escapeHtml(r[2]) + '</td>' +
-        '<td>' + escapeHtml(r[3]) + '</td>' +
-        '<td>' + escapeHtml(r[4]) + '</td>' +
-        '<td>' + escapeHtml(r[5]) + '</td>' +
-        '<td>' + escapeHtml(r[6]) + '</td>' +
-        '<td>' + escapeHtml(r[7]) + '</td>' +
-        '</tr>';
+    var inns = matches;
+    var runs = Math.round(inns * (18 + perf / 5));
+    var hs = Math.round(40 + perf / 3);
+    var avg = (runs / Math.max(1, inns - 1)).toFixed(1);
+    var sr = (120 + perf).toFixed(1);
+    var fallback = [
+      [athlete.league || 'Domestic event', sport || '—', String(inns), String(runs), String(hs), avg, sr, athlete.teamShort || athlete.team || '—']
+    ];
+    var bodyFb = fallback.map(function (r) {
+      return '<tr>' + r.map(function (c) { return '<td>' + escapeHtml(c) + '</td>'; }).join('') + '</tr>';
     }).join('');
     return (
       '<table class="event-stats-table">' +
         '<thead><tr><th>Event</th><th>Format</th><th>Inns</th><th>Runs</th><th>HS</th><th>Avg</th><th>SR</th><th>Notes</th></tr></thead>' +
-        '<tbody>' + body + '</tbody>' +
+        '<tbody>' + bodyFb + '</tbody>' +
       '</table>'
     );
   }
@@ -1495,11 +1642,20 @@
     if (nameEl) nameEl.textContent = (athlete.rank ? '#' + athlete.rank + ' ' : '') + athlete.name;
     if (subEl) {
       var parts = [];
+      if (athlete.sport) parts.push(athlete.sport);
       if (athlete.league) parts.push(athlete.league);
       if (athlete.teamShort || athlete.team) parts.push(athlete.teamShort || athlete.team);
       if (athlete.role) parts.push(athlete.role);
       if (athlete.verified) parts.push('Verified');
       subEl.textContent = parts.join(' · ');
+    }
+    var uniqueEl = document.getElementById('brand-profile-unique-id');
+    if (uniqueEl) {
+      var code = athlete.profileCode || ('ADC-' + athlete.id);
+      var key = athlete.profileKey || ('id-' + athlete.id);
+      uniqueEl.hidden = false;
+      uniqueEl.innerHTML = '<span class="profile-code">' + escapeHtml(code) + '</span>' +
+        '<span class="profile-key">' + escapeHtml(key) + '</span>';
     }
     if (btnShortlist) {
       var inList = window.ADC_DATA.isInShortlist(athlete.id);
@@ -1548,7 +1704,12 @@
     if (graphEl) graphEl.innerHTML = buildCareerGraphSvg(events);
 
     var eventStatsEl = document.getElementById('brand-event-stats');
-    if (eventStatsEl) eventStatsEl.innerHTML = buildEventStatsTableHtml(athlete);
+    if (eventStatsEl) {
+      var formHtml = athlete.recentForm
+        ? '<p class="profile-recent-form"><strong>Recent form</strong> — ' + escapeHtml(athlete.recentForm) + '</p>'
+        : '';
+      eventStatsEl.innerHTML = formHtml + buildEventStatsTableHtml(athlete);
+    }
 
     var inquiryTo = document.getElementById('inquiry-to-athlete');
     if (inquiryTo) inquiryTo.value = athlete.name + ' (' + (athlete.teamShort || athlete.team || athlete.sport) + ' · ' + athlete.role + ')';

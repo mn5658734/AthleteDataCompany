@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2026-09-06n" />
+  <link rel="stylesheet" href="styles.css?v=2026-09-20b" />
 </head>
 <body>
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -1236,7 +1236,7 @@
         <div>
           <h1>Discovery Assistant</h1>
           <p class="screen-desc">Share a campaign brief below.</p>
-          <p class="discovery-example-line"><span>Example</span> Campaign: New sports nutrition product · Budget: ₹20L · Market: Karnataka + Maharashtra · Audience: 18–30 · Objective: Awareness + sales</p>
+          <p class="discovery-example-line"><span>Example</span> Sport: Cricket · Campaign: New sports nutrition product · Budget: ₹20L · Market: Karnataka + Maharashtra · Audience: 18–30 · Objective: Awareness + sales</p>
         </div>
       </div>
 
@@ -1248,6 +1248,7 @@
           <div class="discovery-ref-group">
             <span class="discovery-ref-label">Campaign brief</span>
             <div class="discovery-ref-tags">
+              <span>Sport</span>
               <span>Campaign</span>
               <span>Budget</span>
               <span>Market</span>
@@ -1299,14 +1300,14 @@
       <div class="discovery-chat-discover discovery-chat-discover--simple" id="discovery-chat-discover">
         <div class="discovery-chat-discover-messages" id="discovery-chat-discover-messages" hidden></div>
         <div class="discovery-chat-discover-chips" id="discovery-chat-discover-chips">
-          <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Campaign: New sports nutrition product&#10;Budget: ₹20L&#10;Market: Karnataka + Maharashtra&#10;Audience: 18–30&#10;Objective: Awareness + sales">Sports nutrition · ₹20L brief</button>
-          <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Campaign: Beverage brand refresh&#10;Budget: ₹12L&#10;Market: PAN India&#10;Audience: Gen Z&#10;Objective: Brand Awareness">Beverage · PAN India</button>
-          <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Campaign: Sportswear endorsement&#10;Budget: ₹8L&#10;Market: Metro Cities&#10;Audience: 18–25&#10;Objective: Product Launch">Sportswear · Metros</button>
+          <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Sport: Cricket&#10;Campaign: New sports nutrition product&#10;Budget: ₹20L&#10;Market: Karnataka + Maharashtra&#10;Audience: 18–30&#10;Objective: Awareness + sales">Cricket · Nutrition · ₹20L</button>
+          <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Sport: Boxing&#10;Campaign: Sportswear endorsement&#10;Budget: ₹12L&#10;Market: PAN India&#10;Audience: Gen Z&#10;Objective: Brand Awareness">Boxing · Sportswear</button>
+          <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Sport: Athletic (25)&#10;Campaign: Beverage brand refresh&#10;Budget: ₹15L&#10;Market: Metro Cities&#10;Audience: 18–30&#10;Objective: Product Launch">Athletics · Beverage</button>
         </div>
         <div class="discovery-chat-discover-input-wrap">
           <div class="discovery-brief-field">
             <label class="discovery-brief-label" for="discovery-chat-discover-input">Campaign brief</label>
-            <textarea id="discovery-chat-discover-input" class="discovery-chat-input discovery-chat-textarea" placeholder="Campaign: … · Budget: … · Market: … · Audience: … · Objective: …" rows="4"></textarea>
+            <textarea id="discovery-chat-discover-input" class="discovery-chat-input discovery-chat-textarea" placeholder="Sport: … · Campaign: … · Budget: … · Market: … · Audience: … · Objective: …" rows="4"></textarea>
           </div>
           <button type="button" class="btn-primary discovery-brief-submit" id="discovery-chat-discover-send">Recommend</button>
         </div>
@@ -1344,6 +1345,7 @@
         <div class="profile-view-meta">
           <h1 id="brand-profile-name">—</h1>
           <p id="brand-profile-subtitle">—</p>
+          <p class="profile-unique-id" id="brand-profile-unique-id" hidden></p>
           <div class="profile-view-actions">
             <button type="button" class="btn-outline" id="btn-shortlist-toggle">Add to shortlist</button>
             <button type="button" class="btn-primary" data-next="brand-inquiry">Send inquiry</button>
@@ -1414,7 +1416,7 @@
         <section class="dashboard-section athlete-panel">
           <div class="athlete-panel-head">
             <h2>Event performance</h2>
-            <span class="athlete-panel-note">One athlete · multiple competitions</span>
+            <span class="athlete-panel-note">Open-web / workbook stats + sport pathway calendar</span>
           </div>
           <div class="event-stats-table-wrap" id="brand-event-stats"></div>
         </section>
@@ -1715,10 +1717,12 @@
     </div>
   </div>
 
-  <script src="data.js?v=2026-09-06d"></script>
+  <script src="sport-events-data.js?v=2026-09-20b"></script>
+  <script src="multisport-data.js?v=2026-09-20b"></script>
+  <script src="data.js?v=2026-09-20b"></script>
   <script src="cricsheet-stats.js"></script>
   <script src="ipl-assistant.js"></script>
-  <script src="app.js?v=2026-09-06n"></script>
+  <script src="app.js?v=2026-09-20b"></script>
   <script src="demo-request.js?v=2026-09-05f"></script>
   <script>
   (function () {

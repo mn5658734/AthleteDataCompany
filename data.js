@@ -1,13 +1,19 @@
 /**
- * Athlete Data Company – IPL 2026 data layer
- * Top 50 athletes derived from ipl_matches_2026.csv
- * Performance score: POM impact (38%) + team win rate (32%) + availability (30%)
- * Social score: performance + POM visibility + star recognition boost
+ * Athlete Data Company – multi-sport data layer
+ * Primary universe: ADC_Consolidated_MultiSport_Cricket_League_Performance.xlsx
+ * + IPL seed athletes for cricket commercial depth
+ * Cricket season aggregates from open-web public stats pages
  */
 
 (function (global) {
   var IPL_META = { season: 2026, totalMatches: 73, source: 'ipl_matches_2026.csv', athleteCount: 50 };
-  var ATHLETES = [
+  var MULTISPORT_META = (global.ADC_MULTISPORT && global.ADC_MULTISPORT.meta) || {
+    source: 'ADC_Consolidated_MultiSport_Cricket_League_Performance.xlsx',
+    count: 0,
+    sports: []
+  };
+
+  var IPL_SEED = [
     { id: 1, rank: 1, name: 'V Kohli', initials: 'VK', sport: 'Cricket', league: 'IPL 2026', role: 'Batsman', age: 29, region: 'PAN India', gender: 'Male', perf: 66, social: 82, verified: true, growth: 'Stable', budget: '₹5–20L', team: 'Royal Challengers Bengaluru', teamShort: 'RCB', matches: 16, pom: 3, wins: 11, winRate: 68.8 },
     { id: 2, rank: 2, name: 'Ishan Kishan', initials: 'IK', sport: 'Cricket', league: 'IPL 2026', role: 'Wicketkeeper', age: 24, region: 'PAN India', gender: 'Male', perf: 64, social: 80, verified: true, growth: 'Stable', budget: '₹1–5L', team: 'Sunrisers Hyderabad', teamShort: 'SRH', matches: 15, pom: 3, wins: 9, winRate: 60.0 },
     { id: 3, rank: 3, name: 'SV Samson', initials: 'SS', sport: 'Cricket', league: 'IPL 2026', role: 'Wicketkeeper', age: 24, region: 'PAN India', gender: 'Male', perf: 59, social: 75, verified: true, growth: 'Stable', budget: '₹1–5L', team: 'Chennai Super Kings', teamShort: 'CSK', matches: 14, pom: 3, wins: 6, winRate: 42.9 },
@@ -57,10 +63,260 @@
     { id: 47, rank: 47, name: 'FH Allen', initials: 'FA', sport: 'Cricket', league: 'IPL 2026', role: 'Batsman', age: 28, region: 'PAN India', gender: 'Male', perf: 50, social: 45, verified: true, growth: 'Emerging', budget: '₹1–5L', team: 'Kolkata Knight Riders', teamShort: 'KKR', matches: 10, pom: 1, wins: 4, winRate: 40.0 },
     { id: 48, rank: 48, name: 'J Overton', initials: 'JO', sport: 'Cricket', league: 'IPL 2026', role: 'Batsman', age: 31, region: 'PAN India', gender: 'Male', perf: 50, social: 45, verified: true, growth: 'Emerging', budget: '₹1–5L', team: 'Chennai Super Kings', teamShort: 'CSK', matches: 10, pom: 1, wins: 6, winRate: 60.0 },
     { id: 49, rank: 49, name: 'MD Choudhary', initials: 'MC', sport: 'Cricket', league: 'IPL 2026', role: 'Batsman', age: 28, region: 'PAN India', gender: 'Male', perf: 50, social: 45, verified: true, growth: 'Emerging', budget: '₹1–5L', team: 'Lucknow Super Giants', teamShort: 'LSG', matches: 10, pom: 1, wins: 3, winRate: 30.0 },
-    { id: 50, rank: 50, name: 'SN Thakur', initials: 'ST', sport: 'Cricket', league: 'IPL 2026', role: 'Batsman', age: 27, region: 'PAN India', gender: 'Male', perf: 50, social: 45, verified: true, growth: 'Emerging', budget: '₹1–5L', team: 'Mumbai Indians', teamShort: 'MI', matches: 9, pom: 1, wins: 2, winRate: 22.2 },
+    { id: 50, rank: 50, name: 'SN Thakur', initials: 'ST', sport: 'Cricket', league: 'IPL 2026', role: 'Batsman', age: 27, region: 'PAN India', gender: 'Male', perf: 50, social: 45, verified: true, growth: 'Emerging', budget: '₹1–5L', team: 'Mumbai Indians', teamShort: 'MI', matches: 9, pom: 1, wins: 2, winRate: 22.2 }
   ];
 
+  // Seed women athletes so gender-aware discovery has real Female profiles (esp. cricket / WPL)
+  var WOMEN_SEED = [
+    { name: 'Smriti Mandhana', initials: 'SM', sport: 'Cricket', league: 'WPL / India', role: 'Batter', age: 28, region: 'PAN India', gender: 'Female', perf: 88, social: 86, verified: true, growth: 'Rising', budget: '₹5–20L', team: 'Royal Challengers Bengaluru', teamShort: 'RCB', matches: 14, pom: 3, wins: 9, winRate: 64, tier: 'TIER 1', opportunity: 'Brand Anchor' },
+    { name: 'Harmanpreet Kaur', initials: 'HK', sport: 'Cricket', league: 'WPL / India', role: 'Batter', age: 35, region: 'PAN India', gender: 'Female', perf: 86, social: 84, verified: true, growth: 'Stable', budget: '₹5–20L', team: 'Mumbai Indians', teamShort: 'MI', matches: 14, pom: 2, wins: 10, winRate: 71, tier: 'TIER 1', opportunity: 'Brand Anchor' },
+    { name: 'Jemimah Rodrigues', initials: 'JR', sport: 'Cricket', league: 'WPL / India', role: 'Batter', age: 24, region: 'PAN India', gender: 'Female', perf: 82, social: 80, verified: true, growth: 'Rising', budget: '₹5–20L', team: 'Delhi Capitals', teamShort: 'DC', matches: 12, pom: 2, wins: 8, winRate: 67, tier: 'TIER 1', opportunity: 'Brand Anchor' },
+    { name: 'Shafali Verma', initials: 'SV', sport: 'Cricket', league: 'WPL / India', role: 'Batter', age: 21, region: 'PAN India', gender: 'Female', perf: 84, social: 78, verified: true, growth: 'Emerging', budget: '₹1–5L', team: 'Delhi Capitals', teamShort: 'DC', matches: 12, pom: 2, wins: 7, winRate: 58, tier: 'TIER 1', opportunity: 'Rising Star' },
+    { name: 'Deepti Sharma', initials: 'DS', sport: 'Cricket', league: 'WPL / India', role: 'All-rounder', age: 27, region: 'PAN India', gender: 'Female', perf: 83, social: 72, verified: true, growth: 'Stable', budget: '₹5–20L', team: 'UP Warriorz', teamShort: 'UPW', matches: 13, pom: 2, wins: 7, winRate: 54, tier: 'TIER 1', opportunity: 'Brand Anchor' },
+    { name: 'Richa Ghosh', initials: 'RG', sport: 'Cricket', league: 'WPL / India', role: 'Wicketkeeper', age: 21, region: 'PAN India', gender: 'Female', perf: 79, social: 74, verified: true, growth: 'Emerging', budget: '₹1–5L', team: 'Royal Challengers Bengaluru', teamShort: 'RCB', matches: 12, pom: 1, wins: 8, winRate: 67, tier: 'TIER 2', opportunity: 'Rising Star' },
+    { name: 'Amanjot Kaur', initials: 'AK', sport: 'Cricket', league: 'WPL / India', role: 'All-rounder', age: 24, region: 'PAN India', gender: 'Female', perf: 76, social: 68, verified: true, growth: 'Emerging', budget: '₹1–5L', team: 'Mumbai Indians', teamShort: 'MI', matches: 11, pom: 1, wins: 7, winRate: 64, tier: 'TIER 2', opportunity: 'Value Pick' },
+    { name: 'Renuka Singh', initials: 'RS', sport: 'Cricket', league: 'WPL / India', role: 'Bowler', age: 28, region: 'PAN India', gender: 'Female', perf: 78, social: 65, verified: true, growth: 'Stable', budget: '₹1–5L', team: 'Royal Challengers Bengaluru', teamShort: 'RCB', matches: 12, pom: 1, wins: 7, winRate: 58, tier: 'TIER 2', opportunity: 'Value Pick' },
+    { name: 'Pooja Vastrakar', initials: 'PV', sport: 'Cricket', league: 'WPL / India', role: 'All-rounder', age: 25, region: 'PAN India', gender: 'Female', perf: 77, social: 66, verified: true, growth: 'Rising', budget: '₹1–5L', team: 'Mumbai Indians', teamShort: 'MI', matches: 11, pom: 1, wins: 7, winRate: 64, tier: 'TIER 2', opportunity: 'Value Pick' },
+    { name: 'Yastika Bhatia', initials: 'YB', sport: 'Cricket', league: 'WPL / India', role: 'Wicketkeeper', age: 24, region: 'PAN India', gender: 'Female', perf: 75, social: 67, verified: true, growth: 'Emerging', budget: '₹1–5L', team: 'Mumbai Indians', teamShort: 'MI', matches: 10, pom: 1, wins: 6, winRate: 60, tier: 'TIER 2', opportunity: 'Rising Star' },
+    { name: 'Pooja Rani', initials: 'PR', sport: 'Boxing', league: 'National / India', role: 'Boxer', age: 30, region: 'PAN India', gender: 'Female', perf: 80, social: 70, verified: true, growth: 'Stable', budget: '₹1–5L', tier: 'TIER 1', opportunity: 'Brand Anchor' },
+    { name: 'Mary Kom', initials: 'MK', sport: 'Boxing', league: 'Olympic / India', role: 'Boxer', age: 41, region: 'PAN India', gender: 'Female', perf: 85, social: 88, verified: true, growth: 'Stable', budget: '₹5–20L', tier: 'TIER 1', opportunity: 'Brand Anchor' },
+    { name: 'Vinesh Phogat', initials: 'VP', sport: 'Athletic (25)', league: 'Olympic / India', role: 'Wrestler', age: 30, region: 'PAN India', gender: 'Female', perf: 84, social: 82, verified: true, growth: 'Rising', budget: '₹5–20L', tier: 'TIER 1', opportunity: 'Brand Anchor' },
+    { name: 'Mirabai Chanu', initials: 'MC', sport: 'Athletic (25)', league: 'Olympic / India', role: 'Weightlifter', age: 30, region: 'PAN India', gender: 'Female', perf: 86, social: 80, verified: true, growth: 'Stable', budget: '₹5–20L', tier: 'TIER 1', opportunity: 'Brand Anchor' },
+    { name: 'PV Sindhu', initials: 'PS', sport: 'Badminton', league: 'Olympic / BWF', role: 'Singles', age: 29, region: 'PAN India', gender: 'Female', perf: 90, social: 92, verified: true, growth: 'Stable', budget: '₹20L+', tier: 'TIER 1', opportunity: 'Brand Anchor' },
+    { name: 'Saina Nehwal', initials: 'SN', sport: 'Badminton', league: 'Olympic / BWF', role: 'Singles', age: 34, region: 'PAN India', gender: 'Female', perf: 82, social: 85, verified: true, growth: 'Stable', budget: '₹5–20L', tier: 'TIER 1', opportunity: 'Brand Anchor' },
+    { name: 'Richa Mishra', initials: 'RM', sport: 'Swimming', league: 'National / India', role: 'Swimmer', age: 28, region: 'PAN India', gender: 'Female', perf: 72, social: 60, verified: true, growth: 'Emerging', budget: '₹1–5L', tier: 'TIER 2', opportunity: 'Value Pick' }
+  ];
+
+  // Obvious mislabels from Excel import (name ↔ gender)
+  var GENDER_FORCE_MALE = {
+    'anmolpreet singh': 1, 'anmol malhotra': 1, 'anmoljeet singh': 1,
+    'himanshu singh': 1, 'himanshu': 1, 'himanshu narwal': 1, 'himanshu mishra': 1,
+    'harmanpreet singh': 1
+  };
+  var GENDER_FORCE_FEMALE = {
+    'pooja rani': 1, 'richa mishra': 1, 'shaili singh': 1, 'swapna barman': 1,
+    'deepika': 1, 'deepika soreng': 1, 'rutuja dadaso pisal': 1, 'sakshi rana': 1,
+    'sakshi chaudhary': 1, 'sakshi': 1, 'rutuja bhosale': 1, 'manika batra': 1,
+    'sreeja akula': 1, 'aditi': 1, 'aditi satish hegde': 1, 'ridhima veerendrakumar': 1,
+    'jaismine lamboria': 1, 'lovlina borgohain': 1, 'nikhat zareen': 1,
+    'nitu ghanghas': 1, 'saweety boora': 1
+  };
+
+  var NAME_ALIASES = {
+    'sv samson': 'sanju samson',
+    'ss iyer': 'shreyas iyer',
+    'rd gaikwad': 'ruturaj gaikwad',
+    'ybk jaiswal': 'yashasvi jaiswal',
+    'h klaasen': 'heinrich klaasen',
+    'ra jadeja': 'ravindra jadeja',
+    'sp narine': 'sunil narine',
+    'pd salt': 'phil salt',
+    'ma starc': 'mitchell starc',
+    'th david': 'tim david',
+    'rm patidar': 'rajat patidar',
+    'jc archer': 'jofra archer',
+    'jr hazlewood': 'josh hazlewood',
+    'mr marsh': 'mitchell marsh',
+    'cv varun': 'varun chakravarthy',
+    'k rabada': 'kagiso rabada',
+    'jo holder': 'jason holder',
+    'nithish kumar reddy': 'nitish kumar reddy',
+    'k nithish kumar reddy': 'nitish kumar reddy',
+    'abishek porel': 'abhishek porel',
+    'b sai sudharsan': 'sai sudharsan',
+    'b. sai sudharsan': 'sai sudharsan',
+    'shashwat rawat': 'shaswat rawat'
+  };
+
+  function normName(n) {
+    n = String(n || '').toLowerCase().replace(/\./g, ' ').replace(/\s+/g, ' ').trim();
+    return NAME_ALIASES[n] || n;
+  }
+
+  function slugify(value) {
+    return String(value || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 48);
+  }
+
+  function hashCode(str) {
+    var h = 0;
+    var s = String(str || '');
+    for (var i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+    return Math.abs(h);
+  }
+
+  function sportCode(sport) {
+    var map = {
+      Cricket: 'CRI', Boxing: 'BOX', 'Athletic (25)': 'ATH', Football: 'FBL',
+      Hockey: 'HOK', Kabaddi: 'KBD', 'Kho Kho': 'KHO', Tennis: 'TEN', TT: 'TTN', Swimming: 'SWM'
+    };
+    return map[sport] || 'ATH';
+  }
+
+  function assignUniqueIdentity(list) {
+    var usedKeys = {};
+    var usedCodes = {};
+    list.forEach(function (a) {
+      var sportSlug = slugify(a.sport || 'sport') || 'sport';
+      var base = a.profileKey || (sportSlug + '-' + slugify(a.name));
+      if (!base || base === sportSlug + '-') base = sportSlug + '-athlete';
+      var key = base;
+      var n = 2;
+      while (usedKeys[key]) {
+        key = base + '-' + n;
+        n += 1;
+      }
+      usedKeys[key] = true;
+      a.profileKey = key;
+
+      var codeBase = 'ADC-' + sportCode(a.sport) + '-' + String(hashCode(key) % 100000).padStart(5, '0');
+      var code = codeBase;
+      var c = 2;
+      while (usedCodes[code]) {
+        code = 'ADC-' + sportCode(a.sport) + '-' + String((hashCode(key + '-' + c) % 100000)).padStart(5, '0');
+        c += 1;
+      }
+      usedCodes[code] = true;
+      a.profileCode = code;
+    });
+  }
+
+  function buildAthleteUniverse() {
+    var multi = (global.ADC_MULTISPORT && global.ADC_MULTISPORT.athletes) ? global.ADC_MULTISPORT.athletes.slice() : [];
+    var byKey = {};
+    multi.forEach(function (a) {
+      byKey[a.sport + '|' + normName(a.name)] = a;
+      if (a.aliases && a.aliases.length) {
+        a.aliases.forEach(function (alias) {
+          byKey[a.sport + '|' + normName(alias)] = a;
+        });
+      }
+    });
+
+    IPL_SEED.forEach(function (seed) {
+      var key = 'Cricket|' + normName(seed.name);
+      var existing = byKey[key];
+      if (existing) {
+        byKey[key] = Object.assign({}, existing, {
+          name: existing.name || seed.name,
+          league: existing.league && String(existing.league).indexOf('IPL') !== -1 ? existing.league : (seed.league || existing.league),
+          team: seed.team || existing.team,
+          teamShort: seed.teamShort || existing.teamShort,
+          role: existing.role || seed.role,
+          age: existing.age != null ? existing.age : seed.age,
+          region: existing.region || seed.region,
+          gender: existing.gender || seed.gender,
+          perf: Math.max(existing.perf || 0, seed.perf || 0),
+          social: Math.max(existing.social || 0, seed.social || 0),
+          verified: true,
+          growth: existing.growth || seed.growth,
+          budget: existing.budget || seed.budget,
+          matches: existing.matches != null ? existing.matches : seed.matches,
+          pom: existing.pom != null ? existing.pom : seed.pom,
+          wins: existing.wins != null ? existing.wins : seed.wins,
+          winRate: existing.winRate != null ? existing.winRate : seed.winRate,
+          runs: existing.runs != null ? existing.runs : seed.runs,
+          wickets: existing.wickets != null ? existing.wickets : seed.wickets,
+          batAvg: existing.batAvg != null ? existing.batAvg : seed.batAvg,
+          strikeRate: existing.strikeRate != null ? existing.strikeRate : seed.strikeRate,
+          highScore: existing.highScore != null ? existing.highScore : seed.highScore,
+          economy: existing.economy != null ? existing.economy : seed.economy,
+          recentForm: existing.recentForm || seed.recentForm,
+          webSource: existing.webSource || seed.webSource,
+          events: existing.events || seed.events,
+          eventStats: existing.eventStats || seed.eventStats,
+          pathwayEvents: existing.pathwayEvents || seed.pathwayEvents,
+          profileKey: existing.profileKey,
+          profileCode: existing.profileCode,
+          tier: existing.tier || 'TIER 1',
+          opportunity: existing.opportunity || 'Brand Anchor',
+          source: existing.source || 'IPL scoring engine'
+        });
+      } else {
+        byKey[key] = Object.assign({}, seed, {
+          tier: 'TIER 1',
+          opportunity: 'Brand Anchor',
+          source: 'IPL scoring engine',
+          sportRaw: 'Cricket'
+        });
+      }
+    });
+
+    WOMEN_SEED.forEach(function (seed) {
+      var key = seed.sport + '|' + normName(seed.name);
+      var existing = byKey[key];
+      if (existing) {
+        byKey[key] = Object.assign({}, existing, {
+          gender: 'Female',
+          verified: true,
+          league: existing.league || seed.league,
+          role: existing.role || seed.role,
+          perf: Math.max(existing.perf || 0, seed.perf || 0),
+          social: Math.max(existing.social || 0, seed.social || 0),
+          growth: existing.growth || seed.growth,
+          budget: existing.budget || seed.budget,
+          team: existing.team || seed.team,
+          teamShort: existing.teamShort || seed.teamShort,
+          tier: existing.tier || seed.tier,
+          opportunity: existing.opportunity || seed.opportunity,
+          source: existing.source || 'Women athlete seed'
+        });
+      } else {
+        byKey[key] = Object.assign({}, seed, {
+          source: 'Women athlete seed',
+          sportRaw: seed.sport
+        });
+      }
+    });
+
+    Object.keys(byKey).forEach(function (k) {
+      var a = byKey[k];
+      var nn = normName(a.name);
+      if (GENDER_FORCE_MALE[nn]) a.gender = 'Male';
+      else if (GENDER_FORCE_FEMALE[nn]) a.gender = 'Female';
+      if (!a.gender) a.gender = 'Male';
+    });
+
+    var list = Object.keys(byKey).map(function (k) { return byKey[k]; });
+    list.sort(function (a, b) {
+      if (a.sport !== b.sport) return String(a.sport).localeCompare(String(b.sport));
+      return ((b.perf || 0) + (b.social || 0)) - ((a.perf || 0) + (a.social || 0));
+    });
+
+    var sportRank = {};
+    list.forEach(function (a, idx) {
+      a.id = idx + 1;
+      sportRank[a.sport] = (sportRank[a.sport] || 0) + 1;
+      a.rank = sportRank[a.sport];
+      if (!a.initials) {
+        var parts = String(a.name || '').split(/\s+/).filter(Boolean);
+        a.initials = parts.length >= 2 ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() : String(a.name || 'NA').slice(0, 2).toUpperCase();
+      }
+    });
+    assignUniqueIdentity(list);
+    return list;
+  }
+
+  var ATHLETES = buildAthleteUniverse();
+
   var STORAGE_KEYS = { shortlist: 'adc_shortlist', athleteProfile: 'adc_athlete_profile', brandProfile: 'adc_brand_profile', requests: 'adc_requests' };
+
+  function normalizeSport(sport) {
+    if (!sport) return sport;
+    var s = String(sport);
+    var map = {
+      'Athletics': 'Athletic (25)',
+      'Athletic': 'Athletic (25)',
+      'Table Tennis': 'TT',
+      'TT': 'TT',
+      'Volleyball': 'Volley Ball',
+      'Volley Ball': 'Volley Ball'
+    };
+    return map[s] || s;
+  }
 
   function getAthletes(filters) {
     filters = filters || {};
@@ -94,13 +350,15 @@
       return 'Booked';
     }
 
+    var wantSport = normalizeSport(filters.sport);
+
     var list = ATHLETES.filter(function (a) {
-      if (filters.sport && filters.sport !== 'All' && a.sport !== filters.sport) return false;
+      if (wantSport && wantSport !== 'All' && normalizeSport(a.sport) !== wantSport) return false;
       if (filters.role && filters.role !== 'All' && a.role !== filters.role) return false;
       if (filters.team && filters.team !== 'All' && a.team !== filters.team) return false;
-      if (filters.ageMin != null && a.age < filters.ageMin) return false;
-      if (filters.ageMax != null && a.age > filters.ageMax) return false;
-      if (filters.region && filters.region !== 'Any' && filters.region !== '' && a.region.toLowerCase().indexOf((filters.region || '').toLowerCase()) === -1) return false;
+      if (filters.ageMin != null && a.age != null && a.age < filters.ageMin) return false;
+      if (filters.ageMax != null && a.age != null && a.age > filters.ageMax) return false;
+      if (filters.region && filters.region !== 'Any' && filters.region !== '' && (a.region || '').toLowerCase().indexOf((filters.region || '').toLowerCase()) === -1) return false;
       if (filters.targetGeography && filters.targetGeography !== 'Any') {
         var geo = filters.targetGeography;
         if (geo === 'PAN India' && a.region !== 'PAN India' && (a.region || '').indexOf('India') === -1) {
@@ -142,7 +400,8 @@
           var sportMatch = (a.sport || '').toLowerCase().indexOf(q) !== -1;
           if (!nameMatch && !sportMatch) return false;
         } else {
-          var match = (a.name + ' ' + a.sport + ' ' + a.role + ' ' + a.region + ' ' + a.team + ' ' + a.teamShort + ' ' + a.league).toLowerCase().indexOf(q) !== -1;
+          var aliasStr = (a.aliases && a.aliases.length) ? (' ' + a.aliases.join(' ')) : '';
+          var match = (a.name + ' ' + a.sport + ' ' + a.role + ' ' + a.region + ' ' + a.team + ' ' + a.teamShort + ' ' + a.league + ' ' + (a.profileKey || '') + ' ' + (a.profileCode || '') + aliasStr).toLowerCase().indexOf(q) !== -1;
           if (!match) return false;
         }
       }
@@ -152,6 +411,14 @@
     return list;
   }
 
+  function getSports() {
+    var seen = {};
+    ATHLETES.forEach(function (a) {
+      if (a.sport) seen[a.sport] = true;
+    });
+    return Object.keys(seen).sort();
+  }
+
   function getTopAthletes(limit) {
     return ATHLETES.slice().sort(function (a, b) { return a.rank - b.rank; }).slice(0, limit || 50);
   }
@@ -159,6 +426,14 @@
   function getAthleteById(id) {
     id = parseInt(id, 10);
     return ATHLETES.filter(function (a) { return a.id === id; })[0] || null;
+  }
+
+  function getAthleteByProfileKey(key) {
+    key = String(key || '').trim();
+    if (!key) return null;
+    return ATHLETES.filter(function (a) {
+      return a.profileKey === key || a.profileCode === key || String(a.id) === key;
+    })[0] || null;
   }
 
   function getShortlist() {
@@ -188,7 +463,6 @@
     return getShortlist().indexOf(parseInt(id, 10)) !== -1;
   }
 
-  /* ─── Sponsorship requests (proposals sent by brands to athletes) ─── */
   function getSponsorshipRequests() {
     try {
       var raw = localStorage.getItem(STORAGE_KEYS.requests);
@@ -224,6 +498,8 @@
     getAthletes: getAthletes,
     getTopAthletes: getTopAthletes,
     getAthleteById: getAthleteById,
+    getAthleteByProfileKey: getAthleteByProfileKey,
+    getSports: getSports,
     getShortlist: getShortlist,
     setShortlist: setShortlist,
     addToShortlist: addToShortlist,
@@ -233,6 +509,8 @@
     addSponsorshipRequest: addSponsorshipRequest,
     updateSponsorshipRequestStatus: updateSponsorshipRequestStatus,
     IPL_META: IPL_META,
+    MULTISPORT_META: MULTISPORT_META,
+    SPORT_EVENTS: global.ADC_SPORT_EVENTS || null,
     ATHLETES: ATHLETES
   };
 })(typeof window !== 'undefined' ? window : this);
