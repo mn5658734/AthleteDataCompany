@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2026-09-24b" />
+  <link rel="stylesheet" href="styles.css?v=2026-09-24e" />
 </head>
 <body>
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -1231,46 +1231,45 @@
   </section>
 
   <section id="screen-brand-discovery" class="screen journey-screen">
-    <div class="screen-inner discovery-screen">
-      <div class="discovery-header">
-        <div>
-          <h1>Discovery Assistant</h1>
-          <p class="screen-desc">Answer Budget → Objective → Audience → Geography → Sport (optional). Recommendations appear above.</p>
-          <p class="discovery-example-line"><span>Example</span> Budget: ₹20L · Objective: Product Launch · Audience: Sports Fans · Geography: Metro Cities · Sport: Cricket</p>
-        </div>
-      </div>
+    <div class="screen-inner discovery-screen discovery-screen--chat">
+      <div class="discovery-header discovery-header--blank" aria-hidden="true"></div>
 
-      <div class="discovery-layout">
-        <div class="results-area">
-          <div class="results-toolbar">
-            <span class="results-count" id="discovery-results-count"></span>
-          </div>
-          <div class="discovery-search-anim" id="discovery-search-anim" hidden aria-live="polite">
-            <div class="discovery-search-anim-lines" id="discovery-search-anim-lines"></div>
-          </div>
-          <div class="discovery-portfolio" id="discovery-portfolio" hidden></div>
-          <div class="discovery-response" id="discovery-athlete-cards"></div>
-          <nav class="discovery-pagination" id="discovery-pagination" aria-label="Athlete results pages"></nav>
-        </div>
-      </div>
+      <div class="discovery-chat-shell" id="discovery-chat-shell">
+        <div class="discovery-chat-scroll" id="discovery-chat-scroll">
+          <div class="discovery-chat-discover-messages" id="discovery-chat-discover-messages" hidden></div>
 
-      <div class="discovery-chat-discover discovery-chat-discover--simple" id="discovery-chat-discover">
-        <div class="discovery-active-criteria" id="discovery-active-criteria" hidden>
-          <span class="discovery-active-criteria-label">Captured brief</span>
-          <div class="discovery-active-criteria-tags" id="discovery-active-criteria-tags"></div>
-        </div>
-        <div class="discovery-chat-discover-messages" id="discovery-chat-discover-messages" hidden></div>
-        <div class="discovery-chat-discover-chips" id="discovery-chat-discover-chips">
-          <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Budget: ₹20L">₹20L budget</button>
-          <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Objective: Brand Awareness">Brand Awareness</button>
-          <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Audience: Gen Z">Gen Z audience</button>
-        </div>
-        <div class="discovery-chat-discover-input-wrap">
-          <div class="discovery-brief-field">
-            <label class="discovery-brief-label" for="discovery-chat-discover-input">Campaign brief</label>
-            <textarea id="discovery-chat-discover-input" class="discovery-chat-input discovery-chat-textarea" placeholder="Answer the next question — Budget, Objective, Audience, Geography, then Sport (optional)" rows="3"></textarea>
+          <div class="results-area discovery-results-in-thread" id="discovery-results-area" hidden>
+            <div class="results-toolbar">
+              <span class="results-count" id="discovery-results-count"></span>
+            </div>
+            <div class="discovery-search-anim" id="discovery-search-anim" hidden aria-live="polite">
+              <div class="discovery-search-anim-lines" id="discovery-search-anim-lines"></div>
+            </div>
+            <div class="discovery-portfolio" id="discovery-portfolio" hidden></div>
+            <div class="discovery-response" id="discovery-athlete-cards"></div>
+            <nav class="discovery-pagination" id="discovery-pagination" aria-label="Athlete results pages"></nav>
           </div>
-          <button type="button" class="btn-primary discovery-brief-submit" id="discovery-chat-discover-send">Send</button>
+        </div>
+
+        <div class="discovery-composer" id="discovery-composer">
+          <div class="discovery-active-criteria" id="discovery-active-criteria" hidden>
+            <span class="discovery-active-criteria-label">Captured brief</span>
+            <div class="discovery-active-criteria-tags" id="discovery-active-criteria-tags"></div>
+          </div>
+          <div class="discovery-chat-discover-chips" id="discovery-chat-discover-chips">
+            <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Budget: Below ₹5L">Below ₹5L</button>
+            <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Budget: Below ₹20L">Below ₹20L</button>
+            <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Budget: ₹50L">₹50L</button>
+            <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Budget: Above ₹1Cr">Above ₹1Cr</button>
+            <button type="button" class="chat-suggestion-chip" data-discovery-prompt="Budget: Up to ₹5Cr">Up to ₹5Cr</button>
+          </div>
+          <div class="discovery-chat-discover-input-wrap">
+            <div class="discovery-brief-field">
+              <label class="discovery-brief-label" for="discovery-chat-discover-input">Message</label>
+              <textarea id="discovery-chat-discover-input" class="discovery-chat-input discovery-chat-textarea" placeholder="Write a short marketing campaign brief or choose options from above" rows="2"></textarea>
+            </div>
+            <button type="button" class="btn-primary discovery-brief-submit" id="discovery-chat-discover-send">Send</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1696,12 +1695,12 @@
     </div>
   </div>
 
-  <script src="sport-events-data.js?v=2026-09-24b"></script>
-  <script src="multisport-data.js?v=2026-09-24b"></script>
-  <script src="data.js?v=2026-09-24b"></script>
+  <script src="sport-events-data.js?v=2026-09-24e"></script>
+  <script src="multisport-data.js?v=2026-09-24e"></script>
+  <script src="data.js?v=2026-09-24e"></script>
   <script src="cricsheet-stats.js"></script>
   <script src="ipl-assistant.js"></script>
-  <script src="app.js?v=2026-09-24b"></script>
+  <script src="app.js?v=2026-09-24e"></script>
   <script src="demo-request.js?v=2026-09-05f"></script>
   <script>
   (function () {

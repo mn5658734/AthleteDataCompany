@@ -124,8 +124,8 @@
     {
       key: 'budgetAmount',
       label: 'Budget',
-      question: 'What is the total campaign budget? (e.g. ₹20L)',
-      chips: ['₹5L', '₹8L', '₹12L', '₹20L', '₹35L'],
+      question: 'What is the total campaign budget?',
+      chips: ['Below ₹5L', 'Below ₹20L', '₹50L', 'Above ₹1Cr', 'Up to ₹5Cr'],
       required: true
     },
     {
@@ -173,9 +173,11 @@
     var wrap = document.getElementById('discovery-chat-discover-chips');
     if (!wrap) return;
     wrap.innerHTML =
-      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Budget: ₹20L">₹20L budget</button>' +
-      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Objective: Brand Awareness">Brand Awareness</button>' +
-      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Audience: Gen Z">Gen Z audience</button>';
+      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Budget: Below ₹5L">Below ₹5L</button>' +
+      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Budget: Below ₹20L">Below ₹20L</button>' +
+      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Budget: ₹50L">₹50L</button>' +
+      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Budget: Above ₹1Cr">Above ₹1Cr</button>' +
+      '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Budget: Up to ₹5Cr">Up to ₹5Cr</button>';
   }
 
   function resetDiscoveryChatUi() {
@@ -207,6 +209,7 @@
       anim.hidden = true;
       anim.classList.remove('is-active');
     }
+    showDiscoveryResultsArea(false);
   }
 
   function startDiscoveryFresh() {
@@ -548,10 +551,12 @@
 
   function syncBriefToFilters(f) {
     if (f.budgetAmount != null) {
-      if (f.budgetAmount <= 5) f.budget = '₹1–5L';
-      else if (f.budgetAmount <= 20) f.budget = '₹5–20L';
-      else f.budget = '₹20L+';
-      f.budgetLabel = '₹' + f.budgetAmount + 'L';
+      if (f.budgetAmount <= 5) f.budget = 'Below ₹5L';
+      else if (f.budgetAmount <= 20) f.budget = 'Below ₹20L';
+      else if (f.budgetAmount <= 50) f.budget = '₹50L';
+      else if (f.budgetAmount < 500) f.budget = 'Above ₹1Cr';
+      else f.budget = 'Up to ₹5Cr';
+      f.budgetLabel = formatBudgetLabel(f.budgetAmount);
     }
     if (f.market) {
       var m = f.market.toLowerCase();
@@ -585,11 +590,27 @@
     }
   }
 
+  function formatBudgetLabel(lakhs) {
+    if (lakhs == null || isNaN(lakhs)) return '';
+    if (lakhs >= 100) {
+      var cr = lakhs / 100;
+      return '₹' + (cr % 1 === 0 ? String(cr) : cr.toFixed(1)) + 'Cr';
+    }
+    return '₹' + lakhs + 'L';
+  }
+
   function parseBudgetLakhs(text) {
     var lower = (text || '').toLowerCase().replace(/,/g, '');
+    // Band chips (check Cr bands before Lakh bands)
+    if (/up\s*to\s*₹?\s*5\s*cr|upto\s*₹?\s*5\s*cr|≤\s*5\s*cr|max\s*5\s*cr/.test(lower)) return 500;
+    if (/above\s*₹?\s*1\s*cr|over\s*₹?\s*1\s*cr|1\s*cr\+|above\s*1\s*crore/.test(lower)) return 150;
+    if (/below\s*₹?\s*5\s*l|under\s*₹?\s*5\s*l|below\s*5\s*lakh/.test(lower)) return 5;
+    if (/below\s*₹?\s*20\s*l|under\s*₹?\s*20|below\s*20/.test(lower)) return 20;
+    if (/₹?\s*50\s*l/.test(lower) && !/below|under|above/.test(lower)) return 50;
+
     var m = lower.match(/₹?\s*(\d+(?:\.\d+)?)\s*l(?:akh)?s?\+?/);
     if (m) return Math.round(parseFloat(m[1]));
-    m = lower.match(/₹\s*(\d+(?:\.\d+)?)\s*(?:cr|crore)/);
+    m = lower.match(/₹?\s*(\d+(?:\.\d+)?)\s*(?:cr|crore)s?/);
     if (m) return Math.round(parseFloat(m[1]) * 100);
     m = lower.match(/\bbudget\s*[:\-]?\s*₹?\s*(\d+(?:\.\d+)?)/);
     if (m) return Math.round(parseFloat(m[1]));
@@ -810,6 +831,23 @@
     return /\b(show|find|search|discover|recommend|go ahead|that'?s enough|looks good|run|apply|results|portfolio)\b/.test(lower);
   }
 
+  function scrollDiscoveryThreadToBottom(smooth) {
+    var scroller = document.getElementById('discovery-chat-scroll');
+    if (!scroller) return;
+    requestAnimationFrame(function () {
+      scroller.scrollTo({
+        top: scroller.scrollHeight,
+        behavior: smooth === false ? 'auto' : 'smooth'
+      });
+    });
+  }
+
+  function showDiscoveryResultsArea(show) {
+    var area = document.getElementById('discovery-results-area');
+    if (!area) return;
+    area.hidden = !show;
+  }
+
   function appendDiscoveryChatMessage(role, html) {
     var box = document.getElementById('discovery-chat-discover-messages');
     if (!box) return;
@@ -818,7 +856,7 @@
     div.className = 'chat-msg chat-msg-' + (role === 'user' ? 'user' : 'bot');
     div.innerHTML = html;
     box.appendChild(div);
-    box.scrollTop = box.scrollHeight;
+    scrollDiscoveryThreadToBottom();
   }
 
   function setDiscoveryQuestionChips(questionDef) {
@@ -844,7 +882,7 @@
       if (val === undefined || val === null || val === '' || val === 'Any' || val === 'All') return;
       items.push('<span class="discovery-criteria-tag"><em>' + label + '</em> ' + val + '</span>');
     }
-    add('Budget', f.budgetLabel || (f.budgetAmount != null ? ('₹' + f.budgetAmount + 'L') : ''));
+    add('Budget', f.budgetLabel || (f.budgetAmount != null ? formatBudgetLabel(f.budgetAmount) : ''));
     add('Objective', f.campaignObjective);
     add('Audience', f.audienceLabel);
     add('Geography', f.market);
@@ -867,7 +905,7 @@
       if (!labels[k]) return;
       if (k === 'budgetLabel' && parsed.budgetAmount != null) return;
       var val = parsed[k];
-      if (k === 'budgetAmount') val = '₹' + val + 'L';
+      if (k === 'budgetAmount') val = formatBudgetLabel(val);
       parts.push('<strong>' + labels[k] + '</strong>: ' + val);
     });
     return parts.length ? '<p>Captured — ' + parts.join(' · ') + '</p>' : '';
@@ -1187,7 +1225,7 @@
       if (summary) appendDiscoveryChatMessage('bot', summary);
     } else if (!wantsShowResults(text)) {
       appendDiscoveryChatMessage('bot',
-        '<p>Let\'s build the brief step by step: <strong>Budget → Objective → Audience → Geography → Sport</strong> (optional).</p>');
+        '<p>Let\'s continue — write a short marketing campaign brief or choose options from above.</p>');
       askNextDiscoveryQuestion();
       return;
     }
@@ -1374,26 +1412,32 @@
   }
 
   function scrollDiscoveryResultsIntoView(focus) {
+    var scroller = document.getElementById('discovery-chat-scroll');
     var target = null;
     if (focus === 'anim') {
       target = document.getElementById('discovery-search-anim') ||
-        document.getElementById('discovery-results-count') ||
-        document.querySelector('#screen-brand-discovery .results-area');
+        document.getElementById('discovery-results-area');
     } else {
-      target = document.getElementById('discovery-athlete-cards') ||
-        document.querySelector('#screen-brand-discovery .results-area');
+      target = document.getElementById('discovery-results-area') ||
+        document.getElementById('discovery-athlete-cards');
     }
-    if (!target) return;
-    requestAnimationFrame(function () {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
+    if (scroller && target && !target.hidden) {
+      requestAnimationFrame(function () {
+        var top = target.offsetTop - 12;
+        scroller.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      });
+      return;
+    }
+    scrollDiscoveryThreadToBottom();
   }
 
   function setDiscoverySearchingUi(isSearching) {
-    var chat = document.getElementById('discovery-chat-discover');
-    var results = document.querySelector('#screen-brand-discovery .results-area');
+    var shell = document.getElementById('discovery-chat-shell');
+    var composer = document.getElementById('discovery-composer');
+    var results = document.getElementById('discovery-results-area');
     var paginationEl = document.getElementById('discovery-pagination');
-    if (chat) chat.classList.toggle('is-searching', !!isSearching);
+    if (shell) shell.classList.toggle('is-searching', !!isSearching);
+    if (composer) composer.classList.toggle('is-searching', !!isSearching);
     if (results) results.classList.toggle('is-searching', !!isSearching);
     if (isSearching && paginationEl) paginationEl.innerHTML = '';
   }
@@ -1450,11 +1494,8 @@
     if (options.resetPage) discoveryState.currentPage = 1;
 
     if (!discoveryState.hasSearched && !options.skipGate) {
-      container.innerHTML =
-        '<div class="discovery-results-placeholder">' +
-          '<p class="discovery-placeholder-title">Campaign response appears here</p>' +
-          '<p>Answer Budget → Objective → Audience → Geography below. Sport is optional.</p>' +
-        '</div>';
+      showDiscoveryResultsArea(false);
+      container.innerHTML = '';
       if (countEl) countEl.textContent = '';
       if (portfolioEl) { portfolioEl.hidden = true; portfolioEl.innerHTML = ''; }
       discoveryState.filteredList = [];
@@ -1462,6 +1503,8 @@
       discoveryState.portfolio = null;
       return;
     }
+
+    showDiscoveryResultsArea(true);
 
     var brief = getDiscoveryFilters();
     var list;
@@ -1485,14 +1528,9 @@
       }
     }
 
-    var pageSize = discoveryState.pageSize;
-    var totalPages = Math.max(1, Math.ceil(list.length / pageSize) || 1);
-    if (list.length === 0) totalPages = 1;
-    if (discoveryState.currentPage > totalPages) discoveryState.currentPage = totalPages;
-    if (discoveryState.currentPage < 1) discoveryState.currentPage = 1;
-
-    var startIdx = (discoveryState.currentPage - 1) * pageSize;
-    var pageList = list.slice(startIdx, startIdx + pageSize);
+    // Full list in-thread — no page 1 / page 2 controls
+    discoveryState.currentPage = 1;
+    var pageList = list;
 
     if (!pageList.length) {
       container.innerHTML = '<p class="discovery-empty">No recommendations matched this brief.</p>';
@@ -1501,7 +1539,7 @@
         '<section class="discovery-response-block">' +
           '<h3 class="discovery-response-h">Recommended athletes</h3>' +
           '<div class="athlete-cards athlete-cards--recommend">' +
-            pageList.map(function (a, i) { return buildAthleteCardHtml(a, startIdx + i, brief); }).join('') +
+            pageList.map(function (a, i) { return buildAthleteCardHtml(a, i, brief); }).join('') +
           '</div>' +
         '</section>' +
         buildComparisonHtml(list, brief);
@@ -1513,11 +1551,14 @@
         : '';
     }
 
-    renderDiscoveryPagination(list.length, discoveryState.currentPage, pageSize);
+    var paginationEl = document.getElementById('discovery-pagination');
+    if (paginationEl) paginationEl.innerHTML = '';
     if (discoveryState.hasSearched) saveDiscoveryCache();
 
     if (options.scrollToResults) {
       scrollDiscoveryResultsIntoView('results');
+    } else {
+      scrollDiscoveryThreadToBottom();
     }
   }
 
@@ -1534,6 +1575,7 @@
     }
 
     setDiscoverySearchingUi(true);
+    showDiscoveryResultsArea(true);
     if (cards) {
       cards.innerHTML = '';
       cards.setAttribute('aria-busy', 'true');
@@ -1544,6 +1586,7 @@
     anim.classList.add('is-active');
     linesEl.innerHTML = '';
     scrollDiscoveryResultsIntoView('anim');
+    scrollDiscoveryThreadToBottom(false);
 
     var campaign = filters.campaign || 'open brief';
     var sport = filters.sport && filters.sport !== 'All' ? filters.sport : 'open';
@@ -2666,8 +2709,7 @@
         setTimeout(function () {
           if (!discoveryState.hasSearched && !countBriefAnswered()) {
             appendDiscoveryChatMessage('bot',
-              '<p>I\'ll design a marketing campaign response once I have your brief.</p>' +
-              '<p>Order: <strong>Budget → Objective → Audience → Geography → Sport</strong> (optional).</p>');
+              '<p>Write a short marketing campaign brief or choose options from above.</p>');
             askNextDiscoveryQuestion();
           }
         }, 0);
