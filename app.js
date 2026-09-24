@@ -10,7 +10,7 @@
     'data': 'Scoring Data',
     'athlete-register': 'Profile', 'athlete-profile': 'Edit profile', 'athlete-dashboard': 'Overview', 'athlete-requests': 'Sponsorship requests',
     'creator-register': 'Registration', 'creator-profile': 'Profile', 'creator-dashboard': 'Dashboard', 'creator-requests': 'Brand requests',
-    'brand-register': 'Registration', 'brand-discovery': 'Discovery', 'brand-intelligence': 'Athlete Intelligence',
+    'brand-register': 'Registration', 'brand-discovery': 'Campaign Agent', 'brand-intelligence': 'Athlete Intelligence',
     'brand-athlete-profile': 'Athlete profile',
     'brand-inquiry': 'Send inquiry', 'brand-proposal': 'Create proposal', 'brand-requests': 'Sponsorship requests', 'brand-shortlist': 'Shortlist',
     'admin-login': 'Login', 'admin-athlete-governance': 'Athlete governance', 'admin-brand-governance': 'Brand governance', 'admin-revenue': 'Revenue dashboard'
@@ -38,7 +38,7 @@
     brand: {
       label: 'Brand / Agency',
       items: [
-        { icon: '🔍', label: 'Athlete Discovery', screen: 'brand-discovery' },
+        { icon: '🔍', label: 'Campaign Agent', screen: 'brand-discovery' },
         { icon: '🧠', label: 'Athlete Intelligence', screen: 'brand-intelligence' },
         { icon: '🤝', label: 'Sponsorship Requests', screen: 'brand-requests', badge: 'brand-requests' },
         { icon: '⭐', label: 'Shortlist', screen: 'brand-shortlist', badge: 'shortlist' },
@@ -1868,7 +1868,7 @@
     if (!athlete) {
       if (avatarEl) avatarEl.textContent = '—';
       if (nameEl) nameEl.textContent = 'Athlete not found';
-      if (subEl) subEl.textContent = 'Go back to Discovery to select an athlete.';
+      if (subEl) subEl.textContent = 'Go back to Campaign Agent to select an athlete.';
       return;
     }
     if (avatarEl) avatarEl.textContent = athlete.initials || athlete.name.slice(0, 2).toUpperCase();
@@ -2530,7 +2530,7 @@
         return;
       }
       var empty = role === 'brand'
-        ? 'No sponsorship requests yet. Send a proposal from an athlete profile in Discovery and it will appear here.'
+        ? 'No sponsorship requests yet. Send a proposal from an athlete profile in Campaign Agent and it will appear here.'
         : 'No requests yet. When a brand sends you a proposal, it will show up here.';
       container.innerHTML = '<div class="requests-empty">' + empty + '</div>';
       return;
@@ -2543,7 +2543,7 @@
     if (!container || !window.ADC_DATA) return;
     var ids = window.ADC_DATA.getShortlist();
     if (!ids.length) {
-      container.innerHTML = '<div class="requests-empty">Your shortlist is empty. Add athletes from Discovery to compare them here.</div>';
+      container.innerHTML = '<div class="requests-empty">Your shortlist is empty. Add athletes from Campaign Agent to compare them here.</div>';
       return;
     }
     container.innerHTML = ids.map(function (id) {
