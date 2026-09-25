@@ -2070,13 +2070,50 @@
     return { brandFit: brandFit, expert: expert, fitness: fitness, roi: roi };
   }
 
+  function isWomenSportEvent(e) {
+    var blob = [e && e.event, e && e.eventId, e && e.name, e && e.level, e && e.format, e && e.notes]
+      .join(' ')
+      .toLowerCase();
+    return /\bwomen\b|women'?s|\bwpl\b|\biwl\b|\bfemale\b|girls?\b/.test(blob);
+  }
+
+  function isMenOnlySportEvent(e) {
+    var blob = [e && e.event, e && e.eventId, e && e.name, e && e.level]
+      .join(' ')
+      .toLowerCase();
+    if (isWomenSportEvent(e)) return false;
+    // Men's premier / domestic cricket pathways (distinct from WPL / women's trophies)
+    if (/\bipl\b|indian premier league/.test(blob)) return true;
+    if (/ranji trophy|syed mushtaq|duleep trophy|irani cup|vijay hazare|sher-?e-?punjab/.test(blob)) return true;
+    return false;
+  }
+
+  function filterEventsForAthlete(athlete, events) {
+    if (!events || !events.length) return [];
+    var gender = String((athlete && athlete.gender) || '').toLowerCase();
+    var isFemale = gender === 'female' || gender === 'woman' || gender === 'women' || gender === 'f';
+    var isMale = gender === 'male' || gender === 'man' || gender === 'men' || gender === 'm';
+    return events.filter(function (e) {
+      if (!e) return false;
+      var women = isWomenSportEvent(e);
+      var menOnly = isMenOnlySportEvent(e);
+      if (isFemale) return !menOnly;
+      if (isMale) return !women;
+      // Unknown gender: still hide clear cross-gender mismatches when sport is cricket
+      if (String((athlete && athlete.sport) || '').toLowerCase() === 'cricket' && women && menOnly) return false;
+      return true;
+    });
+  }
+
   function buildCareerEvents(athlete) {
     var rows = (athlete.eventStats && athlete.eventStats.length)
       ? athlete.eventStats
       : (athlete.events || []);
+    rows = filterEventsForAthlete(athlete, rows);
     if (rows && rows.length) {
       return rows.slice(0, 5).map(function (e) {
         var label = (e.event || 'Event').replace(/Indian Premier League \(IPL\)/i, 'IPL')
+          .replace(/Women'?s Premier League \(WPL\)/i, 'WPL')
           .replace(/Syed Mushtaq Ali Trophy/i, 'SMAT')
           .replace(/Pro Kabaddi League/i, 'PKL')
           .replace(/Hockey India League/i, 'HIL')
@@ -2093,7 +2130,7 @@
     }
     var matches = athlete.matches != null ? Number(athlete.matches) : 10;
     var perf = athlete.perf != null ? Number(athlete.perf) : 50;
-    var pathway = (athlete.pathwayEvents || []).slice(0, 5);
+    var pathway = filterEventsForAthlete(athlete, athlete.pathwayEvents || []).slice(0, 5);
     if (pathway.length) {
       return pathway.map(function (e, i) {
         var label = (e.event || 'Event').split(/[–(/]/)[0].trim();
@@ -2159,6 +2196,7 @@
     var rows = (athlete.eventStats && athlete.eventStats.length)
       ? athlete.eventStats
       : (athlete.events || []);
+    rows = filterEventsForAthlete(athlete, rows);
     var sport = athlete.sport || '';
     var isCricket = sport === 'Cricket';
 
@@ -2197,7 +2235,7 @@
         : '<thead><tr><th>Event</th><th>Format</th><th>M</th><th colspan="4">Level / Team</th><th>Notes / Source</th></tr></thead>';
 
       // Append pathway calendar if measured rows exist
-      var pathway = athlete.pathwayEvents || [];
+      var pathway = filterEventsForAthlete(athlete, athlete.pathwayEvents || []);
       var pathwayHtml = '';
       if (pathway.length && (athlete.eventStats || []).length) {
         pathwayHtml = '<p class="event-pathway-label">Sport pathway calendar</p><ul class="event-pathway-list">' +
@@ -3103,10 +3141,77 @@
         '</td>' +
         '<td class="intelligence-score">' + a.intelScore + '</td>' +
         '<td class="intelligence-detail">' +
-          '<button type="button" class="btn-sm intelligence-view-btn" data-intel-view="' + a.id + '">View</button>' +
+          '<div class="intelligence-detail-actions">' +
+            '<button type="button" class="btn-sm intelligence-view-btn" data-intel-view="' + a.id + '">View</button>' +
+            '<button type="button" class="intelligence-insight-btn" data-intel-insight="' + a.id + '" title="Athlete insight" aria-label="Show insight for ' + escapeHtml(a.name || 'athlete') + '">' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+                '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/>' +
+              '</svg>' +
+            '</button>' +
+          '</div>' +
         '</td>' +
       '</tr>';
     }).join('');
+  }
+
+  function buildIntelligenceInsightHtml(athlete) {
+    var brief = (typeof getDiscoveryFilters === 'function') ? getDiscoveryFilters() : {};
+    var enriched = typeof enrichAthleteRecommendation === 'function'
+      ? enrichAthleteRecommendation(athlete, brief)
+      : athlete;
+    var cat = typeof athleteCategory === 'function' ? athleteCategory(enriched) : (enriched.growth || '');
+    return '<dl class="athlete-brief-grid insight-brief-grid">' +
+      '<div><dt>Why they fit</dt><dd>' + escapeHtml(athleteWhyFits(enriched, brief)) + '</dd></div>' +
+      '<div><dt>Performance trajectory</dt><dd>' + escapeHtml(athleteTrajectory(enriched)) + '</dd></div>' +
+      '<div><dt>Audience fit</dt><dd>' + escapeHtml(athleteAudienceFit(enriched, brief)) + '</dd></div>' +
+      '<div><dt>Category</dt><dd>' + escapeHtml(cat || '—') + '</dd></div>' +
+      '<div><dt>Upcoming opportunities</dt><dd>' + escapeHtml(athleteOpportunities(enriched)) + '</dd></div>' +
+      '<div><dt>Risks</dt><dd>' + escapeHtml(athleteRisks(enriched)) + '</dd></div>' +
+      '</dl>';
+  }
+
+  function closeIntelligenceInsightModal() {
+    var modal = document.getElementById('intelligence-insight-modal');
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('insight-modal-open');
+  }
+
+  function openIntelligenceInsightModal(id) {
+    id = parseInt(id, 10);
+    if (!id || !window.ADC_DATA) return;
+    var athlete = window.ADC_DATA.getAthleteById(id);
+    if (!athlete) return;
+    var modal = document.getElementById('intelligence-insight-modal');
+    var titleEl = document.getElementById('intelligence-insight-title');
+    var subEl = document.getElementById('intelligence-insight-sub');
+    var bodyEl = document.getElementById('intelligence-insight-body');
+    if (!modal || !bodyEl) return;
+    var cat = typeof athleteCategory === 'function' ? athleteCategory(athlete) : (athlete.growth || '');
+    var subParts = [athlete.sport, athlete.role, cat, athlete.verified ? 'Verified' : '']
+      .filter(Boolean);
+    if (titleEl) titleEl.textContent = athlete.name || 'Athlete insight';
+    if (subEl) subEl.textContent = subParts.join(' · ');
+    bodyEl.innerHTML = buildIntelligenceInsightHtml(athlete);
+    modal.hidden = false;
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('insight-modal-open');
+  }
+
+  function initIntelligenceInsightModal() {
+    var modal = document.getElementById('intelligence-insight-modal');
+    if (!modal || modal.getAttribute('data-bound')) return;
+    modal.setAttribute('data-bound', '1');
+    modal.addEventListener('click', function (e) {
+      if (e.target.closest('[data-close-insight]')) {
+        e.preventDefault();
+        closeIntelligenceInsightModal();
+      }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal && !modal.hidden) closeIntelligenceInsightModal();
+    });
   }
 
   function initAthleteIntelligence() {
@@ -3114,6 +3219,7 @@
     var sportSelect = document.getElementById('intelligence-sport-select');
     var categorySelect = document.getElementById('intelligence-category-select');
     populateIntelligenceSportFilter();
+    initIntelligenceInsightModal();
     if (categorySelect && intelligenceState.category) {
       categorySelect.value = intelligenceState.category;
     }
@@ -3327,6 +3433,13 @@
     if (backBtn) {
       e.preventDefault();
       goBackFromAthleteProfile();
+      return;
+    }
+    var intelInsight = e.target.closest('[data-intel-insight]');
+    if (intelInsight) {
+      e.preventDefault();
+      e.stopPropagation();
+      openIntelligenceInsightModal(intelInsight.getAttribute('data-intel-insight'));
       return;
     }
     var intelView = e.target.closest('[data-intel-view]');
