@@ -1337,6 +1337,123 @@
     });
   }
 
+  function normalizeAthleteQuery(text) {
+    return String(text || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9\s.'-]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/^(about|recommend|analyse|analyze|insight(?:s)?(?:\s+on|\s+for)?|for|show|tell me about|who is|profile(?:\s+of)?|look(?:\s+at|\s+up)?)\s+/g, '')
+      .trim();
+  }
+
+  function looksLikeBriefFieldOnly(text) {
+    var t = String(text || '').trim();
+    if (!t) return false;
+    if (/^(budget|objective|audience|geography|sport|campaign|category|gender)\s*[:\-]/i.test(t)) return true;
+    if (/^(below|above|up to)\s*₹/i.test(t)) return true;
+    if (/^skip(\s|$)/i.test(t)) return true;
+    if (/^(awareness\s*\+\s*sales|brand awareness|product launch|performance marketing|athlete endorsement)$/i.test(t)) return true;
+    return false;
+  }
+
+  function resolveAthletesFromQuery(text) {
+    if (!window.ADC_DATA || !text) return [];
+    if (looksLikeBriefFieldOnly(text)) return [];
+    var athletes = window.ADC_DATA.getAthletes({ verifiedOnly: false }) || [];
+    var q = normalizeAthleteQuery(text);
+    if (q.length < 2) return [];
+
+    var scored = [];
+    athletes.forEach(function (a) {
+      var name = String(a.name || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9\s.'-]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (!name) return;
+      var score = 0;
+      if (name === q) score = 100;
+      else if (q.indexOf(name) !== -1) score = 92 + Math.min(7, name.length);
+      else if (name.indexOf(q) !== -1 && q.length >= 3) score = 75 + Math.min(15, q.length);
+      else {
+        var tokens = q.split(' ').filter(function (t) { return t.length >= 2; });
+        if (tokens.length && tokens.every(function (t) { return name.indexOf(t) !== -1; })) {
+          score = 62 + tokens.length * 6;
+        }
+        var parts = name.split(' ');
+        var last = parts[parts.length - 1] || '';
+        if (last.length >= 3 && (q === last || tokens.indexOf(last) !== -1)) {
+          score = Math.max(score, 58);
+        }
+      }
+      if (score >= 55) scored.push({ athlete: a, score: score });
+    });
+
+    scored.sort(function (x, y) {
+      return (y.score - x.score) || String(x.athlete.name || '').localeCompare(String(y.athlete.name || ''));
+    });
+    if (!scored.length) return [];
+    // Prefer a clear winner; if near-ties keep only the top match for single-athlete insight
+    return [scored[0].athlete];
+  }
+
+  function enrichAthleteRecommendation(a, brief) {
+    brief = brief || getDiscoveryFilters();
+    var fee = typeof estimateAthleteFeeLakhs === 'function' ? estimateAthleteFeeLakhs(a) : 8;
+    var score = typeof scoreAthleteForBrief === 'function' ? scoreAthleteForBrief(a, brief) : 70;
+    var cat = typeof athleteCategory === 'function' ? athleteCategory(a) : (a.growth || '');
+    return Object.assign({}, a, {
+      feeLakhs: fee,
+      feeLabel: a.feeLabel || ('₹' + fee + 'L'),
+      matchPct: Math.min(99, Math.max(40, Math.round(score))),
+      recRole: a.recRole || cat || undefined
+    });
+  }
+
+  function runSingleAthleteInsight(athlete) {
+    if (!athlete || discoveryState.chatBusy) return;
+    discoveryState.chatBusy = true;
+    var brief = getDiscoveryFilters();
+    appendDiscoveryChatMessage('bot',
+      '<p>Analysing <strong>' + escapeHtml(athlete.name) + '</strong> for campaign insight…</p>');
+    setDiscoveryQuestionChips(null);
+
+    var enriched = enrichAthleteRecommendation(athlete, brief);
+    discoveryState.hasSearched = true;
+    discoveryState.recommendations = [enriched];
+    discoveryState.filteredList = [enriched];
+    discoveryState.portfolio = null;
+    discoveryState.pendingQuestion = null;
+    discoveryState.chatBusy = false;
+
+    showDiscoveryResultsArea(true);
+    var container = document.getElementById('discovery-athlete-cards');
+    var countEl = document.getElementById('discovery-results-count');
+    var portfolioEl = document.getElementById('discovery-portfolio');
+    if (portfolioEl) {
+      portfolioEl.hidden = true;
+      portfolioEl.innerHTML = '';
+    }
+    if (countEl) countEl.textContent = '1 athlete insight · ' + athlete.name;
+    if (container) {
+      container.innerHTML =
+        '<section class="discovery-response-block">' +
+          '<h3 class="discovery-response-h">Athlete insight</h3>' +
+          '<div class="athlete-cards athlete-cards--recommend">' +
+            buildAthleteCardHtml(enriched, 0, brief) +
+          '</div>' +
+        '</section>';
+    }
+    saveDiscoveryCache();
+    appendDiscoveryChatMessage('bot',
+      '<p>Insight ready above for <strong>' + escapeHtml(athlete.name) +
+      '</strong> — why they fit, trajectory, audience, commercial range, opportunities, and risks.</p>' +
+      '<p>Type another athlete name for a new insight, or update the campaign brief in the message box.</p>');
+    setDiscoveryQuestionChips(null);
+    scrollDiscoveryResultsIntoView('results');
+  }
+
   function handleDiscoveryChatSubmit(rawText) {
     var text = (rawText || '').trim();
     if (!text || discoveryState.chatBusy) return;
@@ -1347,6 +1464,15 @@
     appendDiscoveryChatMessage('user', '<p>' + text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</p>');
     discoveryState.lastQueryText = text;
     var hadResults = !!discoveryState.hasSearched;
+
+    // Athlete-name insight: analyse that athlete only in the same response format
+    if (!looksLikeBriefFieldOnly(text)) {
+      var namedAthletes = resolveAthletesFromQuery(text);
+      if (namedAthletes.length) {
+        runSingleAthleteInsight(namedAthletes[0]);
+        return;
+      }
+    }
 
     // Skip optional fields
     if (/^skip(\s+sport|\s+campaign|\s+remaining)?$/i.test(text) || /^skip sport$/i.test(text) || /^no sport$/i.test(text)) {
@@ -1435,7 +1561,7 @@
         return;
       }
       appendDiscoveryChatMessage('bot',
-        '<p>Let\'s continue — write a short marketing campaign brief or choose options from above.</p>');
+        '<p>Let\'s continue — write a short marketing campaign brief or choose options.</p>');
       askNextDiscoveryQuestion();
       return;
     }
@@ -3096,7 +3222,7 @@
         setTimeout(function () {
           if (!discoveryState.hasSearched && !countBriefAnswered()) {
             appendDiscoveryChatMessage('bot',
-              '<p>Write a short marketing campaign brief or choose options from above.</p>');
+              '<p>Write a short marketing campaign brief or choose options.</p>');
             askNextDiscoveryQuestion();
           }
         }, 0);
