@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2026-09-25j" />
+  <link rel="stylesheet" href="styles.css?v=2026-09-26a" />
 </head>
 <body>
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -625,7 +625,12 @@
   <section id="screen-athlete-dashboard" class="screen journey-screen">
     <div class="screen-inner dashboard-screen athlete-home">
       <div class="athlete-profile-hero">
-        <button type="button" class="btn-secondary btn-sm athlete-edit-profile-btn" data-next="athlete-profile">Edit profile</button>
+        <div class="athlete-profile-hero-actions">
+          <div class="profile-completion-circle" title="Profile completion" aria-label="Profile completion">
+            <strong id="dashboard-profile-completion">50%</strong>
+          </div>
+          <button type="button" class="btn-secondary btn-sm athlete-edit-profile-btn" data-next="athlete-profile">Edit profile</button>
+        </div>
         <div class="athlete-profile-identity">
           <img
             class="athlete-profile-photo"
@@ -657,40 +662,40 @@
           </div>
         </div>
         <div class="athlete-profile-score-stack">
-          <div class="athlete-score-chip completeness">
-            <strong id="dashboard-profile-completion">50%</strong>
-            <span>Profile complete</span>
-          </div>
-          <div class="athlete-score-chip">
-            <strong>88</strong>
-            <span>Performance</span>
-          </div>
-          <div class="athlete-score-chip">
-            <strong>91</strong>
-            <span>Social</span>
-          </div>
-          <div class="athlete-score-chip">
-            <strong>Expert Rating</strong>
-            <div class="star-rating" aria-label="Expert rating 4.5 out of 5">
-              <span class="star filled">★</span>
-              <span class="star filled">★</span>
-              <span class="star filled">★</span>
-              <span class="star filled">★</span>
-              <span class="star half">★</span>
+          <div class="athlete-profile-score-row">
+            <div class="athlete-score-chip">
+              <strong>88</strong>
+              <span>Performance</span>
+            </div>
+            <div class="athlete-score-chip">
+              <strong>91</strong>
+              <span>Social</span>
+            </div>
+            <div class="athlete-score-chip">
+              <strong>Expert Rating</strong>
+              <div class="star-rating" aria-label="Expert rating 4.5 out of 5">
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star half">★</span>
+              </div>
+            </div>
+            <div class="athlete-score-chip">
+              <strong>Fitness</strong>
+              <div class="star-rating" aria-label="Fitness score 4 out of 5">
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star empty">★</span>
+              </div>
             </div>
           </div>
-          <div class="athlete-score-chip">
-            <strong id="dashboard-commercial-range">—</strong>
-            <span>Commercial value</span>
-          </div>
-          <div class="athlete-score-chip">
-            <strong>Fitness</strong>
-            <div class="star-rating" aria-label="Fitness score 4 out of 5">
-              <span class="star filled">★</span>
-              <span class="star filled">★</span>
-              <span class="star filled">★</span>
-              <span class="star filled">★</span>
-              <span class="star empty">★</span>
+          <div class="athlete-profile-score-row">
+            <div class="athlete-score-chip">
+              <strong id="dashboard-commercial-range">—</strong>
+              <span>Commercial value</span>
             </div>
           </div>
         </div>
@@ -1756,12 +1761,12 @@
     </div>
   </div>
 
-  <script src="sport-events-data.js?v=2026-09-25j"></script>
-  <script src="multisport-data.js?v=2026-09-25j"></script>
-  <script src="data.js?v=2026-09-25j"></script>
+  <script src="sport-events-data.js?v=2026-09-26a"></script>
+  <script src="multisport-data.js?v=2026-09-26a"></script>
+  <script src="data.js?v=2026-09-26a"></script>
   <script src="cricsheet-stats.js"></script>
   <script src="ipl-assistant.js"></script>
-  <script src="app.js?v=2026-09-25j"></script>
+  <script src="app.js?v=2026-09-26a"></script>
   <script src="demo-request.js?v=2026-09-05f"></script>
   <script>
   (function () {

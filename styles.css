@@ -2285,10 +2285,38 @@ body.has-sidebar .journey-screen.active { padding-left: 236px; }
 }
 
 .athlete-edit-profile-btn {
+  position: static;
+}
+
+.athlete-profile-hero-actions {
   position: absolute;
   top: 1rem;
   right: 1rem;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.profile-completion-circle {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 2px solid var(--accent, #3dd6c6);
+  background: rgba(61, 214, 198, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(61, 214, 198, 0.15);
+}
+
+.profile-completion-circle strong {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent, #3dd6c6);
+  letter-spacing: -0.02em;
+  line-height: 1;
 }
 
 .athlete-profile-identity {
@@ -2309,7 +2337,7 @@ body.has-sidebar .journey-screen.active { padding-left: 236px; }
 }
 
 .athlete-profile-meta {
-  padding-right: 7.5rem;
+  padding-right: 9.5rem;
 }
 
 .athlete-profile-name-row {
@@ -2387,10 +2415,25 @@ body.has-sidebar .journey-screen.active { padding-left: 236px; }
 }
 
 .athlete-profile-score-stack {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 0.65rem;
   width: 100%;
+}
+
+.athlete-profile-score-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.athlete-profile-score-row:last-child {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.athlete-profile-score-row:last-child .athlete-score-chip {
+  max-width: 100%;
 }
 
 .brand-profile-score-row {
@@ -2650,8 +2693,9 @@ body.has-sidebar .journey-screen.active { padding-left: 236px; }
 }
 
 @media (max-width: 900px) {
-  .athlete-profile-score-stack {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .athlete-profile-score-row,
+  .athlete-profile-score-row:last-child {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .athlete-home-split {
@@ -2664,12 +2708,19 @@ body.has-sidebar .journey-screen.active { padding-left: 236px; }
     flex-direction: column;
   }
 
-  .athlete-profile-score-stack {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .athlete-profile-score-row,
+  .athlete-profile-score-row:last-child {
+    grid-template-columns: 1fr 1fr;
   }
 
   .athlete-profile-meta {
     padding-right: 0;
+  }
+
+  .athlete-profile-hero-actions {
+    position: static;
+    align-self: flex-end;
+    margin-bottom: 0.25rem;
   }
 }
 
