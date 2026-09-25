@@ -172,6 +172,13 @@
   function resetDiscoveryStarterChips() {
     var wrap = document.getElementById('discovery-chat-discover-chips');
     if (!wrap) return;
+    // After a campaign response exists, hide option chips — chatbox only
+    if (discoveryState.hasSearched) {
+      wrap.innerHTML = '';
+      wrap.hidden = true;
+      return;
+    }
+    wrap.hidden = false;
     wrap.innerHTML =
       '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Budget: Below ₹5L">Below ₹5L</button>' +
       '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="Budget: Below ₹20L">Below ₹20L</button>' +
@@ -504,13 +511,107 @@
     return pct;
   }
 
+  function formatManagedByLabel(value) {
+    var v = String(value || '').trim();
+    if (!v || /^self$/i.test(v)) return 'SELF';
+    return v;
+  }
+
+  function formatCommercialRangeLabel(athleteOrRange) {
+    if (athleteOrRange == null) return 'Not quoted';
+    if (typeof athleteOrRange === 'string') {
+      var s = athleteOrRange.trim();
+      return s || 'Not quoted';
+    }
+    var a = athleteOrRange;
+    var range = a.commercialRange || a.commercialValue || a.budget || '';
+    if (range && String(range).trim()) return String(range).trim();
+    return 'Not quoted';
+  }
+
+  function syncAthleteDashboardProfileExtras() {
+    var form = document.getElementById('form-athlete-profile');
+    var managedEl = document.getElementById('athlete-dashboard-managed-by');
+    var commercialEl = document.getElementById('dashboard-commercial-range');
+    var managedVal = 'SELF';
+    var commercialVal = 'Not quoted';
+    if (form) {
+      var managedField = form.querySelector('[name="managedBy"]');
+      var commercialField = form.querySelector('[name="commercialRange"]');
+      if (managedField && managedField.value.trim()) managedVal = formatManagedByLabel(managedField.value);
+      if (commercialField && commercialField.value.trim()) commercialVal = commercialField.value.trim();
+    }
+    if (managedEl) managedEl.textContent = 'Managed by · ' + managedVal;
+    if (commercialEl) commercialEl.textContent = commercialVal;
+  }
+
+  function initAthleteManagedByControl() {
+    var modeGroup = document.getElementById('athlete-managed-by-mode');
+    var hidden = document.getElementById('athlete-managed-by-value');
+    var otherInput = document.getElementById('athlete-managed-by-input');
+    if (!modeGroup || !hidden || modeGroup.getAttribute('data-bound')) return;
+    modeGroup.setAttribute('data-bound', '1');
+
+    function applyMode(mode, keepText) {
+      var isSelf = mode === 'SELF';
+      modeGroup.querySelectorAll('[data-managed-by]').forEach(function (b) {
+        b.classList.toggle('is-selected', b.getAttribute('data-managed-by') === (isSelf ? 'SELF' : 'other'));
+      });
+      if (otherInput) {
+        otherInput.hidden = isSelf;
+        if (isSelf) {
+          hidden.value = 'SELF';
+        } else {
+          if (!keepText) otherInput.focus();
+          hidden.value = (otherInput.value || '').trim() || '';
+        }
+      } else {
+        hidden.value = isSelf ? 'SELF' : hidden.value;
+      }
+      syncAthleteDashboardProfileExtras();
+      updateAthleteProfileCompletion();
+    }
+
+    modeGroup.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-managed-by]');
+      if (!btn) return;
+      applyMode(btn.getAttribute('data-managed-by') === 'SELF' ? 'SELF' : 'other');
+    });
+
+    if (otherInput) {
+      otherInput.addEventListener('input', function () {
+        hidden.value = otherInput.value.trim();
+        syncAthleteDashboardProfileExtras();
+        updateAthleteProfileCompletion();
+      });
+    }
+
+    // Restore UI from saved hidden value
+    var current = (hidden.value || 'SELF').trim();
+    if (current && !/^self$/i.test(current)) {
+      if (otherInput) {
+        otherInput.value = current;
+        otherInput.hidden = false;
+      }
+      applyMode('other', true);
+    } else {
+      applyMode('SELF', true);
+    }
+  }
+
   function initAthleteProfileForm() {
     var form = document.getElementById('form-athlete-profile');
     if (!form || form.getAttribute('data-profile-bound')) return;
     form.setAttribute('data-profile-bound', '1');
 
-    form.addEventListener('input', updateAthleteProfileCompletion);
-    form.addEventListener('change', updateAthleteProfileCompletion);
+    form.addEventListener('input', function () {
+      updateAthleteProfileCompletion();
+      syncAthleteDashboardProfileExtras();
+    });
+    form.addEventListener('change', function () {
+      updateAthleteProfileCompletion();
+      syncAthleteDashboardProfileExtras();
+    });
 
     var methodGroup = document.getElementById('athlete-login-method');
     if (methodGroup) {
@@ -523,7 +624,9 @@
       });
     }
 
+    initAthleteManagedByControl();
     updateAthleteProfileCompletion();
+    syncAthleteDashboardProfileExtras();
   }
 
   function getPersonaForScreen(screenId) {
@@ -885,10 +988,15 @@
   }
 
   function askCampaignObjective(reason) {
-    var objQ = CAMPAIGN_BRIEF_FIELDS.filter(function (q) { return q.key === 'campaignObjective'; })[0];
     discoveryState.pendingQuestion = 'campaignObjective';
     appendDiscoveryChatMessage('bot',
       '<p>' + (reason || 'What is the campaign objective?') + '</p>');
+    // After response: chatbox only — no option chips
+    if (discoveryState.hasSearched) {
+      setDiscoveryQuestionChips(null);
+      return;
+    }
+    var objQ = CAMPAIGN_BRIEF_FIELDS.filter(function (q) { return q.key === 'campaignObjective'; })[0];
     setDiscoveryQuestionChips(objQ);
   }
 
@@ -923,10 +1031,13 @@
   function setDiscoveryQuestionChips(questionDef) {
     var wrap = document.getElementById('discovery-chat-discover-chips');
     if (!wrap) return;
-    if (!questionDef || !questionDef.chips || !questionDef.chips.length) {
+    // After campaign response is generated, never show option chips
+    if (discoveryState.hasSearched || !questionDef || !questionDef.chips || !questionDef.chips.length) {
       wrap.innerHTML = '';
+      wrap.hidden = true;
       return;
     }
+    wrap.hidden = false;
     wrap.innerHTML = questionDef.chips.map(function (c) {
       return '<button type="button" class="chat-suggestion-chip" data-discovery-prompt="' +
         String(c).replace(/"/g, '&quot;') + '">' + c + '</button>';
@@ -1219,9 +1330,9 @@
       } else if (recs.length) {
         html += '<p><strong>Top pick:</strong> ' + recs[0].name + ' (' + recs[0].matchPct + '% · ' + recs[0].feeLabel + ')</p>';
       }
-      html += '<p>Want to refine Budget, Objective, Audience, Geography, or Sport? Reply below — I’ll update the recommendations.</p>';
+      html += '<p>Want to refine Budget, Objective, Audience, Geography, or Sport? Type it in the message box below.</p>';
       appendDiscoveryChatMessage('bot', html);
-      resetDiscoveryStarterChips();
+      setDiscoveryQuestionChips(null);
       scrollDiscoveryResultsIntoView('results');
     });
   }
@@ -1315,11 +1426,11 @@
     } else if (!wantsShowResults(text) && !wantsChangeCampaign(text)) {
       if (hadResults) {
         appendDiscoveryChatMessage('bot',
-          '<p>Your campaign response stays above. Tell me what to change — Budget, Objective, Audience, Geography, or Sport — and I’ll refine it.</p>');
+          '<p>Your campaign response stays above. Tell me what to change in the message box — Budget, Objective, Audience, Geography, or Sport.</p>');
         if (!isBriefFieldAnswered('campaignObjective')) {
-          askCampaignObjective('Campaign objective is missing — pick one so I can refine accurately.');
+          askCampaignObjective('Campaign objective is missing — type one in the message box so I can refine accurately.');
         } else {
-          resetDiscoveryStarterChips();
+          setDiscoveryQuestionChips(null);
         }
         return;
       }
@@ -1334,12 +1445,11 @@
       appendDiscoveryChatMessage('bot',
         '<p>Happy to update the campaign query — your current response stays above until we refine it.</p>');
       if (!isBriefFieldAnswered('campaignObjective')) {
-        askCampaignObjective('First, what is the campaign objective?');
+        askCampaignObjective('First, what is the campaign objective? Type it in the message box.');
       } else {
         appendDiscoveryChatMessage('bot',
-          '<p>What should we change — Budget, Objective, Audience, Geography, or Sport?</p>');
-        var objQChange = CAMPAIGN_BRIEF_FIELDS.filter(function (q) { return q.key === 'campaignObjective'; })[0];
-        if (objQChange) setDiscoveryQuestionChips(objQChange);
+          '<p>What should we change — Budget, Objective, Audience, Geography, or Sport? Type it in the message box.</p>');
+        setDiscoveryQuestionChips(null);
       }
       return;
     }
@@ -2017,6 +2127,7 @@
       if (athlete.league) parts.push(athlete.league);
       if (athlete.teamShort || athlete.team) parts.push(athlete.teamShort || athlete.team);
       if (athlete.role) parts.push(athlete.role);
+      if (typeof athleteCategory === 'function') parts.push(athleteCategory(athlete));
       if (athlete.verified) parts.push('Verified');
       subEl.textContent = parts.join(' · ');
     }
@@ -2027,6 +2138,10 @@
       uniqueEl.hidden = false;
       uniqueEl.innerHTML = '<span class="profile-code">' + escapeHtml(code) + '</span>' +
         '<span class="profile-key">' + escapeHtml(key) + '</span>';
+    }
+    var managedEl = document.getElementById('brand-profile-managed-by');
+    if (managedEl) {
+      managedEl.textContent = 'Managed by · ' + formatManagedByLabel(athlete.managedBy || 'SELF');
     }
     if (btnShortlist) {
       var inList = window.ADC_DATA.isInShortlist(athlete.id);
@@ -2044,12 +2159,14 @@
     var socialEl = document.getElementById('pv-social');
     var fitEl = document.getElementById('pv-fit');
     var roiEl = document.getElementById('pv-roi');
+    var commercialEl = document.getElementById('pv-commercial');
     var expertEl = document.getElementById('pv-expert-stars');
     var fitnessEl = document.getElementById('pv-fitness-stars');
     if (perfEl) perfEl.textContent = athlete.perf != null ? athlete.perf : '—';
     if (socialEl) socialEl.textContent = athlete.social != null ? athlete.social : '—';
     if (fitEl) fitEl.textContent = scores.brandFit;
     if (roiEl) roiEl.textContent = scores.roi;
+    if (commercialEl) commercialEl.textContent = formatCommercialRangeLabel(athlete);
     if (expertEl) {
       var expert = starRatingHtml(scores.expert, 'Expert rating');
       expertEl.innerHTML = expert.html;
@@ -2959,6 +3076,8 @@
       renderDataTable();
     } else if (screenId === 'athlete-profile' || screenId === 'athlete-dashboard') {
       updateAthleteProfileCompletion();
+      syncAthleteDashboardProfileExtras();
+      initAthleteManagedByControl();
     } else if (screenId === 'brand-discovery') {
       if (params.restoreResults) {
         restoreDiscoveryFromCache();

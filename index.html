@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2026-09-25c" />
+  <link rel="stylesheet" href="styles.css?v=2026-09-25e" />
 </head>
 <body>
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -551,7 +551,19 @@
           </div>
           <div class="form-row two-cols">
             <div><label>Location</label><input type="text" name="location" data-profile-field placeholder="City, State" /></div>
-            <div><label>Managed by</label><input type="text" name="managedBy" data-profile-field placeholder="Optional — Agent / Manager / Agency" /></div>
+            <div>
+              <label>Commercial value / range</label>
+              <input type="text" name="commercialRange" data-profile-field placeholder="e.g. ₹5–20L — range quoted by you" />
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Managed by</label>
+            <div class="button-group managed-by-toggle" id="athlete-managed-by-mode">
+              <button type="button" class="btn-secondary is-selected" data-managed-by="SELF">SELF</button>
+              <button type="button" class="btn-secondary" data-managed-by="other">Enter name</button>
+            </div>
+            <input type="hidden" name="managedBy" id="athlete-managed-by-value" data-profile-field value="SELF" />
+            <input type="text" id="athlete-managed-by-input" class="managed-by-other-input" placeholder="Agent / Manager / Agency name" hidden autocomplete="organization" />
           </div>
           <div class="form-row">
             <label>Bio</label>
@@ -628,6 +640,7 @@
               <span class="verified-pill">✓ Verified</span>
             </div>
             <p class="athlete-profile-role">Opener · Left-hand bat · Bihar / East Zone</p>
+            <p class="athlete-profile-managed" id="athlete-dashboard-managed-by">Managed by · SELF</p>
             <p class="athlete-profile-bio">Rising cricket talent with multi-format exposure across IPL, Duleep Trophy and first-class cricket. Tracked for performance trajectory, audience growth and commercial readiness.</p>
             <div class="athlete-profile-tags">
               <span>Cricket</span>
@@ -665,6 +678,10 @@
               <span class="star filled">★</span>
               <span class="star half">★</span>
             </div>
+          </div>
+          <div class="athlete-score-chip">
+            <strong id="dashboard-commercial-range">—</strong>
+            <span>Commercial value</span>
           </div>
           <div class="athlete-score-chip">
             <strong>Fitness</strong>
@@ -1297,6 +1314,7 @@
           <h1 id="brand-profile-name">—</h1>
           <p id="brand-profile-subtitle">—</p>
           <p class="profile-unique-id" id="brand-profile-unique-id" hidden></p>
+          <p class="profile-managed-by" id="brand-profile-managed-by">Managed by · —</p>
           <div class="profile-view-actions">
             <button type="button" class="btn-outline" id="btn-shortlist-toggle">Add to shortlist</button>
             <button type="button" class="btn-primary" data-next="brand-inquiry">Send inquiry</button>
@@ -1324,6 +1342,10 @@
         <div class="athlete-score-chip">
           <strong>Fitness</strong>
           <div class="star-rating" id="pv-fitness-stars" aria-label="Fitness score"></div>
+        </div>
+        <div class="athlete-score-chip">
+          <strong id="pv-commercial">—</strong>
+          <span>Commercial value</span>
         </div>
         <div class="athlete-score-chip">
           <strong id="pv-roi">—</strong>
@@ -1723,12 +1745,12 @@
     </div>
   </div>
 
-  <script src="sport-events-data.js?v=2026-09-25c"></script>
-  <script src="multisport-data.js?v=2026-09-25c"></script>
-  <script src="data.js?v=2026-09-25c"></script>
+  <script src="sport-events-data.js?v=2026-09-25e"></script>
+  <script src="multisport-data.js?v=2026-09-25e"></script>
+  <script src="data.js?v=2026-09-25e"></script>
   <script src="cricsheet-stats.js"></script>
   <script src="ipl-assistant.js"></script>
-  <script src="app.js?v=2026-09-25c"></script>
+  <script src="app.js?v=2026-09-25e"></script>
   <script src="demo-request.js?v=2026-09-05f"></script>
   <script>
   (function () {
