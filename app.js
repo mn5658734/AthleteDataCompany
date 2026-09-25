@@ -2691,32 +2691,98 @@
     }).join('');
   }
 
-  var intelligenceState = { board: 'commercial', sport: 'All' };
+  var intelligenceState = { board: 'commercial', sport: 'All', category: 'All' };
+
+  // Growth category from age + performance + expert rating (social-weighted):
+  // Emerging — young, solid perf + expert (early promise)
+  // Rising — early-prime breakout with stronger expert/social momentum
+  // Stable — mid-career consistent delivery
+  // Elite — prime-career peak expert + perf/social
+  // Ex athlete — older / retired / post-peak
+  function expertRatingFor(a) {
+    var perf = Number(a && a.perf) || 0;
+    var social = Number(a && a.social) || 0;
+    var expert = perf * 0.55 + social * 0.35 + (a && a.verified ? 8 : 0);
+    return Math.max(1, Math.min(99, Math.round(expert)));
+  }
+
+  function athleteCategory(a) {
+    if (!a) return 'Stable';
+    var raw = String(a.growth || a.category || a.careerStage || '').trim().toLowerCase();
+    var age = Number(a.age) || 0;
+    var perf = Number(a.perf) || 0;
+    var social = Number(a.social) || 0;
+    var expert = expertRatingFor(a);
+    var status = String(a.status || a.careerStatus || '').toLowerCase();
+    var tier = String(a.tier || '').toUpperCase();
+    var opportunity = String(a.opportunity || '').toLowerCase();
+
+    if (/ex[\s-]*athlete|^retired$|^ex$/.test(raw) || /retired|ex-athlete/.test(status)) {
+      return 'Ex athlete';
+    }
+    if (raw === 'elite') return 'Elite';
+
+    if (age >= 36) return 'Ex athlete';
+    if (age >= 34 && expert < 68 && social < 72) return 'Ex athlete';
+
+    var eliteSignals =
+      (expert >= 72 && (perf >= 62 || social >= 75) && (a.verified || social >= 80)) ||
+      (perf + social) >= 150 ||
+      (tier === 'TIER 1' && expert >= 70 && social >= 78) ||
+      (opportunity.indexOf('brand anchor') !== -1 && expert >= 68);
+    if (age > 0 && age <= 35 && eliteSignals) return 'Elite';
+
+    // Emerging: young players with good expert rating and performance
+    if (age > 0 && age <= 26 && perf >= 50 && expert >= 52) {
+      if (expert >= 60 && social >= 58 && age >= 23) return 'Rising';
+      return 'Emerging';
+    }
+
+    // Rising: ascending early-prime athletes
+    if (age > 0 && age <= 29 && expert >= 58 && perf >= 50 && (social >= 55 || expert >= 62)) {
+      return 'Rising';
+    }
+    if (raw === 'rising' && age > 0 && age <= 30 && expert >= 55) return 'Rising';
+    if (raw === 'emerging' && age > 0 && age <= 27 && perf >= 50 && expert >= 50) {
+      return 'Emerging';
+    }
+
+    // Stable: established mid-career consistency
+    if (age >= 27 && age <= 35 && expert >= 48) return 'Stable';
+    if (raw === 'stable') return 'Stable';
+
+    return 'Stable';
+  }
 
   function intelligenceScoreFor(a, board) {
     var perf = Number(a.perf) || 0;
     var social = Number(a.social) || 0;
-    var growthMap = { Rising: 92, Emerging: 84, Stable: 72, Declining: 48 };
+    var growthMap = {
+      Elite: 98,
+      Rising: 92,
+      Emerging: 84,
+      Stable: 72,
+      'Ex athlete': 60,
+      Declining: 48
+    };
+    var cat = athleteCategory(a);
     if (board === 'performance') return Math.round(perf);
     if (board === 'social') return Math.round(social);
-    if (board === 'growth') return growthMap[a.growth] || 65;
+    if (board === 'growth') return growthMap[cat] || growthMap[a.growth] || 65;
     if (board === 'growthScore') {
-      var base = growthMap[a.growth] || 65;
+      var base = growthMap[cat] || growthMap[a.growth] || 65;
       return Math.round(base * 0.7 + (perf + social) / 2 * 0.3);
     }
-    if (board === 'expert') {
-      var expert = perf * 0.55 + social * 0.35 + (a.verified ? 8 : 0);
-      return Math.max(1, Math.min(99, Math.round(expert)));
-    }
-    // commercial value (default)
+    if (board === 'expert') return expertRatingFor(a);
     var fee = typeof estimateAthleteFeeLakhs === 'function' ? estimateAthleteFeeLakhs(a) : 8;
     var commercial = (perf + social) / 2 + (a.verified ? 4 : 0) + Math.max(0, 12 - fee);
     return Math.max(1, Math.min(99, Math.round(commercial)));
   }
 
-  function getIntelligenceLeaderboard(board, sport) {
+  function getIntelligenceLeaderboard(board, sport, category) {
     board = board || intelligenceState.board || 'commercial';
     sport = sport || intelligenceState.sport || 'All';
+    category = category || intelligenceState.category || 'All';
     var list = (window.ADC_DATA && window.ADC_DATA.getAthletes({ verifiedOnly: false })) || [];
     if (sport && sport !== 'All') {
       var sportLower = String(sport).toLowerCase();
@@ -2725,8 +2791,17 @@
           String(a.sport || '').toLowerCase().indexOf(sportLower) !== -1;
       });
     }
+    if (category && category !== 'All') {
+      var catWanted = String(category).toLowerCase();
+      list = list.filter(function (a) {
+        return athleteCategory(a).toLowerCase() === catWanted;
+      });
+    }
     return list.map(function (a) {
-      return Object.assign({}, a, { intelScore: intelligenceScoreFor(a, board) });
+      return Object.assign({}, a, {
+        intelScore: intelligenceScoreFor(a, board),
+        intelCategory: athleteCategory(a)
+      });
     }).sort(function (x, y) {
       return (y.intelScore - x.intelScore) || String(x.name || '').localeCompare(String(y.name || ''));
     }).slice(0, 50);
@@ -2758,22 +2833,30 @@
     var body = document.getElementById('intelligence-table-body');
     var select = document.getElementById('intelligence-leaderboard-select');
     var sportSelect = document.getElementById('intelligence-sport-select');
+    var categorySelect = document.getElementById('intelligence-category-select');
     if (!body) return;
     if (select && select.value) intelligenceState.board = select.value;
     if (sportSelect && sportSelect.value) intelligenceState.sport = sportSelect.value;
-    var rows = getIntelligenceLeaderboard(intelligenceState.board, intelligenceState.sport);
+    if (categorySelect && categorySelect.value) intelligenceState.category = categorySelect.value;
+    var rows = getIntelligenceLeaderboard(
+      intelligenceState.board,
+      intelligenceState.sport,
+      intelligenceState.category
+    );
     if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="4" class="intelligence-empty">No athletes for this sport filter.</td></tr>';
+      body.innerHTML = '<tr><td colspan="4" class="intelligence-empty">No athletes for these filters.</td></tr>';
       return;
     }
     body.innerHTML = rows.map(function (a, idx) {
       var rank = idx + 1;
       var sportRole = [a.sport, a.role].filter(Boolean).join(' · ');
+      var cat = a.intelCategory || athleteCategory(a);
       return '<tr class="intelligence-row" data-athlete-id="' + a.id + '">' +
         '<td class="intelligence-rank">#' + rank + '</td>' +
         '<td class="intelligence-name">' +
           '<strong>' + escapeHtml(a.name || '—') + '</strong>' +
-          (sportRole ? '<span class="intelligence-meta">' + escapeHtml(sportRole) + '</span>' : '') +
+          (sportRole ? '<span class="intelligence-meta">' + escapeHtml(sportRole) +
+            (cat ? ' · ' + escapeHtml(cat) : '') + '</span>' : '') +
         '</td>' +
         '<td class="intelligence-score">' + a.intelScore + '</td>' +
         '<td class="intelligence-detail">' +
@@ -2786,7 +2869,11 @@
   function initAthleteIntelligence() {
     var select = document.getElementById('intelligence-leaderboard-select');
     var sportSelect = document.getElementById('intelligence-sport-select');
+    var categorySelect = document.getElementById('intelligence-category-select');
     populateIntelligenceSportFilter();
+    if (categorySelect && intelligenceState.category) {
+      categorySelect.value = intelligenceState.category;
+    }
     if (select && !select.getAttribute('data-bound')) {
       select.setAttribute('data-bound', '1');
       select.addEventListener('change', function () {
@@ -2798,6 +2885,13 @@
       sportSelect.setAttribute('data-bound', '1');
       sportSelect.addEventListener('change', function () {
         intelligenceState.sport = sportSelect.value || 'All';
+        renderAthleteIntelligence();
+      });
+    }
+    if (categorySelect && !categorySelect.getAttribute('data-bound')) {
+      categorySelect.setAttribute('data-bound', '1');
+      categorySelect.addEventListener('change', function () {
+        intelligenceState.category = categorySelect.value || 'All';
         renderAthleteIntelligence();
       });
     }
