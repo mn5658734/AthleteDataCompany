@@ -10,7 +10,7 @@
     'data': 'Scoring Data',
     'athlete-register': 'Profile', 'athlete-profile': 'Edit profile', 'athlete-dashboard': 'Overview', 'athlete-requests': 'Sponsorship requests',
     'creator-register': 'Registration', 'creator-profile': 'Profile', 'creator-dashboard': 'Dashboard', 'creator-requests': 'Brand requests',
-    'brand-register': 'Registration', 'brand-discovery': 'Campaign Agent', 'brand-intelligence': 'Athlete Intelligence',
+    'brand-register': 'Registration', 'brand-discovery': 'Campaign Agent', 'brand-intelligence': 'Scouting Agent',
     'brand-athlete-profile': 'Athlete profile',
     'brand-inquiry': 'Send inquiry', 'brand-proposal': 'Create proposal', 'brand-requests': 'Sponsorship requests', 'brand-shortlist': 'Shortlist',
     'admin-login': 'Login', 'admin-athlete-governance': 'Athlete governance', 'admin-brand-governance': 'Brand governance', 'admin-revenue': 'Revenue dashboard'
@@ -39,7 +39,7 @@
       label: 'Brand / Agency',
       items: [
         { icon: '🔍', label: 'Campaign Agent', screen: 'brand-discovery' },
-        { icon: '🧠', label: 'Athlete Intelligence', screen: 'brand-intelligence' },
+        { icon: '🧠', label: 'Scouting Agent', screen: 'brand-intelligence' },
         { icon: '🤝', label: 'Sponsorship Requests', screen: 'brand-requests', badge: 'brand-requests' },
         { icon: '⭐', label: 'Shortlist', screen: 'brand-shortlist', badge: 'shortlist' },
         { icon: '🏢', label: 'Account', screen: 'brand-register' }
@@ -408,7 +408,7 @@
     bar.hidden = !ret;
     if (!btn || !ret) return;
     if (ret === 'brand-intelligence') {
-      btn.textContent = '← Back to Athlete Intelligence';
+      btn.textContent = '← Back to Scouting Agent';
     } else if (ret === 'brand-discovery') {
       btn.textContent = '← Back to Campaign Agent';
     } else if (ret === 'brand-shortlist') {
