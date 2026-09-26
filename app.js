@@ -2972,7 +2972,7 @@
     }).join('');
   }
 
-  var intelligenceState = { board: 'commercial', sport: 'All', category: 'All' };
+  var intelligenceState = { board: 'commercial', sport: 'All', category: 'All', gender: 'All' };
 
   // Growth category from age + performance + expert rating (social-weighted):
   // Emerging — young, solid perf + expert (early promise)
@@ -3060,10 +3060,11 @@
     return Math.max(1, Math.min(99, Math.round(commercial)));
   }
 
-  function getIntelligenceLeaderboard(board, sport, category) {
+  function getIntelligenceLeaderboard(board, sport, category, gender) {
     board = board || intelligenceState.board || 'commercial';
     sport = sport || intelligenceState.sport || 'All';
     category = category || intelligenceState.category || 'All';
+    gender = gender || intelligenceState.gender || 'All';
     var list = (window.ADC_DATA && window.ADC_DATA.getAthletes({ verifiedOnly: false })) || [];
     if (sport && sport !== 'All') {
       var sportLower = String(sport).toLowerCase();
@@ -3076,6 +3077,19 @@
       var catWanted = String(category).toLowerCase();
       list = list.filter(function (a) {
         return athleteCategory(a).toLowerCase() === catWanted;
+      });
+    }
+    if (gender && gender !== 'All') {
+      var genderWanted = String(gender).toLowerCase();
+      list = list.filter(function (a) {
+        var g = String(a.gender || '').toLowerCase();
+        if (genderWanted === 'male') {
+          return g === 'male' || g === 'm' || g === 'man' || g === 'men';
+        }
+        if (genderWanted === 'female') {
+          return g === 'female' || g === 'f' || g === 'woman' || g === 'women';
+        }
+        return g === genderWanted;
       });
     }
     return list.map(function (a) {
@@ -3115,14 +3129,17 @@
     var select = document.getElementById('intelligence-leaderboard-select');
     var sportSelect = document.getElementById('intelligence-sport-select');
     var categorySelect = document.getElementById('intelligence-category-select');
+    var genderSelect = document.getElementById('intelligence-gender-select');
     if (!body) return;
     if (select && select.value) intelligenceState.board = select.value;
     if (sportSelect && sportSelect.value) intelligenceState.sport = sportSelect.value;
     if (categorySelect && categorySelect.value) intelligenceState.category = categorySelect.value;
+    if (genderSelect && genderSelect.value) intelligenceState.gender = genderSelect.value;
     var rows = getIntelligenceLeaderboard(
       intelligenceState.board,
       intelligenceState.sport,
-      intelligenceState.category
+      intelligenceState.category,
+      intelligenceState.gender
     );
     if (!rows.length) {
       body.innerHTML = '<tr><td colspan="4" class="intelligence-empty">No athletes for these filters.</td></tr>';
@@ -3218,10 +3235,14 @@
     var select = document.getElementById('intelligence-leaderboard-select');
     var sportSelect = document.getElementById('intelligence-sport-select');
     var categorySelect = document.getElementById('intelligence-category-select');
+    var genderSelect = document.getElementById('intelligence-gender-select');
     populateIntelligenceSportFilter();
     initIntelligenceInsightModal();
     if (categorySelect && intelligenceState.category) {
       categorySelect.value = intelligenceState.category;
+    }
+    if (genderSelect && intelligenceState.gender) {
+      genderSelect.value = intelligenceState.gender;
     }
     if (select && !select.getAttribute('data-bound')) {
       select.setAttribute('data-bound', '1');
@@ -3241,6 +3262,13 @@
       categorySelect.setAttribute('data-bound', '1');
       categorySelect.addEventListener('change', function () {
         intelligenceState.category = categorySelect.value || 'All';
+        renderAthleteIntelligence();
+      });
+    }
+    if (genderSelect && !genderSelect.getAttribute('data-bound')) {
+      genderSelect.setAttribute('data-bound', '1');
+      genderSelect.addEventListener('change', function () {
+        intelligenceState.gender = genderSelect.value || 'All';
         renderAthleteIntelligence();
       });
     }
