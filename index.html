@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2026-09-30e" />
+  <link rel="stylesheet" href="styles.css?v=2026-10-01a" />
 </head>
 <body>
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -1368,15 +1368,15 @@
       <div class="dashboard-grid" id="brand-dashboard-stats">
         <div class="stat-card">
           <span class="stat-value" id="brand-dash-portfolio-count">0</span>
-          <span class="stat-label">In portfolio</span>
+          <span class="stat-label">Players in portfolio</span>
         </div>
         <div class="stat-card">
           <span class="stat-value" id="brand-dash-received-count">0</span>
-          <span class="stat-label">Requests received</span>
+          <span class="stat-label">Request received</span>
         </div>
         <div class="stat-card">
           <span class="stat-value" id="brand-dash-sent-count">0</span>
-          <span class="stat-label">Requests sent</span>
+          <span class="stat-label">Portfolio request sent</span>
         </div>
       </div>
       <div class="dashboard-section">
@@ -1672,7 +1672,12 @@
       </div>
       <div class="requests-tab-panel" id="brand-requests-panel-internal" data-brand-req-panel="internal" role="tabpanel" aria-labelledby="brand-req-tab-internal">
         <p class="requests-tab-hint">Athletes in your agency portfolio. Sponsorship proposals sent to them (by any brand) are delivered to both the athlete and you as management.</p>
+        <h3 class="requests-subhead">Players in portfolio <span class="requests-subhead-count" id="brand-req-count-portfolio">0</span></h3>
         <div class="requests-list" id="brand-requests-list-internal" data-role="brand"></div>
+        <h3 class="requests-subhead">Request received <span class="requests-subhead-count" id="brand-req-count-received">0</span></h3>
+        <div class="brand-portfolio-requests" id="brand-requests-list-received"></div>
+        <h3 class="requests-subhead">Portfolio request sent <span class="requests-subhead-count" id="brand-req-count-sent">0</span></h3>
+        <div class="brand-portfolio-requests" id="brand-requests-list-sent"></div>
       </div>
       <div class="requests-tab-panel" id="brand-requests-panel-external" data-brand-req-panel="external" role="tabpanel" aria-labelledby="brand-req-tab-external" hidden>
         <p class="requests-tab-hint">Proposals you’ve sent to athletes outside your portfolio — also delivered to that athlete’s management agency when one is tagged.</p>
@@ -1992,10 +1997,10 @@
 
   <script src="sport-events-data.js?v=2026-09-30e"></script>
   <script src="multisport-data.js?v=2026-09-30e"></script>
-  <script src="data.js?v=2026-09-30e"></script>
+  <script src="data.js?v=2026-10-01a"></script>
   <script src="cricsheet-stats.js"></script>
   <script src="ipl-assistant.js"></script>
-  <script src="app.js?v=2026-09-30e"></script>
+  <script src="app.js?v=2026-10-01a"></script>
   <script src="demo-request.js?v=2026-09-05f"></script>
   <script>
   (function () {

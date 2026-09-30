@@ -5239,6 +5239,26 @@ body.insight-modal-open {
   gap: 0.15rem;
   min-width: 0;
 }
+.requests-subhead {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.5rem 0 0.75rem;
+  font-size: 1rem;
+}
+.requests-tab-hint + .requests-subhead {
+  margin-top: 0.5rem;
+}
+.requests-subhead-count {
+  min-width: 1.5rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+}
 .brand-portfolio-req-row > .brand-portfolio-req-actions {
   flex-direction: row;
   align-items: center;
