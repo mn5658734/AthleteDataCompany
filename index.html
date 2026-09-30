@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2026-09-26b" />
+  <link rel="stylesheet" href="styles.css?v=2026-09-30a" />
 </head>
 <body>
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -1301,10 +1301,34 @@
             </div>
             <button type="button" class="btn-primary discovery-brief-submit" id="discovery-chat-discover-send">Recommend</button>
           </div>
+          <div class="discovery-credits-bar" id="discovery-credits-bar" aria-live="polite">
+            <div class="discovery-credits-track">
+              <div class="discovery-credits-fill" id="discovery-credits-fill" style="width:100%"></div>
+            </div>
+            <div class="discovery-credits-meta">
+              <span class="discovery-credits-info" id="discovery-credits-info">20 credits / search</span>
+              <span class="discovery-credits-remaining" id="discovery-credits-remaining">100 credits</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </section>
+
+  <div id="discovery-credits-modal" class="insight-modal credits-modal" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="discovery-credits-modal-title">
+    <div class="insight-modal-backdrop" data-close-credits tabindex="-1"></div>
+    <div class="insight-modal-dialog credits-modal-dialog">
+      <button type="button" class="insight-modal-close" data-close-credits aria-label="Close">×</button>
+      <p class="insight-modal-kicker">Credits</p>
+      <h2 id="discovery-credits-modal-title" class="insight-modal-title">Request more credits</h2>
+      <p class="insight-modal-sub">You’ve used your 100 search credits (20 per search). Request more to continue Campaign Agent recommendations.</p>
+      <div class="credits-modal-actions">
+        <button type="button" class="btn-primary" id="discovery-credits-request-btn">Request more credits</button>
+        <button type="button" class="btn-secondary" data-close-credits>Close</button>
+      </div>
+      <p class="credits-modal-note" id="discovery-credits-request-note" hidden>Request sent — our team will top up your credits shortly.</p>
+    </div>
+  </div>
 
   <section id="screen-brand-athlete-profile" class="screen journey-screen">
     <div class="screen-inner profile-view-screen athlete-home">
@@ -1769,12 +1793,12 @@
     </div>
   </div>
 
-  <script src="sport-events-data.js?v=2026-09-26b"></script>
-  <script src="multisport-data.js?v=2026-09-26b"></script>
-  <script src="data.js?v=2026-09-26b"></script>
+  <script src="sport-events-data.js?v=2026-09-30a"></script>
+  <script src="multisport-data.js?v=2026-09-30a"></script>
+  <script src="data.js?v=2026-09-30a"></script>
   <script src="cricsheet-stats.js"></script>
   <script src="ipl-assistant.js"></script>
-  <script src="app.js?v=2026-09-26b"></script>
+  <script src="app.js?v=2026-09-30a"></script>
   <script src="demo-request.js?v=2026-09-05f"></script>
   <script>
   (function () {

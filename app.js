@@ -120,6 +120,85 @@
     sessionStartedFresh: false
   };
 
+  // In-memory only — resets on page refresh / re-login
+  var BRAND_CREDITS_TOTAL = 100;
+  var BRAND_CREDITS_PER_SEARCH = 20;
+  var brandCreditsState = {
+    remaining: BRAND_CREDITS_TOTAL,
+    requestSent: false
+  };
+
+  function getBrandCreditsRemaining() {
+    return Math.max(0, brandCreditsState.remaining);
+  }
+
+  function updateBrandCreditsBar() {
+    var remaining = getBrandCreditsRemaining();
+    var fill = document.getElementById('discovery-credits-fill');
+    var remainingEl = document.getElementById('discovery-credits-remaining');
+    var infoEl = document.getElementById('discovery-credits-info');
+    var pct = Math.round((remaining / BRAND_CREDITS_TOTAL) * 100);
+    if (fill) fill.style.width = pct + '%';
+    if (remainingEl) remainingEl.textContent = remaining + ' credits';
+    if (infoEl) {
+      infoEl.textContent = remaining <= 0
+        ? 'Credits used · ' + BRAND_CREDITS_PER_SEARCH + ' credits / search'
+        : BRAND_CREDITS_PER_SEARCH + ' credits / search · ' + remaining + ' of ' + BRAND_CREDITS_TOTAL + ' left';
+    }
+  }
+
+  function closeBrandCreditsModal() {
+    var modal = document.getElementById('discovery-credits-modal');
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('insight-modal-open');
+  }
+
+  function openBrandCreditsModal() {
+    var modal = document.getElementById('discovery-credits-modal');
+    var note = document.getElementById('discovery-credits-request-note');
+    if (!modal) return;
+    if (note) note.hidden = !brandCreditsState.requestSent;
+    modal.hidden = false;
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('insight-modal-open');
+  }
+
+  function consumeBrandSearchCredit() {
+    if (getBrandCreditsRemaining() < BRAND_CREDITS_PER_SEARCH) {
+      openBrandCreditsModal();
+      return false;
+    }
+    brandCreditsState.remaining -= BRAND_CREDITS_PER_SEARCH;
+    updateBrandCreditsBar();
+    return true;
+  }
+
+  function initBrandCreditsUi() {
+    updateBrandCreditsBar();
+    var modal = document.getElementById('discovery-credits-modal');
+    if (!modal || modal.getAttribute('data-credits-bound')) return;
+    modal.setAttribute('data-credits-bound', '1');
+    modal.addEventListener('click', function (e) {
+      if (e.target.closest('[data-close-credits]')) {
+        e.preventDefault();
+        closeBrandCreditsModal();
+      }
+    });
+    var requestBtn = document.getElementById('discovery-credits-request-btn');
+    if (requestBtn) {
+      requestBtn.addEventListener('click', function () {
+        brandCreditsState.requestSent = true;
+        var note = document.getElementById('discovery-credits-request-note');
+        if (note) note.hidden = false;
+      });
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal && !modal.hidden) closeBrandCreditsModal();
+    });
+  }
+
   var CAMPAIGN_BRIEF_FIELDS = [
     {
       key: 'budgetAmount',
@@ -1310,6 +1389,7 @@
       askNextDiscoveryQuestion();
       return;
     }
+    if (!consumeBrandSearchCredit()) return;
     discoveryState.chatBusy = true;
     var refining = !!discoveryState.hasSearched || !!options.refine;
     appendDiscoveryChatMessage('bot', refining
@@ -1413,6 +1493,7 @@
 
   function runSingleAthleteInsight(athlete) {
     if (!athlete || discoveryState.chatBusy) return;
+    if (!consumeBrandSearchCredit()) return;
     discoveryState.chatBusy = true;
     var brief = getDiscoveryFilters();
     appendDiscoveryChatMessage('bot',
@@ -1615,6 +1696,7 @@
   }
 
   function initDiscoveryChat() {
+    initBrandCreditsUi();
     var sendBtn = document.getElementById('discovery-chat-discover-send');
     var input = document.getElementById('discovery-chat-discover-input');
     var chips = document.getElementById('discovery-chat-discover-chips');
