@@ -495,6 +495,8 @@
       btn.textContent = '← Back to Shortlist';
     } else if (ret === 'brand-dashboard') {
       btn.textContent = '← Back to Dashboard';
+    } else if (ret === 'brand-requests') {
+      btn.textContent = '← Back to Sponsorship Requests';
     } else {
       btn.textContent = '← Back';
     }
@@ -3046,26 +3048,78 @@
     }
   }
 
-  function buildRequestCardHtml(req, role) {
+  function resolveAthleteManagement(athlete) {
+    if (!window.ADC_DATA || !athlete) {
+      return { label: 'SELF', agency: null, isSelf: true };
+    }
+    var override = window.ADC_DATA.getAthleteManagedByOverride
+      ? window.ADC_DATA.getAthleteManagedByOverride(athlete.id)
+      : '';
+    var label = formatManagedByLabel(override || athlete.managedBy || 'SELF');
+    var isSelf = !label || /^self$/i.test(label);
+    if (isSelf) return { label: 'SELF', agency: null, isSelf: true };
+
+    var agencies = window.ADC_DATA.getAgencies() || [];
+    var needle = label.toLowerCase();
+    var agency = agencies.filter(function (a) {
+      return String(a.name || '').toLowerCase() === needle;
+    })[0] || null;
+    if (!agency) {
+      agency = agencies.filter(function (a) {
+        return String(a.name || '').toLowerCase().indexOf(needle) !== -1 ||
+          needle.indexOf(String(a.name || '').toLowerCase()) !== -1;
+      })[0] || null;
+    }
+    // Also match portfolio ownership
+    if (!agency) {
+      agency = agencies.filter(function (a) {
+        return window.ADC_DATA.isAthleteInAgencyPortfolio(a.id, athlete.id);
+      })[0] || null;
+      if (agency) label = agency.name;
+    }
+    return { label: label, agency: agency, isSelf: false };
+  }
+
+  function buildRequestDeliveryLine(req) {
+    var parts = ['Athlete'];
+    if (req.sentToAgency && (req.managementAgencyName || req.managementAgencyId)) {
+      parts.push(req.managementAgencyName || 'Management agency');
+    } else if (req.managementAgencyName && !/^self$/i.test(req.managementAgencyName)) {
+      parts.push(req.managementAgencyName);
+    }
+    return 'Delivered to · ' + parts.join(' + ');
+  }
+
+  function buildRequestCardHtml(req, role, options) {
+    options = options || {};
+    var currentAgency = options.agency || null;
     var title = role === 'brand'
       ? (req.athlete || 'Athlete')
       : (req.brand || 'Brand / Agency');
     var sub = role === 'brand'
       ? ('Campaign: ' + (req.brand || '—'))
       : ('Proposal for: ' + (req.athlete || 'you'));
+    if (role === 'agency') {
+      title = req.athlete || 'Athlete';
+      sub = 'From: ' + (req.brand || 'Brand') + ' · for your managed athlete';
+    }
     var dateLabel = req.createdAt ? new Date(req.createdAt).toLocaleDateString() : '';
+    var delivery = buildRequestDeliveryLine(req);
+    var isSender = !!(currentAgency && req.agencyId && req.agencyId === currentAgency.id);
+    var canAct = role === 'athlete' || (role === 'agency' && !isSender);
     var actions = '';
-    if (role !== 'brand') {
+    if (canAct) {
       actions = '<div class="request-actions">' +
         '<button type="button" class="btn-sm btn-primary" data-req-action="Accepted" data-req-id="' + req.id + '">Accept</button>' +
         '<button type="button" class="btn-sm btn-outline" data-req-action="Negotiation" data-req-id="' + req.id + '">Negotiate</button>' +
         '<button type="button" class="btn-sm btn-secondary" data-req-action="Rejected" data-req-id="' + req.id + '">Reject</button>' +
         '</div>';
     }
-    return '<div class="request-card">' +
+    return '<div class="request-card" data-req-id="' + escapeHtml(req.id || '') + '">' +
       '<div class="request-card-top">' +
         '<div><p class="request-card-title">' + escapeHtml(title) + '</p>' +
-        '<p class="request-card-sub">' + escapeHtml(sub) + (dateLabel ? ' · ' + dateLabel : '') + '</p></div>' +
+        '<p class="request-card-sub">' + escapeHtml(sub) + (dateLabel ? ' · ' + dateLabel : '') + '</p>' +
+        '<p class="request-card-sub request-delivery">' + escapeHtml(delivery) + '</p></div>' +
         '<span class="request-status ' + statusClass(req.status) + '">' + escapeHtml(req.status) + '</span>' +
       '</div>' +
       '<div class="request-meta">' +
@@ -3077,6 +3131,173 @@
       (req.message ? '<p class="request-card-sub">“' + escapeHtml(req.message) + '”</p>' : '') +
       actions +
       '</div>';
+  }
+
+  function isAgencyManagementRecipient(req, agency) {
+    if (!req || !agency) return false;
+    if (req.managementAgencyId && req.managementAgencyId === agency.id) return true;
+    if (req.managementAgencyName && agency.name &&
+        String(req.managementAgencyName).toLowerCase() === String(agency.name).toLowerCase()) {
+      return true;
+    }
+    return false;
+  }
+
+  function isSponsorshipRequestInternal(req, agency) {
+    if (!req || !agency) return false;
+    if (isAgencyManagementRecipient(req, agency)) return true;
+    if (req.athleteId != null && window.ADC_DATA &&
+        window.ADC_DATA.isAthleteInAgencyPortfolio(agency.id, req.athleteId)) {
+      return true;
+    }
+    if (req.agencyId === agency.id && (req.managedInternally === true || req.scope === 'internal')) {
+      return true;
+    }
+    return false;
+  }
+
+  function isOutboundExternalRequest(req, agency) {
+    if (!req || !agency) return false;
+    if (req.agencyId !== agency.id) return false;
+    return !isSponsorshipRequestInternal(req, agency);
+  }
+
+  function buildManagedAthleteCardHtml(athlete, relatedReqs, agency) {
+    var meta = [athlete.sport, athlete.role, athlete.teamShort || athlete.team].filter(Boolean).join(' · ');
+    var latest = relatedReqs && relatedReqs[0];
+    var statusHtml = latest
+      ? '<span class="request-status ' + statusClass(latest.status) + '">' + escapeHtml(latest.status) + '</span>'
+      : '<span class="badge">No active request</span>';
+    var reqsHtml = '';
+    if (relatedReqs && relatedReqs.length) {
+      reqsHtml = '<div class="managed-athlete-reqs">' + relatedReqs.map(function (r) {
+        var isInbound = agency && r.agencyId !== agency.id;
+        return buildRequestCardHtml(r, isInbound ? 'agency' : 'brand', { agency: agency });
+      }).join('') + '</div>';
+    }
+    return '<div class="request-card managed-athlete-card" data-athlete-id="' + athlete.id + '">' +
+      '<div class="request-card-top">' +
+        '<div><p class="request-card-title">' + escapeHtml(athlete.name) + '</p>' +
+        '<p class="request-card-sub">' + escapeHtml(meta || 'Managed athlete') + '</p></div>' +
+        statusHtml +
+      '</div>' +
+      (reqsHtml || '<p class="request-card-sub">In your portfolio — inbound sponsorship requests for this athlete are shared with you automatically.</p>') +
+      '<div class="request-actions">' +
+        '<button type="button" class="btn-sm btn-outline" data-portfolio-view="' + athlete.id + '">View profile</button>' +
+        '<button type="button" class="btn-sm btn-primary" data-managed-propose="' + athlete.id + '">New proposal</button>' +
+      '</div>' +
+      '</div>';
+  }
+
+  function renderBrandSponsorshipRequests() {
+    if (!window.ADC_DATA) return;
+    var agency = ensureCurrentAgency();
+    var allReqs = window.ADC_DATA.getSponsorshipRequests().filter(function (r) {
+      return (r.target || 'athlete') === 'athlete';
+    });
+    var internalList = document.getElementById('brand-requests-list-internal');
+    var externalList = document.getElementById('brand-requests-list-external');
+
+    var internalReqs = allReqs.filter(function (r) { return isSponsorshipRequestInternal(r, agency); });
+    var externalReqs = allReqs.filter(function (r) {
+      return agency && r.agencyId === agency.id && !isSponsorshipRequestInternal(r, agency);
+    });
+
+    if (internalList) {
+      var portfolioIds = agency ? window.ADC_DATA.getAgencyPortfolioAthleteIds(agency.id).slice() : [];
+      // Include athletes from inbound management deliveries even if not yet in portfolio list
+      internalReqs.forEach(function (r) {
+        if (r.athleteId == null) return;
+        var id = parseInt(r.athleteId, 10);
+        if (portfolioIds.indexOf(id) === -1) portfolioIds.push(id);
+      });
+
+      if (!portfolioIds.length && !internalReqs.length) {
+        internalList.innerHTML = '<div class="requests-empty">No internally managed athletes yet. Add athletes to your portfolio from <strong>Dashboard</strong>, or wait for brands to send proposals to athletes you manage.</div>';
+      } else {
+        var byAthlete = {};
+        internalReqs.forEach(function (r) {
+          var key = r.athleteId != null ? String(r.athleteId) : ('name:' + (r.athlete || ''));
+          if (!byAthlete[key]) byAthlete[key] = [];
+          byAthlete[key].push(r);
+        });
+        var html = portfolioIds.map(function (id) {
+          var athlete = window.ADC_DATA.getAthleteById(id);
+          if (!athlete) return '';
+          return buildManagedAthleteCardHtml(athlete, byAthlete[String(id)] || [], agency);
+        }).join('');
+        Object.keys(byAthlete).forEach(function (key) {
+          if (key.indexOf('name:') !== 0) return;
+          html += byAthlete[key].map(function (r) {
+            return buildRequestCardHtml(r, 'agency', { agency: agency });
+          }).join('');
+        });
+        internalList.innerHTML = html || '<div class="requests-empty">No internally managed athletes yet.</div>';
+      }
+    }
+
+    if (externalList) {
+      if (!externalReqs.length) {
+        externalList.innerHTML = '<div class="requests-empty">No external sponsorship requests yet. When you send a proposal to an athlete outside your portfolio, it appears here — and is also shared with their management agency.</div>';
+      } else {
+        externalList.innerHTML = externalReqs.map(function (r) {
+          return buildRequestCardHtml(r, 'brand', { agency: agency });
+        }).join('');
+      }
+    }
+
+    var externalTab = document.getElementById('brand-req-tab-external');
+    if (externalTab) {
+      var count = externalReqs.length;
+      externalTab.textContent = count ? ('External requests (' + count + ')') : 'External requests';
+    }
+    var internalTab = document.getElementById('brand-req-tab-internal');
+    if (internalTab && agency) {
+      var n = window.ADC_DATA.getAgencyPortfolioAthleteIds(agency.id).length;
+      var inbound = internalReqs.filter(function (r) { return r.agencyId !== agency.id; }).length;
+      var label = 'Internally managed';
+      if (n) label += ' (' + n + ')';
+      if (inbound) label += ' · ' + inbound + ' inbound';
+      internalTab.textContent = label;
+    }
+  }
+
+  function initBrandRequestsTabs() {
+    var tabs = document.getElementById('brand-requests-tabs');
+    if (!tabs || tabs.getAttribute('data-bound')) return;
+    tabs.setAttribute('data-bound', '1');
+    tabs.addEventListener('click', function (e) {
+      var tab = e.target.closest('[data-brand-req-tab]');
+      if (!tab) return;
+      var key = tab.getAttribute('data-brand-req-tab');
+      tabs.querySelectorAll('[data-brand-req-tab]').forEach(function (t) {
+        var on = t === tab;
+        t.classList.toggle('active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      document.querySelectorAll('[data-brand-req-panel]').forEach(function (panel) {
+        panel.hidden = panel.getAttribute('data-brand-req-panel') !== key;
+      });
+    });
+
+    var internalList = document.getElementById('brand-requests-list-internal');
+    if (internalList && !internalList.getAttribute('data-bound')) {
+      internalList.setAttribute('data-bound', '1');
+      internalList.addEventListener('click', function (e) {
+        var viewBtn = e.target.closest('[data-portfolio-view]');
+        var proposeBtn = e.target.closest('[data-managed-propose]');
+        var id = proposeBtn
+          ? proposeBtn.getAttribute('data-managed-propose')
+          : (viewBtn ? viewBtn.getAttribute('data-portfolio-view') : null);
+        if (!id) return;
+        e.preventDefault();
+        if (proposeBtn) {
+          openAthleteProfile(id, 'brand-requests');
+          return;
+        }
+        openAthleteProfile(id, 'brand-requests');
+      });
+    }
   }
 
   function renderRequests(containerId, role, filterTarget) {
@@ -3816,17 +4037,32 @@
     var msgEl = document.querySelector('#screen-brand-inquiry textarea');
     var ndaEl = document.querySelector('#screen-brand-inquiry input[type="checkbox"]');
     var athlete = window.ADC_DATA && window.ADC_DATA.getAthleteById(state.selectedAthleteId);
+    var agency = ensureCurrentAgency();
+    var managedInternally = !!(agency && athlete && window.ADC_DATA.isAthleteInAgencyPortfolio(agency.id, athlete.id));
+    var management = resolveAthleteManagement(athlete);
+    var sentToAgency = !management.isSelf;
     var req = {
       athlete: (athleteEl && athleteEl.value) || (athlete && athlete.name) || 'Selected athlete',
       athleteId: state.selectedAthleteId || null,
-      brand: (brandEl && brandEl.value.trim()) || 'Your Brand',
+      brand: (brandEl && brandEl.value.trim()) || (agency && agency.name) || 'Your Brand',
       duration: durationEl && durationEl.value.trim(),
       deliverables: deliverablesEl && deliverablesEl.value.trim(),
       budget: budgetEl && budgetEl.value.trim(),
       message: msgEl && msgEl.value.trim(),
       nda: ndaEl ? ndaEl.checked : false,
       target: 'athlete',
-      status: 'Under review'
+      status: 'Under review',
+      managedInternally: managedInternally,
+      scope: managedInternally ? 'internal' : 'external',
+      agencyId: agency ? agency.id : null,
+      senderAgencyName: agency ? agency.name : '',
+      sentToAthlete: true,
+      sentToAgency: sentToAgency,
+      managementAgencyId: management.agency ? management.agency.id : null,
+      managementAgencyName: sentToAgency ? management.label : '',
+      recipients: sentToAgency
+        ? ['athlete', 'agency']
+        : ['athlete']
     };
     if (window.ADC_DATA) window.ADC_DATA.addSponsorshipRequest(req);
     showScreen('brand-requests');
@@ -3908,7 +4144,8 @@
         ? (selected.name + ' (' + (selected.teamShort || selected.team || selected.sport) + ' · ' + selected.role + ')')
         : '';
     } else if (screenId === 'brand-requests') {
-      renderRequests('brand-requests-list', 'brand');
+      initBrandRequestsTabs();
+      renderBrandSponsorshipRequests();
     } else if (screenId === 'brand-shortlist') {
       renderBrandShortlist();
     } else if (screenId === 'brand-intelligence') {
@@ -4065,6 +4302,10 @@
     var role = listEl ? listEl.getAttribute('data-role') : null;
     if (role === 'athlete') renderRequests('athlete-requests-list', 'athlete', 'athlete');
     else if (role === 'creator') renderRequests('creator-requests-list', 'creator', 'creator');
+    else if (role === 'brand' || document.getElementById('screen-brand-requests') &&
+        document.getElementById('screen-brand-requests').classList.contains('active')) {
+      renderBrandSponsorshipRequests();
+    }
     var current = parseRoute();
     renderSidebar(current);
   }
@@ -4129,6 +4370,7 @@
     initBrandDashboard();
     initBrandRegisterForm();
     initAdminBrandGovernance();
+    initBrandRequestsTabs();
     var dataSearch = document.getElementById('data-search');
     if (dataSearch) {
       dataSearch.addEventListener('input', function () {

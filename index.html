@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2026-09-30b" />
+  <link rel="stylesheet" href="styles.css?v=2026-09-30d" />
 </head>
 <body>
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -953,7 +953,7 @@
   <section id="screen-athlete-requests" class="screen journey-screen">
     <div class="screen-inner dashboard-screen">
       <h1>Sponsorship Requests</h1>
-      <p class="screen-desc">Proposals and queries sent to you by brands and agencies. Accept, negotiate, or reject each request.</p>
+      <p class="screen-desc">Proposals sent to you by brands and agencies. If you’re managed by an agency, the same request is shared with them. Accept, negotiate, or reject each request.</p>
 
       <section class="dashboard-section athlete-panel">
         <div class="athlete-panel-head">
@@ -963,7 +963,7 @@
           <li>
             <div>
               <strong>Energy Drink Co.</strong>
-              <span class="inquiry-meta">Campaign inquiry · IPL window</span>
+              <span class="inquiry-meta">Campaign inquiry · IPL window · Shared with athlete + agency</span>
             </div>
             <span class="badge">Under review</span>
           </li>
@@ -1523,7 +1523,7 @@
   <section id="screen-brand-proposal" class="screen journey-screen">
     <div class="screen-inner form-screen">
       <h1>Create sponsorship proposal</h1>
-      <p class="screen-desc">Define campaign duration, deliverables, and budget. Athlete can Accept / Negotiate / Reject.</p>
+      <p class="screen-desc">Define campaign duration, deliverables, and budget. The request is delivered to the athlete and their management agency (if tagged). Either can Accept / Negotiate / Reject.</p>
       <form class="proto-form">
         <div class="form-row two-cols">
           <div>
@@ -1574,11 +1574,22 @@
       <div class="requests-header">
         <div>
           <h1>Sponsorship Requests</h1>
-          <p class="screen-desc">Every proposal you send is tracked here with full campaign details and live status.</p>
+          <p class="screen-desc">Track proposals for athletes you manage, and requests you’ve sent to athletes outside your portfolio.</p>
         </div>
         <button type="button" class="btn-primary" data-next="brand-discovery">+ New from Campaign Agent</button>
       </div>
-      <div class="requests-list" id="brand-requests-list" data-role="brand"></div>
+      <div class="admin-tabs requests-tabs" id="brand-requests-tabs" role="tablist" aria-label="Sponsorship request views">
+        <button type="button" class="tab active" role="tab" aria-selected="true" data-brand-req-tab="internal" id="brand-req-tab-internal">Internally managed</button>
+        <button type="button" class="tab" role="tab" aria-selected="false" data-brand-req-tab="external" id="brand-req-tab-external">External requests</button>
+      </div>
+      <div class="requests-tab-panel" id="brand-requests-panel-internal" data-brand-req-panel="internal" role="tabpanel" aria-labelledby="brand-req-tab-internal">
+        <p class="requests-tab-hint">Athletes in your agency portfolio. Sponsorship proposals sent to them (by any brand) are delivered to both the athlete and you as management.</p>
+        <div class="requests-list" id="brand-requests-list-internal" data-role="brand"></div>
+      </div>
+      <div class="requests-tab-panel" id="brand-requests-panel-external" data-brand-req-panel="external" role="tabpanel" aria-labelledby="brand-req-tab-external" hidden>
+        <p class="requests-tab-hint">Proposals you’ve sent to athletes outside your portfolio — also delivered to that athlete’s management agency when one is tagged.</p>
+        <div class="requests-list" id="brand-requests-list-external" data-role="brand"></div>
+      </div>
     </div>
   </section>
 
@@ -1891,12 +1902,12 @@
     </div>
   </div>
 
-  <script src="sport-events-data.js?v=2026-09-30b"></script>
-  <script src="multisport-data.js?v=2026-09-30b"></script>
-  <script src="data.js?v=2026-09-30b"></script>
+  <script src="sport-events-data.js?v=2026-09-30d"></script>
+  <script src="multisport-data.js?v=2026-09-30d"></script>
+  <script src="data.js?v=2026-09-30d"></script>
   <script src="cricsheet-stats.js"></script>
   <script src="ipl-assistant.js"></script>
-  <script src="app.js?v=2026-09-30b"></script>
+  <script src="app.js?v=2026-09-30d"></script>
   <script src="demo-request.js?v=2026-09-05f"></script>
   <script>
   (function () {

@@ -1835,6 +1835,48 @@ body.has-sidebar .journey-screen.active { padding-left: 236px; }
   margin-top: 0.5rem;
 }
 
+.requests-tabs {
+  margin: 1rem 0 0.75rem;
+}
+
+.requests-tab-hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.requests-tab-panel[hidden] {
+  display: none !important;
+}
+
+.managed-athlete-reqs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.managed-athlete-reqs .request-card {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.managed-athlete-req {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.request-delivery {
+  color: var(--accent, #3dd6c6) !important;
+  font-weight: 500;
+}
+
 .request-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
