@@ -674,6 +674,7 @@
       athleteId: athleteId,
       athleteName: req.athleteName || '',
       athleteSport: req.athleteSport || '',
+      initiatedBy: req.initiatedBy || 'agency',
       status: 'pending',
       createdAt: new Date().toISOString()
     };
@@ -682,12 +683,14 @@
     return item;
   }
 
-  function updatePortfolioRequestStatus(id, status) {
+  function updatePortfolioRequestStatus(id, status, decidedBy) {
     var list = getPortfolioRequests();
     var updated = null;
     list = list.map(function (r) {
       if (r.id === id) {
         r.status = status;
+        r.decidedBy = decidedBy || 'admin';
+        r.decidedAt = new Date().toISOString();
         updated = r;
       }
       return r;

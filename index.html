@@ -566,7 +566,8 @@
             <div id="athlete-managed-by-agency-wrap" class="managed-by-agency-wrap" hidden>
               <input type="search" id="athlete-managed-by-input" class="managed-by-other-input" placeholder="Search registered agency…" autocomplete="off" />
               <div id="athlete-managed-by-results" class="managed-by-agency-results" role="listbox" hidden></div>
-              <p class="form-hint">Pick from brands / agencies created on the platform.</p>
+              <p class="form-hint">Pick from brands / agencies created on the platform. The agency or admin must approve before you join their portfolio.</p>
+              <p class="form-hint" id="athlete-managed-by-note" hidden></p>
             </div>
           </div>
           <div class="form-row">
@@ -783,6 +784,14 @@
           </div>
         </div>
       </div>
+
+      <section class="dashboard-section athlete-panel">
+        <div class="athlete-panel-head">
+          <h2>Agency requests</h2>
+          <span class="athlete-panel-note">Agencies asking to manage you, and requests you’ve sent</span>
+        </div>
+        <div id="athlete-agency-requests-list" class="brand-portfolio-requests"></div>
+      </section>
 
       <section class="dashboard-section athlete-panel">
         <div class="athlete-panel-head">
@@ -1352,7 +1361,7 @@
       <div class="brand-dashboard-header">
         <div>
           <h1>Agency dashboard</h1>
-          <p class="screen-desc" id="brand-dashboard-subtitle">Manage your athlete portfolio. Add athletes via request — admin approval required.</p>
+          <p class="screen-desc" id="brand-dashboard-subtitle">Manage your athlete portfolio. Add athletes via request — approval from the athlete or admin required.</p>
         </div>
         <button type="button" class="btn-primary" id="brand-portfolio-add-btn">+ Add athlete</button>
       </div>
@@ -1362,12 +1371,12 @@
           <span class="stat-label">In portfolio</span>
         </div>
         <div class="stat-card">
-          <span class="stat-value" id="brand-dash-pending-count">0</span>
-          <span class="stat-label">Pending requests</span>
+          <span class="stat-value" id="brand-dash-received-count">0</span>
+          <span class="stat-label">Requests received</span>
         </div>
         <div class="stat-card">
-          <span class="stat-value" id="brand-dash-agency-name">—</span>
-          <span class="stat-label">Agency</span>
+          <span class="stat-value" id="brand-dash-sent-count">0</span>
+          <span class="stat-label">Requests sent</span>
         </div>
       </div>
       <div class="dashboard-section">
@@ -1389,7 +1398,7 @@
       <button type="button" class="insight-modal-close" data-close-portfolio-add aria-label="Close">×</button>
       <p class="insight-modal-kicker">Portfolio</p>
       <h2 id="brand-portfolio-add-title" class="insight-modal-title">Add athlete</h2>
-      <p class="insight-modal-sub">Search a player and send a request. Admin will approve before they join your portfolio.</p>
+      <p class="insight-modal-sub">Search a player and send a request. The athlete or admin must approve before they join your portfolio.</p>
       <label class="portfolio-add-search-label" for="brand-portfolio-search-input">Search athlete</label>
       <input type="search" id="brand-portfolio-search-input" class="portfolio-add-search-input" placeholder="Name or sport…" autocomplete="off" />
       <div id="brand-portfolio-search-results" class="portfolio-add-results" role="listbox" aria-label="Athlete search results"></div>

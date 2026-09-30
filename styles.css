@@ -5239,6 +5239,14 @@ body.insight-modal-open {
   gap: 0.15rem;
   min-width: 0;
 }
+.brand-portfolio-req-row > .brand-portfolio-req-actions {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
 .brand-portfolio-card-main span,
 .brand-portfolio-req-row span:not(.badge) {
   font-size: 0.8125rem;
@@ -5316,13 +5324,6 @@ body.insight-modal-open {
 .badge.danger {
   background: rgba(239, 68, 68, 0.15);
   color: #f87171;
-}
-#brand-dash-agency-name {
-  font-size: 1.1rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
 }
 @media (max-width: 640px) {
   .brand-dashboard-header {

@@ -21,7 +21,7 @@
     athlete: {
       label: 'Athlete',
       items: [
-        { icon: '📊', label: 'Overview', screen: 'athlete-dashboard' },
+        { icon: '📊', label: 'Overview', screen: 'athlete-dashboard', badge: 'athlete-agency-requests' },
         { icon: '👤', label: 'Profile', screen: 'athlete-profile' },
         { icon: '🤝', label: 'Sponsorship Requests', screen: 'athlete-requests', badge: 'athlete-requests' }
       ]
@@ -38,7 +38,7 @@
     brand: {
       label: 'Brand / Agency',
       items: [
-        { icon: '📊', label: 'Dashboard', screen: 'brand-dashboard' },
+        { icon: '📊', label: 'Dashboard', screen: 'brand-dashboard', badge: 'agency-received-requests' },
         { icon: '🔍', label: 'Campaign Agent', screen: 'brand-discovery' },
         { icon: '🧠', label: 'Scouting Agent', screen: 'brand-intelligence' },
         { icon: '🤝', label: 'Sponsorship Requests', screen: 'brand-requests', badge: 'brand-requests' },
@@ -820,6 +820,7 @@
         hideAgencyResults();
         syncAthleteDashboardProfileExtras();
         updateAthleteProfileCompletion();
+        sendAthleteAgencyRequest(opt.getAttribute('data-agency-id'), name);
       });
     }
 
@@ -2624,6 +2625,18 @@
     if (key === 'portfolio-requests') {
       return window.ADC_DATA.getPortfolioRequests().filter(function (r) { return r.status === 'pending'; }).length;
     }
+    if (key === 'athlete-agency-requests') {
+      var athlete = getCurrentAthlete();
+      return athlete ? window.ADC_DATA.getPortfolioRequests().filter(function (r) {
+        return r.status === 'pending' && r.initiatedBy !== 'athlete' && parseInt(r.athleteId, 10) === athlete.id;
+      }).length : 0;
+    }
+    if (key === 'agency-received-requests') {
+      var agency = window.ADC_DATA.getCurrentAgency();
+      return agency ? window.ADC_DATA.getPortfolioRequests().filter(function (r) {
+        return r.status === 'pending' && r.initiatedBy === 'athlete' && r.agencyId === agency.id;
+      }).length : 0;
+    }
     var reqs = window.ADC_DATA.getSponsorshipRequests();
     if (key === 'brand-requests') return reqs.length;
     if (key === 'athlete-requests' || key === 'creator-requests') {
@@ -3539,6 +3552,128 @@
     }
   }
 
+  var DEMO_ATHLETE_NAME = 'V Suryavanshi';
+
+  function findAthleteByExactName(name) {
+    if (!name) return null;
+    return (window.ADC_DATA.getAthletes({
+      searchQuery: name,
+      nameOrSportOnly: true,
+      verifiedOnly: false
+    }) || []).filter(function (a) {
+      return String(a.name || '').toLowerCase() === name.toLowerCase();
+    })[0] || null;
+  }
+
+  function getCurrentAthlete() {
+    if (!window.ADC_DATA) return null;
+    var form = document.getElementById('form-athlete-profile');
+    var nameField = form && form.querySelector('[name="name"]');
+    var name = nameField ? nameField.value.trim() : '';
+    return findAthleteByExactName(name) || findAthleteByExactName(DEMO_ATHLETE_NAME);
+  }
+
+  function portfolioStatusBadgeHtml(r) {
+    var cls = r.status === 'approved' ? 'success' : (r.status === 'rejected' ? 'danger' : '');
+    var label = r.status + (r.decidedBy ? ' by ' + r.decidedBy : '');
+    return '<span class="badge ' + cls + '">' + escapeHtml(label) + '</span>';
+  }
+
+  function portfolioDecisionButtonsHtml(r, attr) {
+    return '<button type="button" class="btn-sm btn-primary" ' + attr + '="approved" data-portfolio-req-id="' + escapeHtml(r.id) + '">Approve</button>' +
+      '<button type="button" class="btn-sm btn-outline" ' + attr + '="rejected" data-portfolio-req-id="' + escapeHtml(r.id) + '">Decline</button>';
+  }
+
+  function setAthleteManagedByValue(name) {
+    var hidden = document.getElementById('athlete-managed-by-value');
+    var otherInput = document.getElementById('athlete-managed-by-input');
+    var modeGroup = document.getElementById('athlete-managed-by-mode');
+    var wrap = document.getElementById('athlete-managed-by-agency-wrap');
+    if (hidden) hidden.value = name;
+    if (otherInput) otherInput.value = name;
+    if (wrap) wrap.hidden = false;
+    if (modeGroup) {
+      modeGroup.querySelectorAll('[data-managed-by]').forEach(function (b) {
+        b.classList.toggle('is-selected', b.getAttribute('data-managed-by') === 'other');
+      });
+    }
+    syncAthleteDashboardProfileExtras();
+  }
+
+  function sendAthleteAgencyRequest(agencyId, agencyName) {
+    if (!window.ADC_DATA || !agencyId) return;
+    var note = document.getElementById('athlete-managed-by-note');
+    var athlete = getCurrentAthlete();
+    if (!athlete) return;
+    var message;
+    if (window.ADC_DATA.isAthleteInAgencyPortfolio(agencyId, athlete.id)) {
+      message = 'You’re already in ' + agencyName + '’s portfolio.';
+    } else {
+      var req = window.ADC_DATA.addPortfolioRequest({
+        agencyId: agencyId,
+        agencyName: agencyName,
+        athleteId: athlete.id,
+        athleteName: athlete.name,
+        athleteSport: athlete.sport || '',
+        initiatedBy: 'athlete'
+      });
+      message = req.initiatedBy === 'athlete'
+        ? 'Request sent to ' + agencyName + ' — awaiting approval from the agency or admin.'
+        : agencyName + ' has already asked to manage you — approve it under Agency requests on your Overview.';
+    }
+    if (note) {
+      note.hidden = false;
+      note.textContent = message;
+    }
+    renderAthleteAgencyRequests();
+    renderSidebar('athlete-profile');
+  }
+
+  function renderAthleteAgencyRequests() {
+    var listEl = document.getElementById('athlete-agency-requests-list');
+    if (!listEl || !window.ADC_DATA) return;
+    var athlete = getCurrentAthlete();
+    var reqs = athlete
+      ? window.ADC_DATA.getPortfolioRequests().filter(function (r) { return parseInt(r.athleteId, 10) === athlete.id; })
+      : [];
+    if (!reqs.length) {
+      listEl.innerHTML = '<div class="requests-empty">No agency requests yet. Choose an agency under <strong>Profile → Managed by</strong> to send one.</div>';
+      return;
+    }
+    listEl.innerHTML = reqs.slice(0, 8).map(function (r) {
+      var received = r.initiatedBy !== 'athlete';
+      var actionHtml;
+      if (r.status === 'pending' && received) {
+        actionHtml = portfolioDecisionButtonsHtml(r, 'data-athlete-portfolio-decision');
+      } else if (r.status === 'pending') {
+        actionHtml = '<span class="badge">Awaiting agency / admin</span>';
+      } else {
+        actionHtml = portfolioStatusBadgeHtml(r);
+      }
+      return '<div class="brand-portfolio-req-row">' +
+        '<div><strong>' + escapeHtml(r.agencyName || r.agencyId) + '</strong>' +
+          '<span>' + (received ? 'Request received · wants to add you to their portfolio' : 'Request sent · you asked to join their portfolio') + '</span>' +
+        '</div>' +
+        '<div class="brand-portfolio-req-actions">' + actionHtml + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function initAthleteAgencyRequests() {
+    var listEl = document.getElementById('athlete-agency-requests-list');
+    if (!listEl || listEl.getAttribute('data-bound')) return;
+    listEl.setAttribute('data-bound', '1');
+    listEl.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-athlete-portfolio-decision]');
+      if (!btn || !window.ADC_DATA) return;
+      var status = btn.getAttribute('data-athlete-portfolio-decision');
+      var updated = window.ADC_DATA.updatePortfolioRequestStatus(btn.getAttribute('data-portfolio-req-id'), status, 'athlete');
+      if (updated && status === 'approved' && updated.agencyName) setAthleteManagedByValue(updated.agencyName);
+      renderAthleteAgencyRequests();
+      renderSidebar('athlete-dashboard');
+    });
+  }
+
   function openPortfolioAddModal() {
     var modal = document.getElementById('brand-portfolio-add-modal');
     if (!modal) return;
@@ -3580,14 +3715,14 @@
     }
     resultsEl.innerHTML = athletes.map(function (a) {
       var inPortfolio = agency && window.ADC_DATA.isAthleteInAgencyPortfolio(agency.id, a.id);
-      var pending = agency && window.ADC_DATA.getPortfolioRequests().some(function (r) {
+      var pending = agency && window.ADC_DATA.getPortfolioRequests().filter(function (r) {
         return r.agencyId === agency.id && parseInt(r.athleteId, 10) === a.id && r.status === 'pending';
-      });
+      })[0];
       var actionHtml;
       if (inPortfolio) {
         actionHtml = '<span class="badge success">In portfolio</span>';
       } else if (pending) {
-        actionHtml = '<span class="badge">Request pending</span>';
+        actionHtml = '<span class="badge">' + (pending.initiatedBy === 'athlete' ? 'Request received' : 'Request sent') + '</span>';
       } else {
         actionHtml = '<button type="button" class="btn-sm btn-primary" data-portfolio-request="' + a.id + '">Request</button>';
       }
@@ -3626,7 +3761,7 @@
     var noteOk = document.getElementById('brand-portfolio-add-note');
     if (noteOk) {
       noteOk.hidden = false;
-      noteOk.textContent = 'Request sent for ' + athlete.name + ' — awaiting admin approval.';
+      noteOk.textContent = 'Request sent for ' + athlete.name + ' — awaiting approval from the athlete or admin.';
     }
     var input = document.getElementById('brand-portfolio-search-input');
     renderPortfolioAthleteSearch(input ? input.value : '');
@@ -3637,16 +3772,15 @@
   function renderBrandDashboard() {
     if (!window.ADC_DATA) return;
     var agency = ensureCurrentAgency();
-    var nameEl = document.getElementById('brand-dash-agency-name');
     var portCountEl = document.getElementById('brand-dash-portfolio-count');
-    var pendingCountEl = document.getElementById('brand-dash-pending-count');
+    var receivedCountEl = document.getElementById('brand-dash-received-count');
+    var sentCountEl = document.getElementById('brand-dash-sent-count');
     var listEl = document.getElementById('brand-portfolio-list');
     var reqListEl = document.getElementById('brand-portfolio-requests-list');
     var subEl = document.getElementById('brand-dashboard-subtitle');
 
-    if (nameEl) nameEl.textContent = agency ? agency.name : '—';
     if (subEl && agency) {
-      subEl.textContent = agency.name + ' · Add athletes to your portfolio. Requests need admin approval.';
+      subEl.textContent = agency.name + ' · Add athletes to your portfolio. Requests need approval from the athlete or admin.';
     }
 
     var ids = agency ? window.ADC_DATA.getAgencyPortfolioAthleteIds(agency.id) : [];
@@ -3656,7 +3790,9 @@
       ? window.ADC_DATA.getPortfolioRequests().filter(function (r) { return r.agencyId === agency.id; })
       : [];
     var pending = myReqs.filter(function (r) { return r.status === 'pending'; });
-    if (pendingCountEl) pendingCountEl.textContent = String(pending.length);
+    var received = pending.filter(function (r) { return r.initiatedBy === 'athlete'; });
+    if (receivedCountEl) receivedCountEl.textContent = String(received.length);
+    if (sentCountEl) sentCountEl.textContent = String(pending.length - received.length);
 
     if (listEl) {
       if (!ids.length) {
@@ -3682,12 +3818,21 @@
         reqListEl.innerHTML = '<div class="requests-empty">No portfolio requests yet.</div>';
       } else {
         reqListEl.innerHTML = myReqs.slice(0, 8).map(function (r) {
-          var statusClass = r.status === 'approved' ? 'success' : (r.status === 'rejected' ? 'danger' : '');
+          var isReceived = r.initiatedBy === 'athlete';
+          var actionHtml;
+          if (r.status === 'pending' && isReceived) {
+            actionHtml = portfolioDecisionButtonsHtml(r, 'data-agency-portfolio-decision');
+          } else if (r.status === 'pending') {
+            actionHtml = '<span class="badge">Awaiting athlete / admin</span>';
+          } else {
+            actionHtml = portfolioStatusBadgeHtml(r);
+          }
+          var meta = [isReceived ? 'Request received' : 'Request sent', r.athleteSport].filter(Boolean).join(' · ');
           return '<div class="brand-portfolio-req-row">' +
             '<div><strong>' + escapeHtml(r.athleteName) + '</strong>' +
-              (r.athleteSport ? '<span> · ' + escapeHtml(r.athleteSport) + '</span>' : '') +
+              '<span>' + escapeHtml(meta) + '</span>' +
             '</div>' +
-            '<span class="badge ' + statusClass + '">' + escapeHtml(r.status) + '</span>' +
+            '<div class="brand-portfolio-req-actions">' + actionHtml + '</div>' +
           '</div>';
         }).join('');
       }
@@ -3735,6 +3880,21 @@
         openAthleteProfile(id, 'brand-dashboard');
       });
     }
+    var reqListEl = document.getElementById('brand-portfolio-requests-list');
+    if (reqListEl && !reqListEl.getAttribute('data-bound')) {
+      reqListEl.setAttribute('data-bound', '1');
+      reqListEl.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-agency-portfolio-decision]');
+        if (!btn || !window.ADC_DATA) return;
+        window.ADC_DATA.updatePortfolioRequestStatus(
+          btn.getAttribute('data-portfolio-req-id'),
+          btn.getAttribute('data-agency-portfolio-decision'),
+          'agency'
+        );
+        renderBrandDashboard();
+        renderSidebar('brand-dashboard');
+      });
+    }
   }
 
   function renderAdminCompanies() {
@@ -3774,7 +3934,7 @@
         actions = '<span class="badge ' + cls + '">' + escapeHtml(r.status) + '</span>';
       }
       return '<tr>' +
-        '<td>' + escapeHtml(r.agencyName || r.agencyId) + '</td>' +
+        '<td>' + escapeHtml(r.agencyName || r.agencyId) + '<div class="admin-cell-meta">' + (r.initiatedBy === 'athlete' ? 'Sent by athlete' : 'Sent by agency') + '</div></td>' +
         '<td>' + escapeHtml(r.athleteName) + (r.athleteSport ? '<div class="admin-cell-meta">' + escapeHtml(r.athleteSport) + '</div>' : '') + '</td>' +
         '<td><span class="badge">' + escapeHtml(r.status) + '</span></td>' +
         '<td>' + actions + '</td>' +
@@ -3806,7 +3966,7 @@
         if (!btn) return;
         var id = btn.getAttribute('data-portfolio-req-id');
         var status = btn.getAttribute('data-portfolio-admin');
-        if (window.ADC_DATA) window.ADC_DATA.updatePortfolioRequestStatus(id, status);
+        if (window.ADC_DATA) window.ADC_DATA.updatePortfolioRequestStatus(id, status, 'admin');
         renderAdminPortfolioRequests();
         renderAdminCompanies();
         renderSidebar('admin-brand-governance');
@@ -4213,6 +4373,8 @@
       syncAthleteDashboardProfileExtras();
       initAthleteManagedByControl();
       initAthleteFitnessTrackers();
+      initAthleteAgencyRequests();
+      renderAthleteAgencyRequests();
     } else if (screenId === 'brand-dashboard') {
       initBrandDashboard();
       renderBrandDashboard();
