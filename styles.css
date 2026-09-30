@@ -5329,3 +5329,61 @@ body.insight-modal-open {
     flex-direction: column;
   }
 }
+
+/* Athlete fitness tracker connections */
+.fitness-trackers-intro {
+  margin: -0.25rem 0 0.85rem;
+}
+.fitness-tracker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+.fitness-tracker-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.85rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card, rgba(255, 255, 255, 0.02));
+}
+.fitness-tracker-card.is-connected {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px rgba(61, 214, 198, 0.25);
+}
+.fitness-tracker-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+.fitness-tracker-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+.fitness-tracker-brand strong {
+  display: block;
+  font-size: 0.9rem;
+}
+.fitness-tracker-brand span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+.fitness-consent-row {
+  margin-top: 0.25rem;
+}
+.athlete-score-chip--trackers strong {
+  font-size: 0.95rem;
+  line-height: 1.2;
+}

@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2026-09-30d" />
+  <link rel="stylesheet" href="styles.css?v=2026-09-30e" />
 </head>
 <body>
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -591,6 +591,81 @@
           </div>
         </fieldset>
 
+        <fieldset class="form-section" id="athlete-fitness-trackers-section">
+          <legend>Fitness trackers &amp; health data</legend>
+          <p class="form-hint fitness-trackers-intro">Connect a wearable so ADC can collect recovery, load, sleep and readiness signals for your fitness score and brand readiness.</p>
+          <input type="hidden" name="fitnessTrackers" id="athlete-fitness-trackers-value" data-profile-field value="" />
+          <div class="fitness-tracker-grid" id="athlete-fitness-tracker-grid" role="list">
+            <article class="fitness-tracker-card" data-tracker="fitbit" role="listitem">
+              <div class="fitness-tracker-brand">
+                <span class="fitness-tracker-icon" aria-hidden="true">⌚</span>
+                <div>
+                  <strong>Fitbit</strong>
+                  <span>Activity, HR, sleep</span>
+                </div>
+              </div>
+              <button type="button" class="btn-sm btn-primary" data-tracker-connect="fitbit">Connect</button>
+            </article>
+            <article class="fitness-tracker-card" data-tracker="apple" role="listitem">
+              <div class="fitness-tracker-brand">
+                <span class="fitness-tracker-icon" aria-hidden="true"></span>
+                <div>
+                  <strong>Apple Watch</strong>
+                  <span>Apple Health</span>
+                </div>
+              </div>
+              <button type="button" class="btn-sm btn-primary" data-tracker-connect="apple">Connect</button>
+            </article>
+            <article class="fitness-tracker-card" data-tracker="garmin" role="listitem">
+              <div class="fitness-tracker-brand">
+                <span class="fitness-tracker-icon" aria-hidden="true">◎</span>
+                <div>
+                  <strong>Garmin</strong>
+                  <span>Training load, VO₂</span>
+                </div>
+              </div>
+              <button type="button" class="btn-sm btn-primary" data-tracker-connect="garmin">Connect</button>
+            </article>
+            <article class="fitness-tracker-card" data-tracker="googlefit" role="listitem">
+              <div class="fitness-tracker-brand">
+                <span class="fitness-tracker-icon" aria-hidden="true">▶</span>
+                <div>
+                  <strong>Google Fit</strong>
+                  <span>Android health sync</span>
+                </div>
+              </div>
+              <button type="button" class="btn-sm btn-primary" data-tracker-connect="googlefit">Connect</button>
+            </article>
+            <article class="fitness-tracker-card" data-tracker="whoop" role="listitem">
+              <div class="fitness-tracker-brand">
+                <span class="fitness-tracker-icon" aria-hidden="true">◆</span>
+                <div>
+                  <strong>WHOOP</strong>
+                  <span>Strain &amp; recovery</span>
+                </div>
+              </div>
+              <button type="button" class="btn-sm btn-primary" data-tracker-connect="whoop">Connect</button>
+            </article>
+            <article class="fitness-tracker-card" data-tracker="samsung" role="listitem">
+              <div class="fitness-tracker-brand">
+                <span class="fitness-tracker-icon" aria-hidden="true">◈</span>
+                <div>
+                  <strong>Samsung Health</strong>
+                  <span>Galaxy Watch</span>
+                </div>
+              </div>
+              <button type="button" class="btn-sm btn-primary" data-tracker-connect="samsung">Connect</button>
+            </article>
+          </div>
+          <div class="form-row checkbox-row fitness-consent-row">
+            <label class="checkbox-label">
+              <input type="checkbox" name="healthDataConsent" id="athlete-health-data-consent" data-profile-check />
+              I consent to ADC collecting and processing health &amp; fitness data from connected trackers for my profile and brand readiness insights.
+            </label>
+          </div>
+          <p class="form-hint" id="athlete-fitness-tracker-status">No trackers connected yet.</p>
+        </fieldset>
+
         <fieldset class="form-section">
           <legend>Social media profiles</legend>
           <div class="form-row two-cols">
@@ -700,6 +775,10 @@
             <div class="athlete-score-chip">
               <strong id="dashboard-commercial-range">—</strong>
               <span>Commercial value</span>
+            </div>
+            <div class="athlete-score-chip athlete-score-chip--trackers">
+              <strong id="dashboard-fitness-trackers">None</strong>
+              <span>Health trackers</span>
             </div>
           </div>
         </div>
@@ -1902,12 +1981,12 @@
     </div>
   </div>
 
-  <script src="sport-events-data.js?v=2026-09-30d"></script>
-  <script src="multisport-data.js?v=2026-09-30d"></script>
-  <script src="data.js?v=2026-09-30d"></script>
+  <script src="sport-events-data.js?v=2026-09-30e"></script>
+  <script src="multisport-data.js?v=2026-09-30e"></script>
+  <script src="data.js?v=2026-09-30e"></script>
   <script src="cricsheet-stats.js"></script>
   <script src="ipl-assistant.js"></script>
-  <script src="app.js?v=2026-09-30d"></script>
+  <script src="app.js?v=2026-09-30e"></script>
   <script src="demo-request.js?v=2026-09-05f"></script>
   <script>
   (function () {

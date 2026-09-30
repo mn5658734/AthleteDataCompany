@@ -613,6 +613,114 @@
     return 'Not quoted';
   }
 
+  var FITNESS_TRACKER_META = {
+    fitbit: { label: 'Fitbit' },
+    apple: { label: 'Apple Watch' },
+    garmin: { label: 'Garmin' },
+    googlefit: { label: 'Google Fit' },
+    whoop: { label: 'WHOOP' },
+    samsung: { label: 'Samsung Health' }
+  };
+  var FITNESS_TRACKERS_KEY = 'adc_athlete_fitness_trackers';
+
+  function getConnectedFitnessTrackers() {
+    try {
+      var raw = localStorage.getItem(FITNESS_TRACKERS_KEY);
+      var list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch (e) { return []; }
+  }
+
+  function setConnectedFitnessTrackers(ids) {
+    try {
+      localStorage.setItem(FITNESS_TRACKERS_KEY, JSON.stringify(ids || []));
+    } catch (e) {}
+    var hidden = document.getElementById('athlete-fitness-trackers-value');
+    if (hidden) {
+      hidden.value = (ids || []).join(',');
+    }
+  }
+
+  function syncFitnessTrackerUI() {
+    var connected = getConnectedFitnessTrackers();
+    setConnectedFitnessTrackers(connected);
+    var grid = document.getElementById('athlete-fitness-tracker-grid');
+    if (grid) {
+      grid.querySelectorAll('[data-tracker]').forEach(function (card) {
+        var id = card.getAttribute('data-tracker');
+        var isOn = connected.indexOf(id) !== -1;
+        card.classList.toggle('is-connected', isOn);
+        var btn = card.querySelector('[data-tracker-connect]');
+        if (btn) {
+          btn.textContent = isOn ? 'Disconnect' : 'Connect';
+          btn.classList.toggle('btn-primary', !isOn);
+          btn.classList.toggle('btn-outline', isOn);
+          btn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+        }
+      });
+    }
+    var statusEl = document.getElementById('athlete-fitness-tracker-status');
+    if (statusEl) {
+      if (!connected.length) {
+        statusEl.textContent = 'No trackers connected yet.';
+      } else {
+        var names = connected.map(function (id) {
+          return (FITNESS_TRACKER_META[id] && FITNESS_TRACKER_META[id].label) || id;
+        });
+        statusEl.textContent = 'Connected · ADC can collect health data from: ' + names.join(', ') + '.';
+      }
+    }
+    var dashEl = document.getElementById('dashboard-fitness-trackers');
+    if (dashEl) {
+      if (!connected.length) dashEl.textContent = 'None';
+      else if (connected.length === 1) {
+        dashEl.textContent = (FITNESS_TRACKER_META[connected[0]] && FITNESS_TRACKER_META[connected[0]].label) || '1 connected';
+      } else {
+        dashEl.textContent = connected.length + ' connected';
+      }
+    }
+  }
+
+  function toggleFitnessTracker(trackerId) {
+    if (!trackerId || !FITNESS_TRACKER_META[trackerId]) return;
+    var consent = document.getElementById('athlete-health-data-consent');
+    var connected = getConnectedFitnessTrackers();
+    var idx = connected.indexOf(trackerId);
+    if (idx === -1) {
+      if (consent && !consent.checked) {
+        consent.checked = true;
+      }
+      connected.push(trackerId);
+      var statusEl = document.getElementById('athlete-fitness-tracker-status');
+      if (statusEl) {
+        statusEl.textContent = (FITNESS_TRACKER_META[trackerId].label || trackerId) +
+          ' connected — ADC will sync health metrics (prototype).';
+      }
+    } else {
+      connected.splice(idx, 1);
+    }
+    setConnectedFitnessTrackers(connected);
+    syncFitnessTrackerUI();
+    updateAthleteProfileCompletion();
+    syncAthleteDashboardProfileExtras();
+  }
+
+  function initAthleteFitnessTrackers() {
+    var grid = document.getElementById('athlete-fitness-tracker-grid');
+    if (!grid || grid.getAttribute('data-bound')) {
+      syncFitnessTrackerUI();
+      return;
+    }
+    grid.setAttribute('data-bound', '1');
+    grid.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-tracker-connect]');
+      if (!btn) return;
+      e.preventDefault();
+      toggleFitnessTracker(btn.getAttribute('data-tracker-connect'));
+    });
+    syncFitnessTrackerUI();
+  }
+
   function syncAthleteDashboardProfileExtras() {
     var form = document.getElementById('form-athlete-profile');
     var managedEl = document.getElementById('athlete-dashboard-managed-by');
@@ -759,6 +867,7 @@
     }
 
     initAthleteManagedByControl();
+    initAthleteFitnessTrackers();
     updateAthleteProfileCompletion();
     syncAthleteDashboardProfileExtras();
   }
@@ -4103,6 +4212,7 @@
       updateAthleteProfileCompletion();
       syncAthleteDashboardProfileExtras();
       initAthleteManagedByControl();
+      initAthleteFitnessTrackers();
     } else if (screenId === 'brand-dashboard') {
       initBrandDashboard();
       renderBrandDashboard();
