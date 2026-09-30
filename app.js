@@ -4,13 +4,13 @@
  */
 
 (function () {
-  var PERSONA_START = { athlete: 'athlete-profile', brand: 'brand-register', admin: 'admin-login', creator: 'creator-register' };
+  var PERSONA_START = { athlete: 'athlete-profile', brand: 'brand-dashboard', admin: 'admin-login', creator: 'creator-register' };
   var PERSONA_LABELS = { athlete: 'Athlete', brand: 'Brand / Agency', admin: 'Admin', creator: 'Sports Content Creator' };
   var BREADCRUMBS = {
     'data': 'Scoring Data',
     'athlete-register': 'Profile', 'athlete-profile': 'Edit profile', 'athlete-dashboard': 'Overview', 'athlete-requests': 'Sponsorship requests',
     'creator-register': 'Registration', 'creator-profile': 'Profile', 'creator-dashboard': 'Dashboard', 'creator-requests': 'Brand requests',
-    'brand-register': 'Registration', 'brand-discovery': 'Campaign Agent', 'brand-intelligence': 'Scouting Agent',
+    'brand-register': 'Registration', 'brand-dashboard': 'Dashboard', 'brand-discovery': 'Campaign Agent', 'brand-intelligence': 'Scouting Agent',
     'brand-athlete-profile': 'Athlete profile',
     'brand-inquiry': 'Send inquiry', 'brand-proposal': 'Create proposal', 'brand-requests': 'Sponsorship requests', 'brand-shortlist': 'Shortlist',
     'admin-login': 'Login', 'admin-athlete-governance': 'Athlete governance', 'admin-brand-governance': 'Brand governance', 'admin-revenue': 'Revenue dashboard'
@@ -38,6 +38,7 @@
     brand: {
       label: 'Brand / Agency',
       items: [
+        { icon: '📊', label: 'Dashboard', screen: 'brand-dashboard' },
         { icon: '🔍', label: 'Campaign Agent', screen: 'brand-discovery' },
         { icon: '🧠', label: 'Scouting Agent', screen: 'brand-intelligence' },
         { icon: '🤝', label: 'Sponsorship Requests', screen: 'brand-requests', badge: 'brand-requests' },
@@ -49,7 +50,7 @@
       label: 'Admin Console',
       items: [
         { icon: '🛡️', label: 'Athlete Governance', screen: 'admin-athlete-governance' },
-        { icon: '🏢', label: 'Brand Governance', screen: 'admin-brand-governance' },
+        { icon: '🏢', label: 'Brand Governance', screen: 'admin-brand-governance', badge: 'portfolio-requests' },
         { icon: '💹', label: 'Revenue Dashboard', screen: 'admin-revenue' }
       ]
     }
@@ -492,6 +493,8 @@
       btn.textContent = '← Back to Campaign Agent';
     } else if (ret === 'brand-shortlist') {
       btn.textContent = '← Back to Shortlist';
+    } else if (ret === 'brand-dashboard') {
+      btn.textContent = '← Back to Dashboard';
     } else {
       btn.textContent = '← Back';
     }
@@ -628,21 +631,49 @@
     var modeGroup = document.getElementById('athlete-managed-by-mode');
     var hidden = document.getElementById('athlete-managed-by-value');
     var otherInput = document.getElementById('athlete-managed-by-input');
+    var wrap = document.getElementById('athlete-managed-by-agency-wrap');
+    var resultsEl = document.getElementById('athlete-managed-by-results');
     if (!modeGroup || !hidden || modeGroup.getAttribute('data-bound')) return;
     modeGroup.setAttribute('data-bound', '1');
+
+    function hideAgencyResults() {
+      if (resultsEl) {
+        resultsEl.hidden = true;
+        resultsEl.innerHTML = '';
+      }
+    }
+
+    function renderAgencyResults(query) {
+      if (!resultsEl || !window.ADC_DATA) return;
+      var list = window.ADC_DATA.searchAgencies(query || '');
+      if (!list.length) {
+        resultsEl.innerHTML = '<div class="managed-by-agency-empty">No matching agencies. Register a brand/agency first.</div>';
+        resultsEl.hidden = false;
+        return;
+      }
+      resultsEl.innerHTML = list.map(function (a) {
+        return '<button type="button" class="managed-by-agency-option" role="option" data-agency-id="' + escapeHtml(a.id) + '" data-agency-name="' + escapeHtml(a.name) + '">' +
+          '<strong>' + escapeHtml(a.name) + '</strong>' +
+          '<span>' + escapeHtml(a.type === 'brand' ? 'Brand' : 'Agency') + (a.email ? ' · ' + escapeHtml(a.email) : '') + '</span>' +
+          '</button>';
+      }).join('');
+      resultsEl.hidden = false;
+    }
 
     function applyMode(mode, keepText) {
       var isSelf = mode === 'SELF';
       modeGroup.querySelectorAll('[data-managed-by]').forEach(function (b) {
         b.classList.toggle('is-selected', b.getAttribute('data-managed-by') === (isSelf ? 'SELF' : 'other'));
       });
+      if (wrap) wrap.hidden = isSelf;
       if (otherInput) {
-        otherInput.hidden = isSelf;
         if (isSelf) {
           hidden.value = 'SELF';
+          hideAgencyResults();
         } else {
           if (!keepText) otherInput.focus();
           hidden.value = (otherInput.value || '').trim() || '';
+          renderAgencyResults(otherInput.value || '');
         }
       } else {
         hidden.value = isSelf ? 'SELF' : hidden.value;
@@ -660,17 +691,39 @@
     if (otherInput) {
       otherInput.addEventListener('input', function () {
         hidden.value = otherInput.value.trim();
+        renderAgencyResults(otherInput.value);
+        syncAthleteDashboardProfileExtras();
+        updateAthleteProfileCompletion();
+      });
+      otherInput.addEventListener('focus', function () {
+        renderAgencyResults(otherInput.value);
+      });
+    }
+
+    if (resultsEl) {
+      resultsEl.addEventListener('click', function (e) {
+        var opt = e.target.closest('[data-agency-name]');
+        if (!opt) return;
+        var name = opt.getAttribute('data-agency-name') || '';
+        if (otherInput) otherInput.value = name;
+        hidden.value = name;
+        hideAgencyResults();
         syncAthleteDashboardProfileExtras();
         updateAthleteProfileCompletion();
       });
     }
+
+    document.addEventListener('click', function (e) {
+      if (!wrap || wrap.hidden) return;
+      if (wrap.contains(e.target)) return;
+      hideAgencyResults();
+    });
 
     // Restore UI from saved hidden value
     var current = (hidden.value || 'SELF').trim();
     if (current && !/^self$/i.test(current)) {
       if (otherInput) {
         otherInput.value = current;
-        otherInput.hidden = false;
       }
       applyMode('other', true);
     } else {
@@ -2387,7 +2440,10 @@
     }
     var managedEl = document.getElementById('brand-profile-managed-by');
     if (managedEl) {
-      managedEl.textContent = 'Managed by · ' + formatManagedByLabel(athlete.managedBy || 'SELF');
+      var managedOverride = window.ADC_DATA.getAthleteManagedByOverride
+        ? window.ADC_DATA.getAthleteManagedByOverride(athlete.id)
+        : '';
+      managedEl.textContent = 'Managed by · ' + formatManagedByLabel(managedOverride || athlete.managedBy || 'SELF');
     }
     if (btnShortlist) {
       var inList = window.ADC_DATA.isInShortlist(athlete.id);
@@ -2454,6 +2510,9 @@
   function getBadgeCount(key) {
     if (!window.ADC_DATA) return 0;
     if (key === 'shortlist') return window.ADC_DATA.getShortlist().length;
+    if (key === 'portfolio-requests') {
+      return window.ADC_DATA.getPortfolioRequests().filter(function (r) { return r.status === 'pending'; }).length;
+    }
     var reqs = window.ADC_DATA.getSponsorshipRequests();
     if (key === 'brand-requests') return reqs.length;
     if (key === 'athlete-requests' || key === 'creator-requests') {
@@ -3039,6 +3098,394 @@
     container.innerHTML = reqs.map(function (r) { return buildRequestCardHtml(r, role); }).join('');
   }
 
+  function ensureCurrentAgency() {
+    if (!window.ADC_DATA) return null;
+    var agency = window.ADC_DATA.getCurrentAgency();
+    if (agency) return agency;
+    var email = '';
+    try { email = sessionStorage.getItem('adc_login_email') || ''; } catch (e) {}
+    if (email) {
+      agency = window.ADC_DATA.findAgencyByEmail(email);
+      if (agency) {
+        window.ADC_DATA.setCurrentAgencyId(agency.id);
+        return agency;
+      }
+      agency = window.ADC_DATA.upsertAgency({
+        name: email.split('@')[0] || 'My Agency',
+        email: email,
+        type: 'agency',
+        plan: 'pro'
+      });
+      window.ADC_DATA.setCurrentAgencyId(agency.id);
+      return agency;
+    }
+    var list = window.ADC_DATA.getAgencies();
+    if (list && list[0]) {
+      window.ADC_DATA.setCurrentAgencyId(list[0].id);
+      return list[0];
+    }
+    return null;
+  }
+
+  function saveBrandRegistration() {
+    if (!window.ADC_DATA) return null;
+    var nameEl = document.getElementById('brand-register-name');
+    var emailEl = document.getElementById('brand-register-email');
+    var name = nameEl && nameEl.value ? nameEl.value.trim() : '';
+    var email = emailEl && emailEl.value ? emailEl.value.trim() : '';
+    if (!email) {
+      try { email = sessionStorage.getItem('adc_login_email') || ''; } catch (e) {}
+    }
+    var typeBtn = document.querySelector('#brand-register-type .is-selected[data-account-type]');
+    var type = typeBtn ? typeBtn.getAttribute('data-account-type') : 'agency';
+    var planEl = document.querySelector('#form-brand-register input[name="plan"]:checked');
+    var plan = planEl ? planEl.value : 'pro';
+    if (!name) {
+      var note = document.getElementById('brand-register-note');
+      if (note) {
+        note.hidden = false;
+        note.textContent = 'Please enter a company / agency name.';
+      }
+      if (nameEl) nameEl.focus();
+      return null;
+    }
+    var agency = window.ADC_DATA.upsertAgency({ name: name, email: email, type: type, plan: plan });
+    window.ADC_DATA.setCurrentAgencyId(agency.id);
+    try {
+      if (email) sessionStorage.setItem('adc_login_email', email);
+    } catch (e) {}
+    var noteOk = document.getElementById('brand-register-note');
+    if (noteOk) {
+      noteOk.hidden = false;
+      noteOk.textContent = 'Saved — "' + agency.name + '" is now searchable under Managed by.';
+    }
+    return agency;
+  }
+
+  function initBrandRegisterForm() {
+    var typeGroup = document.getElementById('brand-register-type');
+    if (typeGroup && !typeGroup.getAttribute('data-bound')) {
+      typeGroup.setAttribute('data-bound', '1');
+      typeGroup.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-account-type]');
+        if (!btn) return;
+        typeGroup.querySelectorAll('[data-account-type]').forEach(function (b) {
+          b.classList.toggle('is-selected', b === btn);
+        });
+      });
+    }
+    var continueBtn = document.getElementById('brand-register-continue-btn');
+    if (continueBtn && !continueBtn.getAttribute('data-bound')) {
+      continueBtn.setAttribute('data-bound', '1');
+      continueBtn.addEventListener('click', function () {
+        if (saveBrandRegistration()) showScreen('brand-dashboard');
+      });
+    }
+    var verifyBtn = document.getElementById('brand-register-verify-btn');
+    if (verifyBtn && !verifyBtn.getAttribute('data-bound')) {
+      verifyBtn.setAttribute('data-bound', '1');
+      verifyBtn.addEventListener('click', function () {
+        var agency = saveBrandRegistration();
+        var note = document.getElementById('brand-register-note');
+        if (agency && note) {
+          note.hidden = false;
+          note.textContent = 'Verification requested for "' + agency.name + '". You can continue to the dashboard.';
+        }
+      });
+    }
+    // Prefill email from login session
+    var emailEl = document.getElementById('brand-register-email');
+    if (emailEl && !emailEl.value) {
+      try {
+        var loginEmail = sessionStorage.getItem('adc_login_email') || '';
+        if (loginEmail) emailEl.value = loginEmail;
+      } catch (e) {}
+    }
+    var agency = window.ADC_DATA && window.ADC_DATA.getCurrentAgency();
+    if (agency) {
+      var nameEl = document.getElementById('brand-register-name');
+      if (nameEl && !nameEl.value) nameEl.value = agency.name || '';
+      if (emailEl && !emailEl.value && agency.email) emailEl.value = agency.email;
+    }
+  }
+
+  function openPortfolioAddModal() {
+    var modal = document.getElementById('brand-portfolio-add-modal');
+    if (!modal) return;
+    modal.hidden = false;
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('insight-modal-open');
+    var input = document.getElementById('brand-portfolio-search-input');
+    var note = document.getElementById('brand-portfolio-add-note');
+    if (note) { note.hidden = true; note.textContent = ''; }
+    if (input) {
+      input.value = '';
+      input.focus();
+    }
+    renderPortfolioAthleteSearch('');
+  }
+
+  function closePortfolioAddModal() {
+    var modal = document.getElementById('brand-portfolio-add-modal');
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('insight-modal-open');
+  }
+
+  function renderPortfolioAthleteSearch(query) {
+    var resultsEl = document.getElementById('brand-portfolio-search-results');
+    if (!resultsEl || !window.ADC_DATA) return;
+    var agency = ensureCurrentAgency();
+    var q = String(query || '').trim();
+    var athletes = window.ADC_DATA.getAthletes({
+      searchQuery: q,
+      nameOrSportOnly: true,
+      verifiedOnly: false
+    }) || [];
+    athletes = athletes.slice(0, 8);
+    if (!athletes.length) {
+      resultsEl.innerHTML = '<div class="portfolio-add-empty">' + (q ? 'No athletes match that search.' : 'Type a name to search athletes.') + '</div>';
+      return;
+    }
+    resultsEl.innerHTML = athletes.map(function (a) {
+      var inPortfolio = agency && window.ADC_DATA.isAthleteInAgencyPortfolio(agency.id, a.id);
+      var pending = agency && window.ADC_DATA.getPortfolioRequests().some(function (r) {
+        return r.agencyId === agency.id && parseInt(r.athleteId, 10) === a.id && r.status === 'pending';
+      });
+      var actionHtml;
+      if (inPortfolio) {
+        actionHtml = '<span class="badge success">In portfolio</span>';
+      } else if (pending) {
+        actionHtml = '<span class="badge">Request pending</span>';
+      } else {
+        actionHtml = '<button type="button" class="btn-sm btn-primary" data-portfolio-request="' + a.id + '">Request</button>';
+      }
+      var meta = [a.sport, a.role, a.teamShort || a.team].filter(Boolean).join(' · ');
+      return '<div class="portfolio-add-row" role="option">' +
+        '<div class="portfolio-add-row-main">' +
+          '<strong>' + escapeHtml(a.name) + '</strong>' +
+          (meta ? '<span>' + escapeHtml(meta) + '</span>' : '') +
+        '</div>' +
+        '<div class="portfolio-add-row-action">' + actionHtml + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function requestAddAthleteToPortfolio(athleteId) {
+    if (!window.ADC_DATA) return;
+    var agency = ensureCurrentAgency();
+    if (!agency) {
+      var note = document.getElementById('brand-portfolio-add-note');
+      if (note) {
+        note.hidden = false;
+        note.textContent = 'Register your agency under Account first.';
+      }
+      return;
+    }
+    var athlete = window.ADC_DATA.getAthleteById(parseInt(athleteId, 10));
+    if (!athlete) return;
+    if (window.ADC_DATA.isAthleteInAgencyPortfolio(agency.id, athlete.id)) return;
+    window.ADC_DATA.addPortfolioRequest({
+      agencyId: agency.id,
+      agencyName: agency.name,
+      athleteId: athlete.id,
+      athleteName: athlete.name,
+      athleteSport: athlete.sport || ''
+    });
+    var noteOk = document.getElementById('brand-portfolio-add-note');
+    if (noteOk) {
+      noteOk.hidden = false;
+      noteOk.textContent = 'Request sent for ' + athlete.name + ' — awaiting admin approval.';
+    }
+    var input = document.getElementById('brand-portfolio-search-input');
+    renderPortfolioAthleteSearch(input ? input.value : '');
+    renderBrandDashboard();
+    renderSidebar('brand-dashboard');
+  }
+
+  function renderBrandDashboard() {
+    if (!window.ADC_DATA) return;
+    var agency = ensureCurrentAgency();
+    var nameEl = document.getElementById('brand-dash-agency-name');
+    var portCountEl = document.getElementById('brand-dash-portfolio-count');
+    var pendingCountEl = document.getElementById('brand-dash-pending-count');
+    var listEl = document.getElementById('brand-portfolio-list');
+    var reqListEl = document.getElementById('brand-portfolio-requests-list');
+    var subEl = document.getElementById('brand-dashboard-subtitle');
+
+    if (nameEl) nameEl.textContent = agency ? agency.name : '—';
+    if (subEl && agency) {
+      subEl.textContent = agency.name + ' · Add athletes to your portfolio. Requests need admin approval.';
+    }
+
+    var ids = agency ? window.ADC_DATA.getAgencyPortfolioAthleteIds(agency.id) : [];
+    if (portCountEl) portCountEl.textContent = String(ids.length);
+
+    var myReqs = agency
+      ? window.ADC_DATA.getPortfolioRequests().filter(function (r) { return r.agencyId === agency.id; })
+      : [];
+    var pending = myReqs.filter(function (r) { return r.status === 'pending'; });
+    if (pendingCountEl) pendingCountEl.textContent = String(pending.length);
+
+    if (listEl) {
+      if (!ids.length) {
+        listEl.innerHTML = '<div class="requests-empty">No athletes in your portfolio yet. Click <strong>+ Add athlete</strong> to search and send a request.</div>';
+      } else {
+        listEl.innerHTML = ids.map(function (id) {
+          var a = window.ADC_DATA.getAthleteById(id);
+          if (!a) return '';
+          var meta = [a.sport, a.role, a.teamShort || a.team].filter(Boolean).join(' · ');
+          return '<div class="brand-portfolio-card" data-athlete-id="' + a.id + '">' +
+            '<div class="brand-portfolio-card-main">' +
+              '<strong>' + escapeHtml(a.name) + '</strong>' +
+              (meta ? '<span>' + escapeHtml(meta) + '</span>' : '') +
+            '</div>' +
+            '<button type="button" class="btn-sm btn-outline" data-portfolio-view="' + a.id + '">View</button>' +
+          '</div>';
+        }).join('');
+      }
+    }
+
+    if (reqListEl) {
+      if (!myReqs.length) {
+        reqListEl.innerHTML = '<div class="requests-empty">No portfolio requests yet.</div>';
+      } else {
+        reqListEl.innerHTML = myReqs.slice(0, 8).map(function (r) {
+          var statusClass = r.status === 'approved' ? 'success' : (r.status === 'rejected' ? 'danger' : '');
+          return '<div class="brand-portfolio-req-row">' +
+            '<div><strong>' + escapeHtml(r.athleteName) + '</strong>' +
+              (r.athleteSport ? '<span> · ' + escapeHtml(r.athleteSport) + '</span>' : '') +
+            '</div>' +
+            '<span class="badge ' + statusClass + '">' + escapeHtml(r.status) + '</span>' +
+          '</div>';
+        }).join('');
+      }
+    }
+  }
+
+  function initBrandDashboard() {
+    var addBtn = document.getElementById('brand-portfolio-add-btn');
+    if (addBtn && !addBtn.getAttribute('data-bound')) {
+      addBtn.setAttribute('data-bound', '1');
+      addBtn.addEventListener('click', function () { openPortfolioAddModal(); });
+    }
+    var searchInput = document.getElementById('brand-portfolio-search-input');
+    if (searchInput && !searchInput.getAttribute('data-bound')) {
+      searchInput.setAttribute('data-bound', '1');
+      searchInput.addEventListener('input', function () {
+        renderPortfolioAthleteSearch(searchInput.value);
+      });
+    }
+    var modal = document.getElementById('brand-portfolio-add-modal');
+    if (modal && !modal.getAttribute('data-bound')) {
+      modal.setAttribute('data-bound', '1');
+      modal.addEventListener('click', function (e) {
+        if (e.target.closest('[data-close-portfolio-add]')) {
+          closePortfolioAddModal();
+          return;
+        }
+        var reqBtn = e.target.closest('[data-portfolio-request]');
+        if (reqBtn) {
+          e.preventDefault();
+          requestAddAthleteToPortfolio(reqBtn.getAttribute('data-portfolio-request'));
+        }
+      });
+    }
+    var listEl = document.getElementById('brand-portfolio-list');
+    if (listEl && !listEl.getAttribute('data-bound')) {
+      listEl.setAttribute('data-bound', '1');
+      listEl.addEventListener('click', function (e) {
+        var viewBtn = e.target.closest('[data-portfolio-view]');
+        var card = e.target.closest('[data-athlete-id]');
+        var id = viewBtn
+          ? viewBtn.getAttribute('data-portfolio-view')
+          : (card ? card.getAttribute('data-athlete-id') : null);
+        if (!id) return;
+        openAthleteProfile(id, 'brand-dashboard');
+      });
+    }
+  }
+
+  function renderAdminCompanies() {
+    var tbody = document.getElementById('admin-companies-tbody');
+    if (!tbody || !window.ADC_DATA) return;
+    var agencies = window.ADC_DATA.getAgencies();
+    if (!agencies.length) {
+      tbody.innerHTML = '<tr><td colspan="4">No companies registered yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = agencies.map(function (a) {
+      return '<tr>' +
+        '<td>' + escapeHtml(a.name) + '<div class="admin-cell-meta">' + escapeHtml(a.email || '') + ' · ' + escapeHtml(a.type || 'agency') + '</div></td>' +
+        '<td>' + escapeHtml(a.plan || '—') + '</td>' +
+        '<td><span class="badge success">Active</span></td>' +
+        '<td><button type="button" class="btn-sm btn-outline">Manage</button></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  function renderAdminPortfolioRequests() {
+    var tbody = document.getElementById('admin-portfolio-requests-tbody');
+    if (!tbody || !window.ADC_DATA) return;
+    var list = window.ADC_DATA.getPortfolioRequests();
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="4">No portfolio requests yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(function (r) {
+      var actions = '';
+      if (r.status === 'pending') {
+        actions =
+          '<button type="button" class="btn-sm btn-primary" data-portfolio-admin="approved" data-portfolio-req-id="' + escapeHtml(r.id) + '">Approve</button> ' +
+          '<button type="button" class="btn-sm btn-outline" data-portfolio-admin="rejected" data-portfolio-req-id="' + escapeHtml(r.id) + '">Reject</button>';
+      } else {
+        var cls = r.status === 'approved' ? 'success' : '';
+        actions = '<span class="badge ' + cls + '">' + escapeHtml(r.status) + '</span>';
+      }
+      return '<tr>' +
+        '<td>' + escapeHtml(r.agencyName || r.agencyId) + '</td>' +
+        '<td>' + escapeHtml(r.athleteName) + (r.athleteSport ? '<div class="admin-cell-meta">' + escapeHtml(r.athleteSport) + '</div>' : '') + '</td>' +
+        '<td><span class="badge">' + escapeHtml(r.status) + '</span></td>' +
+        '<td>' + actions + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  function initAdminBrandGovernance() {
+    var tabs = document.getElementById('admin-brand-tabs');
+    if (tabs && !tabs.getAttribute('data-bound')) {
+      tabs.setAttribute('data-bound', '1');
+      tabs.addEventListener('click', function (e) {
+        var tab = e.target.closest('[data-admin-brand-tab]');
+        if (!tab) return;
+        var key = tab.getAttribute('data-admin-brand-tab');
+        tabs.querySelectorAll('[data-admin-brand-tab]').forEach(function (t) {
+          t.classList.toggle('active', t === tab);
+        });
+        document.querySelectorAll('[data-admin-brand-panel]').forEach(function (panel) {
+          panel.hidden = panel.getAttribute('data-admin-brand-panel') !== key;
+        });
+      });
+    }
+    var tbody = document.getElementById('admin-portfolio-requests-tbody');
+    if (tbody && !tbody.getAttribute('data-bound')) {
+      tbody.setAttribute('data-bound', '1');
+      tbody.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-portfolio-admin]');
+        if (!btn) return;
+        var id = btn.getAttribute('data-portfolio-req-id');
+        var status = btn.getAttribute('data-portfolio-admin');
+        if (window.ADC_DATA) window.ADC_DATA.updatePortfolioRequestStatus(id, status);
+        renderAdminPortfolioRequests();
+        renderAdminCompanies();
+        renderSidebar('admin-brand-governance');
+      });
+    }
+    renderAdminCompanies();
+    renderAdminPortfolioRequests();
+  }
+
   function renderBrandShortlist() {
     var container = document.getElementById('brand-shortlist-list');
     if (!container || !window.ADC_DATA) return;
@@ -3420,6 +3867,11 @@
       updateAthleteProfileCompletion();
       syncAthleteDashboardProfileExtras();
       initAthleteManagedByControl();
+    } else if (screenId === 'brand-dashboard') {
+      initBrandDashboard();
+      renderBrandDashboard();
+    } else if (screenId === 'brand-register') {
+      initBrandRegisterForm();
     } else if (screenId === 'brand-discovery') {
       if (params.restoreResults) {
         restoreDiscoveryFromCache();
@@ -3462,6 +3914,8 @@
     } else if (screenId === 'brand-intelligence') {
       initAthleteIntelligence();
       renderAthleteIntelligence();
+    } else if (screenId === 'admin-brand-governance') {
+      initAdminBrandGovernance();
     } else if (screenId === 'athlete-requests') {
       renderRequests('athlete-requests-list', 'athlete', 'athlete');
     } else if (screenId === 'creator-requests') {
@@ -3672,6 +4126,9 @@
     if (scrim) scrim.addEventListener('click', function () { setMobileSidebarOpen(false); });
     initDiscoveryChat();
     initAthleteIntelligence();
+    initBrandDashboard();
+    initBrandRegisterForm();
+    initAdminBrandGovernance();
     var dataSearch = document.getElementById('data-search');
     if (dataSearch) {
       dataSearch.addEventListener('input', function () {

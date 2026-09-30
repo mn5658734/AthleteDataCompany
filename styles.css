@@ -4339,11 +4339,57 @@ body.ai-overlay-open { overflow: hidden; }
 .managed-by-toggle {
   margin-bottom: 0.55rem;
 }
+.managed-by-agency-wrap {
+  position: relative;
+}
 .managed-by-other-input {
   width: 100%;
 }
 .managed-by-other-input[hidden] {
   display: none !important;
+}
+.managed-by-agency-results {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  max-height: 220px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card, #0f141b);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+.managed-by-agency-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+.managed-by-agency-option:last-child {
+  border-bottom: 0;
+}
+.managed-by-agency-option:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+.managed-by-agency-option span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.managed-by-agency-empty {
+  padding: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
 }
 .athlete-profile-code {
   display: inline-block;
@@ -5096,3 +5142,148 @@ body.insight-modal-open {
 .event-pathway-label { margin: 1rem 0 0.4rem; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
 .event-pathway-list { margin: 0; padding-left: 1.1rem; color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; }
 .event-pathway-list a { color: var(--accent); }
+
+/* Brand / Agency dashboard + portfolio add popup */
+.brand-dashboard {
+  max-width: 960px;
+}
+.brand-dashboard-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.brand-dashboard-header .screen-desc {
+  margin-bottom: 0;
+}
+.brand-portfolio-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.brand-portfolio-section-head h2 {
+  margin: 0;
+}
+.brand-portfolio-list,
+.brand-portfolio-requests {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.brand-portfolio-card,
+.brand-portfolio-req-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card, rgba(255, 255, 255, 0.02));
+}
+.brand-portfolio-card {
+  cursor: pointer;
+}
+.brand-portfolio-card:hover {
+  border-color: var(--accent);
+}
+.brand-portfolio-card-main,
+.brand-portfolio-req-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.brand-portfolio-card-main span,
+.brand-portfolio-req-row span:not(.badge) {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+.portfolio-add-dialog {
+  width: min(420px, 100%);
+}
+.portfolio-add-search-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  margin-bottom: 0.35rem;
+  color: var(--text);
+}
+.portfolio-add-search-input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  margin-bottom: 0.65rem;
+}
+.portfolio-add-search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.portfolio-add-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 280px;
+  overflow: auto;
+}
+.portfolio-add-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.65rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.portfolio-add-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.portfolio-add-row-main span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.portfolio-add-empty {
+  padding: 1rem 0.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+.portfolio-add-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--accent);
+}
+.admin-cell-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+.admin-tabs .tab {
+  cursor: pointer;
+}
+.badge.danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+#brand-dash-agency-name {
+  font-size: 1.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+@media (max-width: 640px) {
+  .brand-dashboard-header {
+    flex-direction: column;
+  }
+}

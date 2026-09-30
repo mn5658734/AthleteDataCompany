@@ -302,7 +302,23 @@
 
   var ATHLETES = buildAthleteUniverse();
 
-  var STORAGE_KEYS = { shortlist: 'adc_shortlist', athleteProfile: 'adc_athlete_profile', brandProfile: 'adc_brand_profile', requests: 'adc_requests' };
+  var STORAGE_KEYS = {
+    shortlist: 'adc_shortlist',
+    athleteProfile: 'adc_athlete_profile',
+    brandProfile: 'adc_brand_profile',
+    requests: 'adc_requests',
+    agencies: 'adc_agencies',
+    portfolioRequests: 'adc_portfolio_requests',
+    agencyPortfolios: 'adc_agency_portfolios',
+    athleteManagedBy: 'adc_athlete_managed_by',
+    currentAgencyId: 'adc_current_agency_id'
+  };
+
+  var SEED_AGENCIES = [
+    { id: 'agency-demo-1', name: 'Agency B', email: 'agencyb@example.com', type: 'agency', plan: 'starter' },
+    { id: 'agency-demo-2', name: 'SportsFirst Management', email: 'hello@sportsfirst.in', type: 'agency', plan: 'pro' },
+    { id: 'agency-demo-3', name: 'Brand A', email: 'branda@example.com', type: 'brand', plan: 'pro' }
+  ];
 
   function normalizeSport(sport) {
     if (!sport) return sport;
@@ -494,6 +510,216 @@
     setSponsorshipRequests(list);
   }
 
+  function getAgencies() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEYS.agencies);
+      var list = raw ? JSON.parse(raw) : null;
+      if (!Array.isArray(list) || !list.length) {
+        list = SEED_AGENCIES.slice();
+        localStorage.setItem(STORAGE_KEYS.agencies, JSON.stringify(list));
+      }
+      return list;
+    } catch (e) {
+      return SEED_AGENCIES.slice();
+    }
+  }
+
+  function setAgencies(list) {
+    try {
+      localStorage.setItem(STORAGE_KEYS.agencies, JSON.stringify(list || []));
+    } catch (e) {}
+  }
+
+  function getAgencyById(id) {
+    if (!id) return null;
+    return getAgencies().filter(function (a) { return a.id === id; })[0] || null;
+  }
+
+  function findAgencyByEmail(email) {
+    var e = String(email || '').trim().toLowerCase();
+    if (!e) return null;
+    return getAgencies().filter(function (a) {
+      return String(a.email || '').toLowerCase() === e;
+    })[0] || null;
+  }
+
+  function upsertAgency(payload) {
+    var list = getAgencies();
+    var email = String((payload && payload.email) || '').trim().toLowerCase();
+    var name = String((payload && payload.name) || '').trim();
+    if (!name) name = email ? email.split('@')[0] : 'Untitled Agency';
+    var existing = null;
+    if (payload && payload.id) existing = list.filter(function (a) { return a.id === payload.id; })[0];
+    if (!existing && email) existing = list.filter(function (a) { return String(a.email || '').toLowerCase() === email; })[0];
+    if (existing) {
+      existing.name = name;
+      if (email) existing.email = email;
+      if (payload.type) existing.type = payload.type;
+      if (payload.plan) existing.plan = payload.plan;
+      setAgencies(list);
+      return existing;
+    }
+    var agency = {
+      id: 'agency-' + Date.now(),
+      name: name,
+      email: email || '',
+      type: (payload && payload.type) || 'agency',
+      plan: (payload && payload.plan) || 'pro',
+      createdAt: new Date().toISOString()
+    };
+    list.unshift(agency);
+    setAgencies(list);
+    return agency;
+  }
+
+  function searchAgencies(query) {
+    var q = String(query || '').trim().toLowerCase();
+    var list = getAgencies();
+    if (!q) return list.slice(0, 12);
+    return list.filter(function (a) {
+      return String(a.name || '').toLowerCase().indexOf(q) !== -1 ||
+        String(a.email || '').toLowerCase().indexOf(q) !== -1;
+    }).slice(0, 12);
+  }
+
+  function getCurrentAgencyId() {
+    try {
+      return localStorage.getItem(STORAGE_KEYS.currentAgencyId) || '';
+    } catch (e) { return ''; }
+  }
+
+  function setCurrentAgencyId(id) {
+    try {
+      if (id) localStorage.setItem(STORAGE_KEYS.currentAgencyId, id);
+      else localStorage.removeItem(STORAGE_KEYS.currentAgencyId);
+    } catch (e) {}
+  }
+
+  function getCurrentAgency() {
+    var id = getCurrentAgencyId();
+    var agency = getAgencyById(id);
+    if (agency) return agency;
+    try {
+      var email = sessionStorage.getItem('adc_login_email') || '';
+      agency = findAgencyByEmail(email);
+      if (agency) {
+        setCurrentAgencyId(agency.id);
+        return agency;
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function getAgencyPortfolios() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEYS.agencyPortfolios);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+
+  function setAgencyPortfolios(map) {
+    try {
+      localStorage.setItem(STORAGE_KEYS.agencyPortfolios, JSON.stringify(map || {}));
+    } catch (e) {}
+  }
+
+  function getAgencyPortfolioAthleteIds(agencyId) {
+    var map = getAgencyPortfolios();
+    var ids = map[agencyId] || [];
+    return ids.map(function (id) { return parseInt(id, 10); }).filter(Boolean);
+  }
+
+  function addAthleteToAgencyPortfolio(agencyId, athleteId) {
+    if (!agencyId || !athleteId) return;
+    var map = getAgencyPortfolios();
+    var ids = (map[agencyId] || []).slice();
+    var idNum = parseInt(athleteId, 10);
+    if (ids.indexOf(idNum) === -1 && ids.indexOf(String(idNum)) === -1) {
+      ids.push(idNum);
+      map[agencyId] = ids;
+      setAgencyPortfolios(map);
+    }
+  }
+
+  function isAthleteInAgencyPortfolio(agencyId, athleteId) {
+    var ids = getAgencyPortfolioAthleteIds(agencyId);
+    return ids.indexOf(parseInt(athleteId, 10)) !== -1;
+  }
+
+  function getPortfolioRequests() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEYS.portfolioRequests);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function setPortfolioRequests(list) {
+    try {
+      localStorage.setItem(STORAGE_KEYS.portfolioRequests, JSON.stringify(list || []));
+    } catch (e) {}
+  }
+
+  function addPortfolioRequest(req) {
+    var list = getPortfolioRequests();
+    var athleteId = parseInt(req.athleteId, 10);
+    var agencyId = req.agencyId;
+    var existing = list.filter(function (r) {
+      return r.agencyId === agencyId && parseInt(r.athleteId, 10) === athleteId && r.status === 'pending';
+    })[0];
+    if (existing) return existing;
+    var item = {
+      id: 'port-req-' + Date.now(),
+      agencyId: agencyId,
+      agencyName: req.agencyName || '',
+      athleteId: athleteId,
+      athleteName: req.athleteName || '',
+      athleteSport: req.athleteSport || '',
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+    list.unshift(item);
+    setPortfolioRequests(list);
+    return item;
+  }
+
+  function updatePortfolioRequestStatus(id, status) {
+    var list = getPortfolioRequests();
+    var updated = null;
+    list = list.map(function (r) {
+      if (r.id === id) {
+        r.status = status;
+        updated = r;
+      }
+      return r;
+    });
+    setPortfolioRequests(list);
+    if (updated && status === 'approved') {
+      addAthleteToAgencyPortfolio(updated.agencyId, updated.athleteId);
+      if (updated.agencyName) setAthleteManagedByOverride(updated.athleteId, updated.agencyName);
+    }
+    return updated;
+  }
+
+  function getAthleteManagedByMap() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEYS.athleteManagedBy);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+
+  function setAthleteManagedByOverride(athleteId, agencyName) {
+    var map = getAthleteManagedByMap();
+    map[String(athleteId)] = agencyName;
+    try {
+      localStorage.setItem(STORAGE_KEYS.athleteManagedBy, JSON.stringify(map));
+    } catch (e) {}
+  }
+
+  function getAthleteManagedByOverride(athleteId) {
+    var map = getAthleteManagedByMap();
+    return map[String(athleteId)] || '';
+  }
+
   global.ADC_DATA = {
     getAthletes: getAthletes,
     getTopAthletes: getTopAthletes,
@@ -508,6 +734,22 @@
     getSponsorshipRequests: getSponsorshipRequests,
     addSponsorshipRequest: addSponsorshipRequest,
     updateSponsorshipRequestStatus: updateSponsorshipRequestStatus,
+    getAgencies: getAgencies,
+    getAgencyById: getAgencyById,
+    findAgencyByEmail: findAgencyByEmail,
+    upsertAgency: upsertAgency,
+    searchAgencies: searchAgencies,
+    getCurrentAgencyId: getCurrentAgencyId,
+    setCurrentAgencyId: setCurrentAgencyId,
+    getCurrentAgency: getCurrentAgency,
+    getAgencyPortfolioAthleteIds: getAgencyPortfolioAthleteIds,
+    addAthleteToAgencyPortfolio: addAthleteToAgencyPortfolio,
+    isAthleteInAgencyPortfolio: isAthleteInAgencyPortfolio,
+    getPortfolioRequests: getPortfolioRequests,
+    addPortfolioRequest: addPortfolioRequest,
+    updatePortfolioRequestStatus: updatePortfolioRequestStatus,
+    getAthleteManagedByOverride: getAthleteManagedByOverride,
+    setAthleteManagedByOverride: setAthleteManagedByOverride,
     IPL_META: IPL_META,
     MULTISPORT_META: MULTISPORT_META,
     SPORT_EVENTS: global.ADC_SPORT_EVENTS || null,

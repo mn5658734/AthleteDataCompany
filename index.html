@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2026-09-30a" />
+  <link rel="stylesheet" href="styles.css?v=2026-09-30b" />
 </head>
 <body>
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -560,10 +560,14 @@
             <label>Managed by</label>
             <div class="button-group managed-by-toggle" id="athlete-managed-by-mode">
               <button type="button" class="btn-secondary is-selected" data-managed-by="SELF">SELF</button>
-              <button type="button" class="btn-secondary" data-managed-by="other">Enter name</button>
+              <button type="button" class="btn-secondary" data-managed-by="other">Agency</button>
             </div>
             <input type="hidden" name="managedBy" id="athlete-managed-by-value" data-profile-field value="SELF" />
-            <input type="text" id="athlete-managed-by-input" class="managed-by-other-input" placeholder="Agent / Manager / Agency name" hidden autocomplete="organization" />
+            <div id="athlete-managed-by-agency-wrap" class="managed-by-agency-wrap" hidden>
+              <input type="search" id="athlete-managed-by-input" class="managed-by-other-input" placeholder="Search registered agency…" autocomplete="off" />
+              <div id="athlete-managed-by-results" class="managed-by-agency-results" role="listbox" hidden></div>
+              <p class="form-hint">Pick from brands / agencies created on the platform.</p>
+            </div>
           </div>
           <div class="form-row">
             <label>Bio</label>
@@ -1206,11 +1210,22 @@
   <section id="screen-brand-register" class="screen journey-screen">
     <div class="screen-inner form-screen">
       <h1>Brand / Agency Registration</h1>
-      <p class="screen-desc">Company verification and subscription. Max 3 users per account in MVP.</p>
-      <form class="proto-form">
+      <p class="screen-desc">Company verification and subscription. Max 3 users per account in MVP. Once created, your agency can be tagged by athletes under Managed by.</p>
+      <form class="proto-form" id="form-brand-register">
+        <div class="form-row">
+          <label>Company / Agency name (mandatory)</label>
+          <input type="text" name="companyName" id="brand-register-name" placeholder="e.g. SportsFirst Management" required />
+        </div>
         <div class="form-row">
           <label>Company email (mandatory)</label>
-          <input type="email" placeholder="brand@company.com" />
+          <input type="email" name="email" id="brand-register-email" placeholder="brand@company.com" required />
+        </div>
+        <div class="form-row">
+          <label>Account type</label>
+          <div class="button-group" id="brand-register-type">
+            <button type="button" class="btn-secondary is-selected" data-account-type="agency">Agency</button>
+            <button type="button" class="btn-secondary" data-account-type="brand">Brand</button>
+          </div>
         </div>
         <div class="form-row">
           <label>Business verification (GST optional)</label>
@@ -1244,13 +1259,64 @@
           <input type="text" placeholder="Add team members by email" />
           <p class="form-hint">Scout, Manager, Admin roles available.</p>
         </div>
+        <p class="form-hint" id="brand-register-note" hidden></p>
         <div class="form-actions">
-          <button type="button" class="btn-secondary">Apply for verification</button>
-          <button type="button" class="btn-primary" data-next="brand-discovery">Continue to Campaign Agent →</button>
+          <button type="button" class="btn-secondary" id="brand-register-verify-btn">Apply for verification</button>
+          <button type="button" class="btn-primary" id="brand-register-continue-btn">Save &amp; go to Dashboard →</button>
         </div>
       </form>
     </div>
   </section>
+
+  <section id="screen-brand-dashboard" class="screen journey-screen">
+    <div class="screen-inner dashboard-screen brand-dashboard">
+      <div class="brand-dashboard-header">
+        <div>
+          <h1>Agency dashboard</h1>
+          <p class="screen-desc" id="brand-dashboard-subtitle">Manage your athlete portfolio. Add athletes via request — admin approval required.</p>
+        </div>
+        <button type="button" class="btn-primary" id="brand-portfolio-add-btn">+ Add athlete</button>
+      </div>
+      <div class="dashboard-grid" id="brand-dashboard-stats">
+        <div class="stat-card">
+          <span class="stat-value" id="brand-dash-portfolio-count">0</span>
+          <span class="stat-label">In portfolio</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="brand-dash-pending-count">0</span>
+          <span class="stat-label">Pending requests</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="brand-dash-agency-name">—</span>
+          <span class="stat-label">Agency</span>
+        </div>
+      </div>
+      <div class="dashboard-section">
+        <div class="brand-portfolio-section-head">
+          <h2>Athlete portfolio</h2>
+        </div>
+        <div id="brand-portfolio-list" class="brand-portfolio-list"></div>
+      </div>
+      <div class="dashboard-section">
+        <h2>Recent portfolio requests</h2>
+        <div id="brand-portfolio-requests-list" class="brand-portfolio-requests"></div>
+      </div>
+    </div>
+  </section>
+
+  <div id="brand-portfolio-add-modal" class="insight-modal portfolio-add-modal" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="brand-portfolio-add-title">
+    <div class="insight-modal-backdrop" data-close-portfolio-add tabindex="-1"></div>
+    <div class="insight-modal-dialog portfolio-add-dialog">
+      <button type="button" class="insight-modal-close" data-close-portfolio-add aria-label="Close">×</button>
+      <p class="insight-modal-kicker">Portfolio</p>
+      <h2 id="brand-portfolio-add-title" class="insight-modal-title">Add athlete</h2>
+      <p class="insight-modal-sub">Search a player and send a request. Admin will approve before they join your portfolio.</p>
+      <label class="portfolio-add-search-label" for="brand-portfolio-search-input">Search athlete</label>
+      <input type="search" id="brand-portfolio-search-input" class="portfolio-add-search-input" placeholder="Name or sport…" autocomplete="off" />
+      <div id="brand-portfolio-search-results" class="portfolio-add-results" role="listbox" aria-label="Athlete search results"></div>
+      <p class="portfolio-add-note" id="brand-portfolio-add-note" hidden></p>
+    </div>
+  </div>
 
   <section id="screen-brand-discovery" class="screen journey-screen">
     <div class="screen-inner discovery-screen discovery-screen--chat">
@@ -1681,38 +1747,70 @@
   <section id="screen-admin-brand-governance" class="screen journey-screen">
     <div class="screen-inner dashboard-screen">
       <h1>Brand governance</h1>
-      <p class="screen-desc">Verify companies, monitor spam, manage subscription plans.</p>
-      <div class="admin-tabs">
-        <button type="button" class="tab active">Companies</button>
-        <button type="button" class="tab">Spam reports</button>
-        <button type="button" class="tab">Plans</button>
+      <p class="screen-desc">Verify companies, approve agency portfolio requests, monitor spam, manage plans.</p>
+      <div class="admin-tabs" id="admin-brand-tabs">
+        <button type="button" class="tab active" data-admin-brand-tab="companies">Companies</button>
+        <button type="button" class="tab" data-admin-brand-tab="portfolio">Portfolio requests</button>
+        <button type="button" class="tab" data-admin-brand-tab="spam">Spam reports</button>
+        <button type="button" class="tab" data-admin-brand-tab="plans">Plans</button>
       </div>
-      <div class="admin-table-wrap">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Company</th>
-              <th>Plan</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Brand A</td>
-              <td>Pro</td>
-              <td><span class="badge success">Active</span></td>
-              <td><button type="button" class="btn-sm btn-outline">Manage</button></td>
-            </tr>
-            <tr>
-              <td>Agency B</td>
-              <td>Starter</td>
-              <td><span class="badge">Pending verification</span></td>
-              <td><button type="button" class="btn-sm btn-primary">Verify</button></td>
-            </tr>
-          </tbody>
-        </table>
+
+      <div class="admin-brand-panel" id="admin-brand-panel-companies" data-admin-brand-panel="companies">
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Company</th>
+                <th>Plan</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-companies-tbody">
+              <tr>
+                <td>Brand A</td>
+                <td>Pro</td>
+                <td><span class="badge success">Active</span></td>
+                <td><button type="button" class="btn-sm btn-outline">Manage</button></td>
+              </tr>
+              <tr>
+                <td>Agency B</td>
+                <td>Starter</td>
+                <td><span class="badge">Pending verification</span></td>
+                <td><button type="button" class="btn-sm btn-primary">Verify</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+
+      <div class="admin-brand-panel" id="admin-brand-panel-portfolio" data-admin-brand-panel="portfolio" hidden>
+        <p class="screen-desc">Agency requests to add athletes to their portfolio. Approve to confirm representation.</p>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Agency</th>
+                <th>Athlete</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-portfolio-requests-tbody">
+              <tr><td colspan="4">No portfolio requests yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="admin-brand-panel" id="admin-brand-panel-spam" data-admin-brand-panel="spam" hidden>
+        <p class="requests-empty">No spam reports in this prototype.</p>
+      </div>
+
+      <div class="admin-brand-panel" id="admin-brand-panel-plans" data-admin-brand-panel="plans" hidden>
+        <p class="requests-empty">Starter · Pro · Enterprise — plan management coming soon.</p>
+      </div>
+
       <div class="form-actions">
         <button type="button" class="btn-secondary" data-next="admin-athlete-governance">← Athlete gov</button>
         <button type="button" class="btn-primary" data-next="admin-revenue">Revenue dashboard →</button>
@@ -1793,12 +1891,12 @@
     </div>
   </div>
 
-  <script src="sport-events-data.js?v=2026-09-30a"></script>
-  <script src="multisport-data.js?v=2026-09-30a"></script>
-  <script src="data.js?v=2026-09-30a"></script>
+  <script src="sport-events-data.js?v=2026-09-30b"></script>
+  <script src="multisport-data.js?v=2026-09-30b"></script>
+  <script src="data.js?v=2026-09-30b"></script>
   <script src="cricsheet-stats.js"></script>
   <script src="ipl-assistant.js"></script>
-  <script src="app.js?v=2026-09-30a"></script>
+  <script src="app.js?v=2026-09-30b"></script>
   <script src="demo-request.js?v=2026-09-05f"></script>
   <script>
   (function () {
