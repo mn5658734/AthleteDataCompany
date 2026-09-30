@@ -8,7 +8,7 @@
   var PERSONA_LABELS = { athlete: 'Athlete', brand: 'Brand / Agency', admin: 'Admin', creator: 'Sports Content Creator' };
   var BREADCRUMBS = {
     'data': 'Scoring Data',
-    'athlete-register': 'Profile', 'athlete-profile': 'Edit profile', 'athlete-dashboard': 'Overview', 'athlete-requests': 'Sponsorship requests',
+    'athlete-register': 'Profile', 'athlete-profile': 'Edit profile', 'athlete-dashboard': 'Overview', 'athlete-requests': 'Sponsorship requests', 'athlete-services': 'ADC Services',
     'creator-register': 'Registration', 'creator-profile': 'Profile', 'creator-dashboard': 'Dashboard', 'creator-requests': 'Brand requests',
     'brand-register': 'Registration', 'brand-dashboard': 'Dashboard', 'brand-discovery': 'Campaign Agent', 'brand-intelligence': 'Scouting Agent',
     'brand-athlete-profile': 'Athlete profile',
@@ -23,7 +23,8 @@
       items: [
         { icon: '📊', label: 'Overview', screen: 'athlete-dashboard', badge: 'athlete-agency-requests' },
         { icon: '👤', label: 'Profile', screen: 'athlete-profile' },
-        { icon: '🤝', label: 'Sponsorship Requests', screen: 'athlete-requests', badge: 'athlete-requests' }
+        { icon: '🤝', label: 'Sponsorship Requests', screen: 'athlete-requests', badge: 'athlete-requests' },
+        { icon: '🧰', label: 'ADC Services', screen: 'athlete-services' }
       ]
     },
     creator: {
@@ -3619,6 +3620,99 @@
     }
   }
 
+  var ADC_SERVICES = [
+    { id: 'sportzengage', name: 'SportzEngage', category: 'Fan engagement & media', description: 'Fan engagement and athlete branding campaigns to grow your audience and sponsor visibility.' },
+    { id: 'scoutedge', name: 'ScoutEdge', category: 'Scouting & career', description: 'Talent scouting and performance video analysis to get noticed by selectors, clubs and academies.' },
+    { id: 'athleteworld', name: 'athleteworld.in', category: 'Scouting & career', description: 'Athlete network for trials, tournaments and career opportunities across sports.', url: 'https://athleteworld.in' },
+    { id: 'str8bat', name: 'str8bat', category: 'Performance tech', description: 'Smart bat sensor for cricketers — track bat speed, swing path and shot quality every session.', url: 'https://www.str8bat.com' },
+    { id: 'acko', name: 'ACKO', category: 'Insurance', description: 'Health and accident insurance for athletes, including cover for sports injuries and hospitalisation.', url: 'https://www.acko.com' },
+    { id: 'ultrahuman', name: 'Ultrahuman', category: 'Performance tech', description: 'Wearables that track sleep, recovery and readiness so you train hard on the right days.', url: 'https://www.ultrahuman.com' },
+    { id: 'healthifyme', name: 'HealthifyMe', category: 'Fitness & nutrition', description: 'Nutrition coaching and meal tracking tailored to your training load and competition calendar.', url: 'https://www.healthifyme.com' },
+    { id: 'cultfit', name: 'cult.fit', category: 'Fitness & nutrition', description: 'Strength and conditioning programmes, gyms and group training across Indian cities.', url: 'https://www.cult.fit' },
+    { id: 'playo', name: 'Playo', category: 'Training & gear', description: 'Book courts, nets and grounds for practice sessions and find training partners nearby.', url: 'https://playo.co' },
+    { id: 'khelomore', name: 'KheloMore', category: 'Training & gear', description: 'Discover academies, coaches and venues to level up your coaching setup.', url: 'https://www.khelomore.com' },
+    { id: 'sportvot', name: 'SportVot', category: 'Fan engagement & media', description: 'Live-stream your grassroots and domestic matches to build a highlight reel and fan base.', url: 'https://sportvot.com' },
+    { id: 'decathlon', name: 'Decathlon', category: 'Training & gear', description: 'Sports equipment, apparel and footwear for training and match days.', url: 'https://www.decathlon.in' }
+  ];
+  var SERVICE_INTEREST_KEY = 'adc_athlete_service_interest';
+  var athleteServicesFilter = 'All';
+
+  function getServiceInterest() {
+    try {
+      var raw = localStorage.getItem(SERVICE_INTEREST_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+
+  function markServiceInterest(id) {
+    var map = getServiceInterest();
+    map[id] = new Date().toISOString();
+    try { localStorage.setItem(SERVICE_INTEREST_KEY, JSON.stringify(map)); } catch (e) {}
+  }
+
+  function serviceInitials(name) {
+    var words = String(name).replace(/\.[a-z]+$/i, '').split(/[\s.]+/).filter(Boolean);
+    var letters = words.length > 1 ? words[0][0] + words[1][0] : String(words[0] || name).slice(0, 2);
+    return letters.toUpperCase();
+  }
+
+  function renderAthleteServices() {
+    var grid = document.getElementById('athlete-services-grid');
+    var filtersEl = document.getElementById('athlete-services-filters');
+    if (!grid) return;
+    var categories = ['All'];
+    ADC_SERVICES.forEach(function (s) {
+      if (categories.indexOf(s.category) === -1) categories.push(s.category);
+    });
+    if (filtersEl) {
+      filtersEl.innerHTML = categories.map(function (c) {
+        var active = c === athleteServicesFilter ? ' active' : '';
+        return '<button type="button" class="tab' + active + '" data-service-filter="' + escapeHtml(c) + '">' + escapeHtml(c) + '</button>';
+      }).join('');
+    }
+    var interest = getServiceInterest();
+    var list = ADC_SERVICES.filter(function (s) {
+      return athleteServicesFilter === 'All' || s.category === athleteServicesFilter;
+    });
+    grid.innerHTML = list.map(function (s) {
+      var interested = !!interest[s.id];
+      var interestBtn = interested
+        ? '<button type="button" class="btn-sm btn-secondary" disabled>Interest sent ✓</button>'
+        : '<button type="button" class="btn-sm btn-primary" data-service-interest="' + escapeHtml(s.id) + '">Express interest</button>';
+      var visit = s.url
+        ? '<a class="btn-sm btn-outline" href="' + escapeHtml(s.url) + '" target="_blank" rel="noopener noreferrer">Visit site ↗</a>'
+        : '';
+      return '<div class="service-card">' +
+        '<div class="service-card-top">' +
+          '<span class="service-card-mark">' + escapeHtml(serviceInitials(s.name)) + '</span>' +
+          '<div><h3>' + escapeHtml(s.name) + '</h3>' +
+          '<span class="service-card-category">' + escapeHtml(s.category) + '</span></div>' +
+        '</div>' +
+        '<p>' + escapeHtml(s.description) + '</p>' +
+        '<div class="request-actions">' + interestBtn + visit + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function initAthleteServices() {
+    var screen = document.getElementById('screen-athlete-services');
+    if (!screen || screen.getAttribute('data-bound')) return;
+    screen.setAttribute('data-bound', '1');
+    screen.addEventListener('click', function (e) {
+      var filterBtn = e.target.closest('[data-service-filter]');
+      if (filterBtn) {
+        athleteServicesFilter = filterBtn.getAttribute('data-service-filter');
+        renderAthleteServices();
+        return;
+      }
+      var interestBtn = e.target.closest('[data-service-interest]');
+      if (interestBtn) {
+        markServiceInterest(interestBtn.getAttribute('data-service-interest'));
+        renderAthleteServices();
+      }
+    });
+  }
+
   var DEMO_ATHLETE_NAME = 'V Suryavanshi';
 
   function findAthleteByExactName(name) {
@@ -4472,6 +4566,9 @@
       initAdminBrandGovernance();
     } else if (screenId === 'athlete-requests') {
       renderRequests('athlete-requests-list', 'athlete', 'athlete');
+    } else if (screenId === 'athlete-services') {
+      initAthleteServices();
+      renderAthleteServices();
     } else if (screenId === 'creator-requests') {
       renderRequests('creator-requests-list', 'creator', 'creator');
     }
