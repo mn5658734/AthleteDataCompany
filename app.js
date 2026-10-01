@@ -8,7 +8,7 @@
   var PERSONA_LABELS = { athlete: 'Athlete', brand: 'Brand / Agency', admin: 'Admin', creator: 'Sports Content Creator' };
   var BREADCRUMBS = {
     'data': 'Scoring Data',
-    'athlete-register': 'Profile', 'athlete-profile': 'Edit profile', 'athlete-dashboard': 'Overview', 'athlete-requests': 'Sponsorship requests', 'athlete-services': 'ADC Services',
+    'athlete-register': 'Profile', 'athlete-profile': 'Edit profile', 'athlete-dashboard': 'Overview', 'athlete-requests': 'Sponsorship requests', 'athlete-services': 'Brand Partners', 'athlete-csr-funds': 'CSR Funds',
     'creator-register': 'Registration', 'creator-profile': 'Profile', 'creator-dashboard': 'Dashboard', 'creator-requests': 'Brand requests',
     'brand-register': 'Registration', 'brand-dashboard': 'Dashboard', 'brand-discovery': 'Campaign Agent', 'brand-intelligence': 'Scouting Agent',
     'brand-athlete-profile': 'Athlete profile',
@@ -24,7 +24,8 @@
         { icon: '📊', label: 'Overview', screen: 'athlete-dashboard', badge: 'athlete-agency-requests' },
         { icon: '👤', label: 'Profile', screen: 'athlete-profile' },
         { icon: '🤝', label: 'Sponsorship Requests', screen: 'athlete-requests', badge: 'athlete-requests' },
-        { icon: '🧰', label: 'ADC Services', screen: 'athlete-services' }
+        { icon: '💚', label: 'CSR Funds', screen: 'athlete-csr-funds' },
+        { icon: '🧰', label: 'Brand Partners', screen: 'athlete-services' }
       ]
     },
     creator: {
@@ -2640,9 +2641,13 @@
       return buckets.managed.length + buckets.external.length;
     }
     var reqs = window.ADC_DATA.getSponsorshipRequests();
-    if (key === 'athlete-requests' || key === 'creator-requests') {
-      var target = key === 'athlete-requests' ? 'athlete' : 'creator';
-      return reqs.filter(function (r) { return (r.target || 'athlete') === target; }).length;
+    if (key === 'athlete-requests') {
+      return reqs.filter(function (r) {
+        return (r.target || 'athlete') === 'athlete' && isRequestForCurrentAthlete(r);
+      }).length;
+    }
+    if (key === 'creator-requests') {
+      return reqs.filter(function (r) { return (r.target || 'athlete') === 'creator'; }).length;
     }
     return 0;
   }
@@ -3495,9 +3500,10 @@
     if (!container || !window.ADC_DATA) return;
     var reqs = window.ADC_DATA.getSponsorshipRequests();
     if (filterTarget) reqs = reqs.filter(function (r) { return (r.target || 'athlete') === filterTarget; });
+    if (role === 'athlete') reqs = reqs.filter(isRequestForCurrentAthlete);
     if (!reqs.length) {
       if (role === 'athlete') {
-        container.innerHTML = '';
+        container.innerHTML = '<div class="requests-empty">No sponsorship proposals sent to you yet. When a brand or agency sends you a proposal, it will show up here.</div>';
         return;
       }
       var empty = role === 'brand'
@@ -3713,6 +3719,113 @@
     });
   }
 
+  var CSR_FUNDS = [
+    {
+      id: 'csr-fit-foundation',
+      org: 'FitLife Foundation',
+      focus: 'Athlete fitness',
+      fund: '₹2.4 Cr',
+      details: 'Strength & conditioning grants, gym access subsidies, and wearable kits for emerging athletes building a sustainable fitness base.'
+    },
+    {
+      id: 'csr-career-path',
+      org: 'SportCareer Trust',
+      focus: 'Athlete career',
+      fund: '₹1.8 Cr',
+      details: 'Career transition coaching, education scholarships, and placement support for athletes planning life beyond competitive sport.'
+    },
+    {
+      id: 'csr-med-care',
+      org: 'Pulse Medical CSR',
+      focus: 'Athlete medical support',
+      fund: '₹3.1 Cr',
+      details: 'Covered diagnostics, physiotherapy, surgery co-pay and recovery programmes for injury and long-term athletic health.'
+    },
+    {
+      id: 'csr-nutrition',
+      org: 'GreenFuel Nutrition Fund',
+      focus: 'Athlete nutrition',
+      fund: '₹95 L',
+      details: 'Personalised nutrition plans, meal stipends and sports dietitian sessions focused on performance and recovery.'
+    },
+    {
+      id: 'csr-mental',
+      org: 'MindArena Initiative',
+      focus: 'Mental wellbeing',
+      fund: '₹1.2 Cr',
+      details: 'Sports psychology sessions, stress and focus workshops, and confidential counselling for competition pressure.'
+    },
+    {
+      id: 'csr-equip',
+      org: 'GearUp Sports CSR',
+      focus: 'Equipment & kit',
+      fund: '₹1.5 Cr',
+      details: 'Match kits, training gear and safety equipment for athletes who lack sponsorship-backed equipment support.'
+    },
+    {
+      id: 'csr-women',
+      org: 'ShePlays Foundation',
+      focus: 'Women athletes',
+      fund: '₹2.0 Cr',
+      details: 'Travel grants, coaching stipends and academy placements designed to keep women athletes in competitive pathways.'
+    },
+    {
+      id: 'csr-rural',
+      org: 'Bharat Grassroots Fund',
+      focus: 'Grassroots & rural talent',
+      fund: '₹2.7 Cr',
+      details: 'Travel, lodging and tournament fees for rural and district-level athletes advancing toward state and national events.'
+    }
+  ];
+  var CSR_INTEREST_KEY = 'adc_athlete_csr_interest';
+
+  function getCsrInterest() {
+    try {
+      var raw = localStorage.getItem(CSR_INTEREST_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+
+  function markCsrInterest(id) {
+    var map = getCsrInterest();
+    map[id] = new Date().toISOString();
+    try { localStorage.setItem(CSR_INTEREST_KEY, JSON.stringify(map)); } catch (e) {}
+  }
+
+  function renderAthleteCsrFunds() {
+    var grid = document.getElementById('athlete-csr-funds-grid');
+    if (!grid) return;
+    var interest = getCsrInterest();
+    grid.innerHTML = CSR_FUNDS.map(function (f) {
+      var interested = !!interest[f.id];
+      var interestBtn = interested
+        ? '<button type="button" class="btn-sm btn-secondary" disabled>Interest sent ✓</button>'
+        : '<button type="button" class="btn-sm btn-primary" data-csr-interest="' + escapeHtml(f.id) + '">Express interest</button>';
+      return '<div class="service-card csr-fund-card">' +
+        '<div class="service-card-top">' +
+          '<span class="service-card-mark">' + escapeHtml(serviceInitials(f.org)) + '</span>' +
+          '<div><h3>' + escapeHtml(f.org) + '</h3>' +
+          '<span class="service-card-category">' + escapeHtml(f.focus) + '</span></div>' +
+        '</div>' +
+        '<p class="csr-fund-value" aria-label="CSR fund value">' + escapeHtml(f.fund) + '</p>' +
+        '<p>' + escapeHtml(f.details) + '</p>' +
+        '<div class="request-actions">' + interestBtn + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function initAthleteCsrFunds() {
+    var screen = document.getElementById('screen-athlete-csr-funds');
+    if (!screen || screen.getAttribute('data-bound')) return;
+    screen.setAttribute('data-bound', '1');
+    screen.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-csr-interest]');
+      if (!btn) return;
+      markCsrInterest(btn.getAttribute('data-csr-interest'));
+      renderAthleteCsrFunds();
+    });
+  }
+
   var DEMO_ATHLETE_NAME = 'V Suryavanshi';
 
   function findAthleteByExactName(name) {
@@ -3724,6 +3837,18 @@
     }) || []).filter(function (a) {
       return String(a.name || '').toLowerCase() === name.toLowerCase();
     })[0] || null;
+  }
+
+  var DEMO_ATHLETE_NAME_ALIASES = ['vaibhav sooryavanshi', 'vaibhav suryavanshi'];
+
+  function isRequestForCurrentAthlete(req) {
+    var athlete = getCurrentAthlete();
+    if (!req || !athlete) return false;
+    if (req.athleteId != null) return parseInt(req.athleteId, 10) === athlete.id;
+    var label = String(req.athlete || '').toLowerCase();
+    return [athlete.name.toLowerCase()].concat(DEMO_ATHLETE_NAME_ALIASES).some(function (name) {
+      return label === name || label.indexOf(name + ' (') === 0;
+    });
   }
 
   function getCurrentAthlete() {
@@ -4569,6 +4694,9 @@
     } else if (screenId === 'athlete-services') {
       initAthleteServices();
       renderAthleteServices();
+    } else if (screenId === 'athlete-csr-funds') {
+      initAthleteCsrFunds();
+      renderAthleteCsrFunds();
     } else if (screenId === 'creator-requests') {
       renderRequests('creator-requests-list', 'creator', 'creator');
     }

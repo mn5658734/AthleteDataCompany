@@ -5473,3 +5473,16 @@ body.insight-modal-open {
   font-size: 0.95rem;
   line-height: 1.2;
 }
+
+/* CSR Funds (athlete persona) */
+.csr-fund-value {
+  margin: 0 !important;
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  color: #22c55e !important;
+  letter-spacing: -0.02em;
+}
+.csr-fund-card .service-card-category {
+  color: var(--accent);
+}
