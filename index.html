@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2026-10-02a" />
+  <link rel="stylesheet" href="styles.css?v=2026-10-02b" />
 </head>
 <body>
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -1078,10 +1078,20 @@
 
   <section id="screen-athlete-events" class="screen journey-screen">
     <div class="screen-inner dashboard-screen">
-      <h1>Events</h1>
-      <p class="screen-desc">Upcoming and ongoing government and private tournaments and leagues. Filter by type and explore opportunities to compete.</p>
-      <div class="admin-tabs service-filters" id="athlete-events-filters" role="tablist" aria-label="Event type"></div>
-      <div class="service-grid athlete-events-grid" id="athlete-events-grid"></div>
+      <h1>Events and Trials</h1>
+      <p class="screen-desc">Browse government and private tournaments/leagues, plus open trials hosted by academies across sports.</p>
+      <div class="admin-tabs requests-tabs" id="athlete-events-main-tabs" role="tablist" aria-label="Events or Trials">
+        <button type="button" class="tab active" role="tab" aria-selected="true" data-events-main-tab="events" id="athlete-tab-events">Events</button>
+        <button type="button" class="tab" role="tab" aria-selected="false" data-events-main-tab="trials" id="athlete-tab-trials">Trials</button>
+      </div>
+      <div class="requests-tab-panel" id="athlete-events-panel-events" data-events-main-panel="events" role="tabpanel">
+        <div class="admin-tabs service-filters" id="athlete-events-filters" role="tablist" aria-label="Event type"></div>
+        <div class="service-grid athlete-events-grid" id="athlete-events-grid"></div>
+      </div>
+      <div class="requests-tab-panel" id="athlete-events-panel-trials" data-events-main-panel="trials" role="tabpanel" hidden>
+        <p class="requests-tab-hint">Open trials from academies — apply or walk in based on each academy’s schedule.</p>
+        <div class="service-grid athlete-events-grid" id="athlete-trials-grid"></div>
+      </div>
     </div>
   </section>
 
@@ -2026,7 +2036,7 @@
   <script src="data.js?v=2026-10-01a"></script>
   <script src="cricsheet-stats.js"></script>
   <script src="ipl-assistant.js"></script>
-  <script src="app.js?v=2026-10-02a"></script>
+  <script src="app.js?v=2026-10-02b"></script>
   <script src="demo-request.js?v=2026-09-05f"></script>
   <script>
   (function () {

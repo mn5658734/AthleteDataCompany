@@ -5518,3 +5518,17 @@ body.insight-modal-open {
 .athlete-event-facts {
   margin-bottom: 0;
 }
+
+.event-type--trial {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.14);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+}
+.athlete-trial-academy {
+  margin: 0 !important;
+  font-size: 0.875rem !important;
+  color: var(--text) !important;
+}
+#athlete-events-main-tabs {
+  margin: 1rem 0 0.85rem;
+}

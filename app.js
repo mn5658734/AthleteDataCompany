@@ -8,7 +8,7 @@
   var PERSONA_LABELS = { athlete: 'Athlete', brand: 'Brand / Agency', admin: 'Admin', creator: 'Sports Content Creator' };
   var BREADCRUMBS = {
     'data': 'Scoring Data',
-    'athlete-register': 'Profile', 'athlete-profile': 'Edit profile', 'athlete-dashboard': 'Overview', 'athlete-requests': 'Sponsorship requests', 'athlete-services': 'Brand Partners', 'athlete-csr-funds': 'CSR Funds', 'athlete-events': 'Events',
+    'athlete-register': 'Profile', 'athlete-profile': 'Edit profile', 'athlete-dashboard': 'Overview', 'athlete-requests': 'Sponsorship requests', 'athlete-services': 'Brand Partners', 'athlete-csr-funds': 'CSR Funds', 'athlete-events': 'Events and Trials',
     'creator-register': 'Registration', 'creator-profile': 'Profile', 'creator-dashboard': 'Dashboard', 'creator-requests': 'Brand requests',
     'brand-register': 'Registration', 'brand-dashboard': 'Dashboard', 'brand-discovery': 'Campaign Agent', 'brand-intelligence': 'Scouting Agent',
     'brand-athlete-profile': 'Athlete profile',
@@ -24,7 +24,7 @@
         { icon: '📊', label: 'Overview', screen: 'athlete-dashboard', badge: 'athlete-agency-requests' },
         { icon: '👤', label: 'Profile', screen: 'athlete-profile' },
         { icon: '🤝', label: 'Sponsorship Requests', screen: 'athlete-requests', badge: 'athlete-requests' },
-        { icon: '🏟️', label: 'Events', screen: 'athlete-events' },
+        { icon: '🏟️', label: 'Events and Trials', screen: 'athlete-events' },
         { icon: '💚', label: 'CSR Funds', screen: 'athlete-csr-funds' },
         { icon: '🧰', label: 'Brand Partners', screen: 'athlete-services' }
       ]
@@ -3983,31 +3983,101 @@
       details: 'School Games Federation of India nationals — government school-sport pipeline.'
     }
   ];
+  var ATHLETE_TRIALS = [
+    {
+      id: 'tr-nca',
+      name: 'Open Pace & Bat Trials',
+      academy: 'National Cricket Academy (NCA)',
+      sport: 'Cricket',
+      when: '12–14 Nov 2025',
+      where: 'Bengaluru',
+      age: 'U16 – U19',
+      status: 'Open',
+      details: 'BCCI-linked academy trials focusing on pace bowling and top-order batting assessment.'
+    },
+    {
+      id: 'tr-mri',
+      name: 'Residential Selection Camp',
+      academy: 'MRF Pace Foundation',
+      sport: 'Cricket',
+      when: '5–8 Dec 2025',
+      where: 'Chennai',
+      age: 'U19 – Senior',
+      status: 'Open',
+      details: 'Invite + walk-in pace bowling trials with video analysis and fitness screening.'
+    },
+    {
+      id: 'tr-tata',
+      name: 'Football Academy Trials',
+      academy: 'Tata Football Academy',
+      sport: 'Football',
+      when: '20–22 Nov 2025',
+      where: 'Jamshedpur',
+      age: 'U14 – U17',
+      status: 'Open',
+      details: 'Multi-day trials covering technical skills, GPS load tests and match simulation.'
+    },
+    {
+      id: 'tr-reliance',
+      name: 'Youth Football Intake',
+      academy: 'Reliance Foundation Young Champs',
+      sport: 'Football',
+      when: 'Jan 2026',
+      where: 'Mumbai / Navi Mumbai',
+      age: 'U13 – U15',
+      status: 'Upcoming',
+      details: 'Scholarship-linked academy trials for grassroots footballers nationwide.'
+    },
+    {
+      id: 'tr-prakash',
+      name: 'Badminton Talent Hunt',
+      academy: 'Prakash Padukone Badminton Academy',
+      sport: 'Badminton',
+      when: '15 Nov 2025',
+      where: 'Bengaluru',
+      age: 'U12 – U17',
+      status: 'Open',
+      details: 'On-court skill trials plus fitness benchmarks for academy programme admission.'
+    },
+    {
+      id: 'tr-gopichand',
+      name: 'High Performance Trials',
+      academy: 'Pullela Gopichand Academy',
+      sport: 'Badminton',
+      when: '28–29 Nov 2025',
+      where: 'Hyderabad',
+      age: 'U15 – Senior',
+      status: 'Open',
+      details: 'Performance pathway trials for state and national-level aspirants.'
+    },
+    {
+      id: 'tr-inha',
+      name: 'Hockey Academy Open Trials',
+      academy: 'Olympic Gold Quest / Partner Academies',
+      sport: 'Hockey',
+      when: 'Dec 2025',
+      where: 'Bhubaneswar',
+      age: 'U16 – U21',
+      status: 'Upcoming',
+      details: 'Skill and fitness trials feeding residential high-performance programmes.'
+    },
+    {
+      id: 'tr-jaiip',
+      name: 'Kabaddi Selection Trials',
+      academy: 'Jaipur Kabaddi Academy',
+      sport: 'Kabaddi',
+      when: '8–9 Nov 2025',
+      where: 'Jaipur',
+      age: 'U17 – Senior',
+      status: 'Open',
+      details: 'Raid/defend skill trials with PKL pathway coaching exposure.'
+    }
+  ];
+  var athleteEventsMainTab = 'events';
   var athleteEventsFilter = 'All';
 
-  function renderAthleteEvents() {
-    var grid = document.getElementById('athlete-events-grid');
-    var filtersEl = document.getElementById('athlete-events-filters');
-    if (!grid) return;
-    var types = ['All', 'Government', 'Private'];
-    if (filtersEl) {
-      filtersEl.innerHTML = types.map(function (t) {
-        var active = t === athleteEventsFilter ? ' active' : '';
-        var count = t === 'All'
-          ? ATHLETE_EVENTS.length
-          : ATHLETE_EVENTS.filter(function (e) { return e.type === t; }).length;
-        return '<button type="button" class="tab' + active + '" data-event-filter="' + escapeHtml(t) + '">' +
-          escapeHtml(t) + ' (' + count + ')</button>';
-      }).join('');
-    }
-    var list = ATHLETE_EVENTS.filter(function (e) {
-      return athleteEventsFilter === 'All' || e.type === athleteEventsFilter;
-    });
-    if (!list.length) {
-      grid.innerHTML = '<div class="requests-empty">No events in this category right now.</div>';
-      return;
-    }
-    grid.innerHTML = list.map(function (e) {
+  function renderAthleteEventCards(list) {
+    return list.map(function (e) {
       var typeClass = e.type === 'Government' ? 'event-type--gov' : 'event-type--private';
       var statusClass = /ongoing/i.test(e.status) ? 'success' : '';
       return '<div class="service-card athlete-event-card">' +
@@ -4029,11 +4099,89 @@
     }).join('');
   }
 
+  function renderAthleteTrialCards(list) {
+    return list.map(function (t) {
+      var statusClass = /open/i.test(t.status) ? 'success' : '';
+      return '<div class="service-card athlete-event-card athlete-trial-card">' +
+        '<div class="service-card-top">' +
+          '<span class="service-card-mark">' + escapeHtml(serviceInitials(t.academy)) + '</span>' +
+          '<div><h3>' + escapeHtml(t.name) + '</h3>' +
+          '<span class="service-card-category">' + escapeHtml(t.sport) + ' · ' + escapeHtml(t.age) + '</span></div>' +
+        '</div>' +
+        '<div class="athlete-event-meta">' +
+          '<span class="event-type-pill event-type--trial">Academy trial</span>' +
+          '<span class="badge ' + statusClass + '">' + escapeHtml(t.status) + '</span>' +
+        '</div>' +
+        '<p class="athlete-trial-academy"><strong>' + escapeHtml(t.academy) + '</strong></p>' +
+        '<div class="request-meta athlete-event-facts">' +
+          '<div class="request-meta-item"><span class="rm-label">When</span><span class="rm-value">' + escapeHtml(t.when) + '</span></div>' +
+          '<div class="request-meta-item"><span class="rm-label">Where</span><span class="rm-value">' + escapeHtml(t.where) + '</span></div>' +
+        '</div>' +
+        '<p>' + escapeHtml(t.details) + '</p>' +
+      '</div>';
+    }).join('');
+  }
+
+  function renderAthleteEvents() {
+    var mainTabs = document.getElementById('athlete-events-main-tabs');
+    if (mainTabs) {
+      mainTabs.querySelectorAll('[data-events-main-tab]').forEach(function (tab) {
+        var on = tab.getAttribute('data-events-main-tab') === athleteEventsMainTab;
+        tab.classList.toggle('active', on);
+        tab.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+    }
+    document.querySelectorAll('[data-events-main-panel]').forEach(function (panel) {
+      panel.hidden = panel.getAttribute('data-events-main-panel') !== athleteEventsMainTab;
+    });
+
+    var eventsTab = document.getElementById('athlete-tab-events');
+    var trialsTab = document.getElementById('athlete-tab-trials');
+    if (eventsTab) eventsTab.textContent = 'Events (' + ATHLETE_EVENTS.length + ')';
+    if (trialsTab) trialsTab.textContent = 'Trials (' + ATHLETE_TRIALS.length + ')';
+
+    if (athleteEventsMainTab === 'trials') {
+      var trialsGrid = document.getElementById('athlete-trials-grid');
+      if (!trialsGrid) return;
+      trialsGrid.innerHTML = ATHLETE_TRIALS.length
+        ? renderAthleteTrialCards(ATHLETE_TRIALS)
+        : '<div class="requests-empty">No academy trials listed right now.</div>';
+      return;
+    }
+
+    var grid = document.getElementById('athlete-events-grid');
+    var filtersEl = document.getElementById('athlete-events-filters');
+    if (!grid) return;
+    var types = ['All', 'Government', 'Private'];
+    if (filtersEl) {
+      filtersEl.innerHTML = types.map(function (t) {
+        var active = t === athleteEventsFilter ? ' active' : '';
+        var count = t === 'All'
+          ? ATHLETE_EVENTS.length
+          : ATHLETE_EVENTS.filter(function (e) { return e.type === t; }).length;
+        return '<button type="button" class="tab' + active + '" data-event-filter="' + escapeHtml(t) + '">' +
+          escapeHtml(t) + ' (' + count + ')</button>';
+      }).join('');
+    }
+    var list = ATHLETE_EVENTS.filter(function (e) {
+      return athleteEventsFilter === 'All' || e.type === athleteEventsFilter;
+    });
+    grid.innerHTML = list.length
+      ? renderAthleteEventCards(list)
+      : '<div class="requests-empty">No events in this category right now.</div>';
+  }
+
   function initAthleteEvents() {
     var screen = document.getElementById('screen-athlete-events');
     if (!screen || screen.getAttribute('data-bound')) return;
     screen.setAttribute('data-bound', '1');
     screen.addEventListener('click', function (e) {
+      var mainTab = e.target.closest('[data-events-main-tab]');
+      if (mainTab) {
+        athleteEventsMainTab = mainTab.getAttribute('data-events-main-tab') || 'events';
+        renderAthleteEvents();
+        return;
+      }
       var filterBtn = e.target.closest('[data-event-filter]');
       if (!filterBtn) return;
       athleteEventsFilter = filterBtn.getAttribute('data-event-filter') || 'All';
