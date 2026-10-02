@@ -8,7 +8,7 @@
   var PERSONA_LABELS = { athlete: 'Athlete', brand: 'Brand / Agency', admin: 'Admin', creator: 'Sports Content Creator' };
   var BREADCRUMBS = {
     'data': 'Scoring Data',
-    'athlete-register': 'Profile', 'athlete-profile': 'Edit profile', 'athlete-dashboard': 'Overview', 'athlete-requests': 'Sponsorship requests', 'athlete-services': 'Brand Partners', 'athlete-csr-funds': 'CSR Funds',
+    'athlete-register': 'Profile', 'athlete-profile': 'Edit profile', 'athlete-dashboard': 'Overview', 'athlete-requests': 'Sponsorship requests', 'athlete-services': 'Brand Partners', 'athlete-csr-funds': 'CSR Funds', 'athlete-events': 'Events',
     'creator-register': 'Registration', 'creator-profile': 'Profile', 'creator-dashboard': 'Dashboard', 'creator-requests': 'Brand requests',
     'brand-register': 'Registration', 'brand-dashboard': 'Dashboard', 'brand-discovery': 'Campaign Agent', 'brand-intelligence': 'Scouting Agent',
     'brand-athlete-profile': 'Athlete profile',
@@ -24,6 +24,7 @@
         { icon: '📊', label: 'Overview', screen: 'athlete-dashboard', badge: 'athlete-agency-requests' },
         { icon: '👤', label: 'Profile', screen: 'athlete-profile' },
         { icon: '🤝', label: 'Sponsorship Requests', screen: 'athlete-requests', badge: 'athlete-requests' },
+        { icon: '🏟️', label: 'Events', screen: 'athlete-events' },
         { icon: '💚', label: 'CSR Funds', screen: 'athlete-csr-funds' },
         { icon: '🧰', label: 'Brand Partners', screen: 'athlete-services' }
       ]
@@ -3826,6 +3827,220 @@
     });
   }
 
+  var ATHLETE_EVENTS = [
+    {
+      id: 'ev-ipl',
+      name: 'Indian Premier League (IPL)',
+      type: 'Private',
+      sport: 'Cricket',
+      level: 'Pro franchise league',
+      when: 'Mar – May 2026',
+      where: 'PAN India',
+      status: 'Upcoming',
+      details: 'Top private T20 franchise league. Pathway via domestic performance and auctions.'
+    },
+    {
+      id: 'ev-wpl',
+      name: "Women's Premier League (WPL)",
+      type: 'Private',
+      sport: 'Cricket',
+      level: 'Pro franchise league',
+      when: 'Feb – Mar 2026',
+      where: 'PAN India',
+      status: 'Upcoming',
+      details: 'Premier private women’s T20 league with franchise contracting and national visibility.'
+    },
+    {
+      id: 'ev-ranji',
+      name: 'Ranji Trophy',
+      type: 'Government',
+      sport: 'Cricket',
+      level: 'Senior domestic',
+      when: 'Oct 2025 – Feb 2026',
+      where: 'State associations',
+      status: 'Ongoing',
+      details: 'BCCI / state association first-class competition — core pathway to national selection.'
+    },
+    {
+      id: 'ev-smat',
+      name: 'Syed Mushtaq Ali Trophy',
+      type: 'Government',
+      sport: 'Cricket',
+      level: 'Senior domestic T20',
+      when: 'Nov – Dec 2025',
+      where: 'State associations',
+      status: 'Upcoming',
+      details: 'Domestic T20 championship run by BCCI — key scouting window for franchise leagues.'
+    },
+    {
+      id: 'ev-isl',
+      name: 'Indian Super League (ISL)',
+      type: 'Private',
+      sport: 'Football',
+      level: 'Pro franchise league',
+      when: 'Sep 2025 – Mar 2026',
+      where: 'PAN India',
+      status: 'Ongoing',
+      details: 'Top private football league in India with club contracts and broadcast exposure.'
+    },
+    {
+      id: 'ev-i-league',
+      name: 'I-League',
+      type: 'Government',
+      sport: 'Football',
+      level: 'National league',
+      when: '2025–26 season',
+      where: 'PAN India',
+      status: 'Ongoing',
+      details: 'AIFF national league pathway feeding clubs and national team consideration.'
+    },
+    {
+      id: 'ev-pkl',
+      name: 'Pro Kabaddi League (PKL)',
+      type: 'Private',
+      sport: 'Kabaddi',
+      level: 'Pro franchise league',
+      when: 'Oct – Dec 2025',
+      where: 'PAN India',
+      status: 'Upcoming',
+      details: 'Private franchise kabaddi league with auctions and multi-city home seasons.'
+    },
+    {
+      id: 'ev-national-games',
+      name: 'National Games',
+      type: 'Government',
+      sport: 'Multi-sport',
+      level: 'National multi-sport',
+      when: '2026',
+      where: 'Host state TBD',
+      status: 'Upcoming',
+      details: 'Government-backed multi-sport games across athletics, aquatics, combat and team sports.'
+    },
+    {
+      id: 'ev-hockey-hicl',
+      name: 'Hockey India League',
+      type: 'Private',
+      sport: 'Hockey',
+      level: 'Pro franchise league',
+      when: 'Dec 2025 – Feb 2026',
+      where: 'PAN India',
+      status: 'Upcoming',
+      details: 'Private franchise hockey league reconnecting domestic talent with pro contracts.'
+    },
+    {
+      id: 'ev-khelo-india',
+      name: 'Khelo India Youth Games',
+      type: 'Government',
+      sport: 'Multi-sport',
+      level: 'Youth national',
+      when: 'Jan – Feb 2026',
+      where: 'Host state',
+      status: 'Upcoming',
+      details: 'Government youth pathway event identifying talent across Olympic and indigenous sports.'
+    },
+    {
+      id: 'ev-pbl',
+      name: 'Premier Badminton League',
+      type: 'Private',
+      sport: 'Badminton',
+      level: 'Pro franchise league',
+      when: 'Jan – Feb 2026',
+      where: 'PAN India',
+      status: 'Upcoming',
+      details: 'Private badminton franchise league featuring Indian and international stars.'
+    },
+    {
+      id: 'ev-inter-state',
+      name: 'National Inter-State Athletics',
+      type: 'Government',
+      sport: 'Athletics',
+      level: 'Senior national',
+      when: '2026 season',
+      where: 'Rotating venues',
+      status: 'Scheduled',
+      details: 'AFI / state government championships for track & field qualification and rankings.'
+    },
+    {
+      id: 'ev-ultimate-kho',
+      name: 'Ultimate Kho Kho',
+      type: 'Private',
+      sport: 'Kho Kho',
+      level: 'Pro franchise league',
+      when: '2026 season',
+      where: 'PAN India',
+      status: 'Upcoming',
+      details: 'Private franchise league modernising kho kho with structured seasons and player contracts.'
+    },
+    {
+      id: 'ev-sgfi',
+      name: 'SGFI National School Games',
+      type: 'Government',
+      sport: 'Multi-sport',
+      level: 'School / junior',
+      when: 'Winter 2025–26',
+      where: 'Multiple host cities',
+      status: 'Upcoming',
+      details: 'School Games Federation of India nationals — government school-sport pipeline.'
+    }
+  ];
+  var athleteEventsFilter = 'All';
+
+  function renderAthleteEvents() {
+    var grid = document.getElementById('athlete-events-grid');
+    var filtersEl = document.getElementById('athlete-events-filters');
+    if (!grid) return;
+    var types = ['All', 'Government', 'Private'];
+    if (filtersEl) {
+      filtersEl.innerHTML = types.map(function (t) {
+        var active = t === athleteEventsFilter ? ' active' : '';
+        var count = t === 'All'
+          ? ATHLETE_EVENTS.length
+          : ATHLETE_EVENTS.filter(function (e) { return e.type === t; }).length;
+        return '<button type="button" class="tab' + active + '" data-event-filter="' + escapeHtml(t) + '">' +
+          escapeHtml(t) + ' (' + count + ')</button>';
+      }).join('');
+    }
+    var list = ATHLETE_EVENTS.filter(function (e) {
+      return athleteEventsFilter === 'All' || e.type === athleteEventsFilter;
+    });
+    if (!list.length) {
+      grid.innerHTML = '<div class="requests-empty">No events in this category right now.</div>';
+      return;
+    }
+    grid.innerHTML = list.map(function (e) {
+      var typeClass = e.type === 'Government' ? 'event-type--gov' : 'event-type--private';
+      var statusClass = /ongoing/i.test(e.status) ? 'success' : '';
+      return '<div class="service-card athlete-event-card">' +
+        '<div class="service-card-top">' +
+          '<span class="service-card-mark">' + escapeHtml(serviceInitials(e.name)) + '</span>' +
+          '<div><h3>' + escapeHtml(e.name) + '</h3>' +
+          '<span class="service-card-category">' + escapeHtml(e.sport) + ' · ' + escapeHtml(e.level) + '</span></div>' +
+        '</div>' +
+        '<div class="athlete-event-meta">' +
+          '<span class="event-type-pill ' + typeClass + '">' + escapeHtml(e.type) + '</span>' +
+          '<span class="badge ' + statusClass + '">' + escapeHtml(e.status) + '</span>' +
+        '</div>' +
+        '<div class="request-meta athlete-event-facts">' +
+          '<div class="request-meta-item"><span class="rm-label">When</span><span class="rm-value">' + escapeHtml(e.when) + '</span></div>' +
+          '<div class="request-meta-item"><span class="rm-label">Where</span><span class="rm-value">' + escapeHtml(e.where) + '</span></div>' +
+        '</div>' +
+        '<p>' + escapeHtml(e.details) + '</p>' +
+      '</div>';
+    }).join('');
+  }
+
+  function initAthleteEvents() {
+    var screen = document.getElementById('screen-athlete-events');
+    if (!screen || screen.getAttribute('data-bound')) return;
+    screen.setAttribute('data-bound', '1');
+    screen.addEventListener('click', function (e) {
+      var filterBtn = e.target.closest('[data-event-filter]');
+      if (!filterBtn) return;
+      athleteEventsFilter = filterBtn.getAttribute('data-event-filter') || 'All';
+      renderAthleteEvents();
+    });
+  }
+
   var DEMO_ATHLETE_NAME = 'V Suryavanshi';
 
   function findAthleteByExactName(name) {
@@ -4697,6 +4912,9 @@
     } else if (screenId === 'athlete-csr-funds') {
       initAthleteCsrFunds();
       renderAthleteCsrFunds();
+    } else if (screenId === 'athlete-events') {
+      initAthleteEvents();
+      renderAthleteEvents();
     } else if (screenId === 'creator-requests') {
       renderRequests('creator-requests-list', 'creator', 'creator');
     }
