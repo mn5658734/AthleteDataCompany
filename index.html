@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2026-10-10a" />
+  <link rel="stylesheet" href="styles.css?v=2026-10-10d" />
 </head>
 <body>
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -1396,34 +1396,51 @@
     <div class="screen-inner dashboard-screen brand-dashboard">
       <div class="brand-dashboard-header">
         <div>
-          <h1>Partner / Agency dashboard</h1>
+          <h1 id="brand-dashboard-title">Partner / Agency dashboard</h1>
           <p class="screen-desc" id="brand-dashboard-subtitle">Manage your athlete portfolio. Add athletes via request — approval from the athlete or admin required.</p>
+          <p class="partner-role-chip" id="partner-role-chip" hidden></p>
         </div>
-        <button type="button" class="btn-primary" id="brand-portfolio-add-btn">+ Add athlete</button>
+        <div class="brand-dashboard-header-actions">
+          <button type="button" class="btn-secondary" id="partner-role-switch-btn">Switch persona</button>
+          <button type="button" class="btn-primary" id="brand-portfolio-add-btn">+ Add athlete</button>
+        </div>
       </div>
       <div class="dashboard-grid" id="brand-dashboard-stats">
         <div class="stat-card">
           <span class="stat-value" id="brand-dash-portfolio-count">0</span>
-          <span class="stat-label">Players in portfolio</span>
+          <span class="stat-label" id="brand-dash-portfolio-label">Players in portfolio</span>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" id="brand-dash-stat-received">
           <span class="stat-value" id="brand-dash-received-count">0</span>
-          <span class="stat-label">Request received</span>
+          <span class="stat-label" id="brand-dash-received-label">Request received</span>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" id="brand-dash-stat-sent">
           <span class="stat-value" id="brand-dash-sent-count">0</span>
-          <span class="stat-label">Portfolio request sent</span>
+          <span class="stat-label" id="brand-dash-sent-label">Portfolio request sent</span>
+        </div>
+        <div class="stat-card" id="brand-dash-stat-attendance" hidden>
+          <span class="stat-value" id="brand-dash-attendance-avg">—</span>
+          <span class="stat-label">Avg attendance</span>
+        </div>
+        <div class="stat-card" id="brand-dash-stat-payments" hidden>
+          <span class="stat-value" id="brand-dash-payments-due">₹0</span>
+          <span class="stat-label">Payments due</span>
         </div>
       </div>
-      <div class="dashboard-section">
+      <div class="dashboard-section" id="brand-portfolio-section">
         <div class="brand-portfolio-section-head">
-          <h2>Athlete portfolio</h2>
+          <h2 id="brand-portfolio-heading">Athlete portfolio</h2>
         </div>
         <div id="brand-portfolio-list" class="brand-portfolio-list"></div>
       </div>
-      <div class="dashboard-section">
+      <div class="dashboard-section" id="brand-portfolio-requests-section">
         <h2>Recent portfolio requests</h2>
         <div id="brand-portfolio-requests-list" class="brand-portfolio-requests"></div>
+      </div>
+      <div class="dashboard-section" id="coach-tracking-section" hidden>
+        <h2>Athlete tracking</h2>
+        <p class="screen-desc">Update performance, attendance and payment metrics for athletes you coach.</p>
+        <div id="coach-tracking-list" class="coach-tracking-list"></div>
       </div>
     </div>
   </section>
@@ -1439,6 +1456,71 @@
       <input type="search" id="brand-portfolio-search-input" class="portfolio-add-search-input" placeholder="Name or sport…" autocomplete="off" />
       <div id="brand-portfolio-search-results" class="portfolio-add-results" role="listbox" aria-label="Athlete search results"></div>
       <p class="portfolio-add-note" id="brand-portfolio-add-note" hidden></p>
+    </div>
+  </div>
+
+  <div id="coach-create-athlete-modal" class="insight-modal portfolio-add-modal" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="coach-create-athlete-title">
+    <div class="insight-modal-backdrop" data-close-coach-create tabindex="-1"></div>
+    <div class="insight-modal-dialog portfolio-add-dialog coach-create-dialog">
+      <button type="button" class="insight-modal-close" data-close-coach-create aria-label="Close">×</button>
+      <p class="insight-modal-kicker">Coach</p>
+      <h2 id="coach-create-athlete-title" class="insight-modal-title">Create athlete profile</h2>
+      <p class="insight-modal-sub">Add basic details. ADC will send an invite link to the athlete’s email and phone number.</p>
+      <form id="coach-create-athlete-form" class="coach-create-form" novalidate>
+        <label class="portfolio-add-search-label" for="coach-athlete-name">Full name</label>
+        <input type="text" id="coach-athlete-name" class="portfolio-add-search-input" required placeholder="Athlete full name" />
+        <div class="coach-create-row">
+          <div>
+            <label class="portfolio-add-search-label" for="coach-athlete-sport">Sport</label>
+            <input type="text" id="coach-athlete-sport" class="portfolio-add-search-input" required placeholder="e.g. Cricket" />
+          </div>
+          <div>
+            <label class="portfolio-add-search-label" for="coach-athlete-age">Age</label>
+            <input type="number" id="coach-athlete-age" class="portfolio-add-search-input" min="8" max="60" placeholder="Age" />
+          </div>
+        </div>
+        <label class="portfolio-add-search-label" for="coach-athlete-email">Email</label>
+        <input type="email" id="coach-athlete-email" class="portfolio-add-search-input" required placeholder="athlete@email.com" />
+        <label class="portfolio-add-search-label" for="coach-athlete-phone">Mobile number</label>
+        <input type="tel" id="coach-athlete-phone" class="portfolio-add-search-input" required placeholder="+91 …" />
+        <div class="coach-create-actions">
+          <button type="button" class="btn-secondary" data-close-coach-create>Cancel</button>
+          <button type="submit" class="btn-primary">Create &amp; send invite</button>
+        </div>
+      </form>
+      <p class="portfolio-add-note" id="coach-create-athlete-note" hidden></p>
+    </div>
+  </div>
+
+  <div id="partner-role-modal" class="insight-modal partner-role-modal" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="partner-role-modal-title">
+    <div class="insight-modal-backdrop" data-close-partner-role tabindex="-1"></div>
+    <div class="insight-modal-dialog partner-role-dialog">
+      <button type="button" class="insight-modal-close" data-close-partner-role aria-label="Close">×</button>
+      <p class="insight-modal-kicker">Partner login</p>
+      <h2 id="partner-role-modal-title" class="insight-modal-title">Choose your persona</h2>
+      <p class="insight-modal-sub">Select how you’ll work on ADC. Shown once after login — hard refresh resets this prototype chooser.</p>
+      <div class="partner-role-grid" id="partner-role-grid" role="listbox" aria-label="Partner personas">
+        <button type="button" class="partner-role-card" role="option" data-partner-role="coach">
+          <span class="partner-role-icon" aria-hidden="true">🧢</span>
+          <strong>Coach</strong>
+          <span>Train, develop and track athlete performance readiness.</span>
+        </button>
+        <button type="button" class="partner-role-card" role="option" data-partner-role="scouting">
+          <span class="partner-role-icon" aria-hidden="true">🔍</span>
+          <strong>Scouting Partner</strong>
+          <span>Discover talent, shortlist prospects and share scouting insights.</span>
+        </button>
+        <button type="button" class="partner-role-card" role="option" data-partner-role="athlete-manager">
+          <span class="partner-role-icon" aria-hidden="true">🗂️</span>
+          <strong>Athlete managers</strong>
+          <span>Manage athlete portfolios, representation and career deals.</span>
+        </button>
+        <button type="button" class="partner-role-card" role="option" data-partner-role="brand-manager">
+          <span class="partner-role-icon" aria-hidden="true">📣</span>
+          <strong>Brand Managers</strong>
+          <span>Run campaigns, sponsorships and partner–athlete matchmaking.</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -2036,7 +2118,7 @@
   <script src="data.js?v=2026-10-10a"></script>
   <script src="cricsheet-stats.js"></script>
   <script src="ipl-assistant.js"></script>
-  <script src="app.js?v=2026-10-10a"></script>
+  <script src="app.js?v=2026-10-10d"></script>
   <script src="demo-request.js?v=2026-09-05f"></script>
   <script>
   (function () {
