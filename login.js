@@ -5,7 +5,7 @@
 (function () {
   var PERSONA_REDIRECTS = {
     athlete: { type: 'internal', hash: '#/athlete/dashboard', hint: "You'll go to your athlete overview after sign-in." },
-    brand: { type: 'internal', hash: '#/brand/dashboard', hint: "You'll go to your agency dashboard after sign-in." }
+    brand: { type: 'internal', hash: '#/brand/dashboard', hint: "You'll go to your partner / agency dashboard after sign-in." }
   };
 
   var selectedPersona = 'athlete';

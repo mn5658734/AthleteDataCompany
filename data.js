@@ -317,7 +317,7 @@
   var SEED_AGENCIES = [
     { id: 'agency-demo-1', name: 'Agency B', email: 'agencyb@example.com', type: 'agency', plan: 'starter' },
     { id: 'agency-demo-2', name: 'SportsFirst Management', email: 'hello@sportsfirst.in', type: 'agency', plan: 'pro' },
-    { id: 'agency-demo-3', name: 'Brand A', email: 'branda@example.com', type: 'brand', plan: 'pro' }
+    { id: 'agency-demo-3', name: 'Partner A', email: 'partnera@example.com', type: 'brand', plan: 'pro' }
   ];
 
   function normalizeSport(sport) {

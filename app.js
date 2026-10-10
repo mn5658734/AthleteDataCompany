@@ -5,15 +5,15 @@
 
 (function () {
   var PERSONA_START = { athlete: 'athlete-profile', brand: 'brand-dashboard', admin: 'admin-login', creator: 'creator-register' };
-  var PERSONA_LABELS = { athlete: 'Athlete', brand: 'Brand / Agency', admin: 'Admin', creator: 'Sports Content Creator' };
+  var PERSONA_LABELS = { athlete: 'Athlete', brand: 'Partner / Agency', admin: 'Admin', creator: 'Sports Content Creator' };
   var BREADCRUMBS = {
     'data': 'Scoring Data',
-    'athlete-register': 'Profile', 'athlete-profile': 'Edit profile', 'athlete-dashboard': 'Overview', 'athlete-requests': 'Sponsorship requests', 'athlete-services': 'Brand Partners', 'athlete-csr-funds': 'CSR Funds', 'athlete-events': 'Events and Trials',
-    'creator-register': 'Registration', 'creator-profile': 'Profile', 'creator-dashboard': 'Dashboard', 'creator-requests': 'Brand requests',
+    'athlete-register': 'Profile', 'athlete-profile': 'Edit profile', 'athlete-dashboard': 'Overview', 'athlete-requests': 'Sponsorship requests', 'athlete-services': 'Partners', 'athlete-csr-funds': 'CSR Funds', 'athlete-events': 'Events and Trials',
+    'creator-register': 'Registration', 'creator-profile': 'Profile', 'creator-dashboard': 'Dashboard', 'creator-requests': 'Partner requests',
     'brand-register': 'Registration', 'brand-dashboard': 'Dashboard', 'brand-discovery': 'Campaign Agent', 'brand-intelligence': 'Scouting Agent',
     'brand-athlete-profile': 'Athlete profile',
     'brand-inquiry': 'Send inquiry', 'brand-proposal': 'Create proposal', 'brand-requests': 'Sponsorship requests', 'brand-shortlist': 'Shortlist',
-    'admin-login': 'Login', 'admin-athlete-governance': 'Athlete governance', 'admin-brand-governance': 'Brand governance', 'admin-revenue': 'Revenue dashboard'
+    'admin-login': 'Login', 'admin-athlete-governance': 'Athlete governance', 'admin-brand-governance': 'Partner governance', 'admin-revenue': 'Revenue dashboard'
   };
 
   // Left-hand navigation menu per persona. `badge:` keys pull a live count.
@@ -26,7 +26,7 @@
         { icon: '🤝', label: 'Sponsorship Requests', screen: 'athlete-requests', badge: 'athlete-requests' },
         { icon: '🏟️', label: 'Events and Trials', screen: 'athlete-events' },
         { icon: '💚', label: 'CSR Funds', screen: 'athlete-csr-funds' },
-        { icon: '🧰', label: 'Brand Partners', screen: 'athlete-services' }
+        { icon: '🧰', label: 'Partners', screen: 'athlete-services' }
       ]
     },
     creator: {
@@ -34,12 +34,12 @@
       items: [
         { icon: '📊', label: 'Dashboard', screen: 'creator-dashboard' },
         { icon: '👤', label: 'My Profile', screen: 'creator-profile' },
-        { icon: '🤝', label: 'Brand Requests', screen: 'creator-requests', badge: 'creator-requests' },
+        { icon: '🤝', label: 'Partner Requests', screen: 'creator-requests', badge: 'creator-requests' },
         { icon: '📝', label: 'Registration', screen: 'creator-register' }
       ]
     },
     brand: {
-      label: 'Brand / Agency',
+      label: 'Partner / Agency',
       items: [
         { icon: '📊', label: 'Dashboard', screen: 'brand-dashboard', badge: 'agency-received-requests' },
         { icon: '🔍', label: 'Campaign Agent', screen: 'brand-discovery' },
@@ -53,7 +53,7 @@
       label: 'Admin Console',
       items: [
         { icon: '🛡️', label: 'Athlete Governance', screen: 'admin-athlete-governance' },
-        { icon: '🏢', label: 'Brand Governance', screen: 'admin-brand-governance', badge: 'portfolio-requests' },
+        { icon: '🏢', label: 'Partner Governance', screen: 'admin-brand-governance', badge: 'portfolio-requests' },
         { icon: '💹', label: 'Revenue Dashboard', screen: 'admin-revenue' }
       ]
     }
@@ -767,7 +767,7 @@
       resultsEl.innerHTML = list.map(function (a) {
         return '<button type="button" class="managed-by-agency-option" role="option" data-agency-id="' + escapeHtml(a.id) + '" data-agency-name="' + escapeHtml(a.name) + '">' +
           '<strong>' + escapeHtml(a.name) + '</strong>' +
-          '<span>' + escapeHtml(a.type === 'brand' ? 'Brand' : 'Agency') + (a.email ? ' · ' + escapeHtml(a.email) : '') + '</span>' +
+          '<span>' + escapeHtml(a.type === 'brand' ? 'Partner' : 'Agency') + (a.email ? ' · ' + escapeHtml(a.email) : '') + '</span>' +
           '</button>';
       }).join('');
       resultsEl.hidden = false;
@@ -2826,9 +2826,9 @@
       },
       {
         id: 'brand',
-        label: '3. Brand Matching Engine',
+        label: '3. Partner Matching Engine',
         columns: [
-          { key: 'brandAudienceFit', label: 'Brand & Audience Fit', resolve: function (a) {
+          { key: 'brandAudienceFit', label: 'Partner & Audience Fit', resolve: function (a) {
             if (a.perf == null || a.social == null) return null;
             return ((Number(a.perf) + Number(a.social)) / 20).toFixed(1);
           }},
@@ -2841,7 +2841,7 @@
             return a.verified ? 'Verified' : 'Unverified';
           }},
           { key: 'sponsorshipReadiness', label: 'Sponsorship Readiness', resolve: function (a) { return a.budget; } },
-          { key: 'brandMatchScore', label: 'Brand Match Score', resolve: function (a) {
+          { key: 'brandMatchScore', label: 'Partner Match Score', resolve: function (a) {
             if (a.perf == null || a.social == null) return null;
             return ((Number(a.perf) + Number(a.social)) / 20).toFixed(1);
           }}
@@ -3013,7 +3013,7 @@
   var DATA_VIEWS = {
     scoring: {
       label: 'Scoring Engines',
-      footnote: 'Performance Engine includes Domestic/IPL columns plus all Test, ODI, and T20I batting & bowling data points from india_cricsheet_stats.py. Missing values show as NA. Social/Brand fields stay engine-aligned; Brand Fit = (Perf + Social) / 20 when both scores exist.',
+      footnote: 'Performance Engine includes Domestic/IPL columns plus all Test, ODI, and T20I batting & bowling data points from india_cricsheet_stats.py. Missing values show as NA. Social/Partner fields stay engine-aligned; Partner Fit = (Perf + Social) / 20 when both scores exist.',
       showLegend: true,
       getGroups: buildScoringEngineGroups,
       getRows: getScoringEngineRows,
@@ -3224,13 +3224,13 @@
     var currentAgency = options.agency || null;
     var title = role === 'brand'
       ? (req.athlete || 'Athlete')
-      : (req.brand || 'Brand / Agency');
+      : (req.brand || 'Partner / Agency');
     var sub = role === 'brand'
       ? ('Campaign: ' + (req.brand || '—'))
       : ('Proposal for: ' + (req.athlete || 'you'));
     if (role === 'agency') {
       title = req.athlete || 'Athlete';
-      sub = 'From: ' + (req.brand || 'Brand') + ' · for your managed athlete';
+      sub = 'From: ' + (req.brand || 'Partner') + ' · for your managed athlete';
     }
     var dateLabel = req.createdAt ? new Date(req.createdAt).toLocaleDateString() : '';
     var delivery = buildRequestDeliveryLine(req);
@@ -4940,7 +4940,7 @@
     var req = {
       athlete: (athleteEl && athleteEl.value) || (athlete && athlete.name) || 'Selected athlete',
       athleteId: state.selectedAthleteId || null,
-      brand: (brandEl && brandEl.value.trim()) || (agency && agency.name) || 'Your Brand',
+      brand: (brandEl && brandEl.value.trim()) || (agency && agency.name) || 'Your Partner',
       duration: durationEl && durationEl.value.trim(),
       deliverables: deliverablesEl && deliverablesEl.value.trim(),
       budget: budgetEl && budgetEl.value.trim(),

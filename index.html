@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2026-10-02b" />
+  <link rel="stylesheet" href="styles.css?v=2026-10-10a" />
 </head>
 <body>
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -179,9 +179,9 @@
       </div>
     </section>
 
-    <section class="landing-trust" aria-label="Brand partners">
+    <section class="landing-trust" aria-label="Partners">
       <div class="landing-trust-inner">
-        <p class="landing-trust-kicker">Brand Partners</p>
+        <p class="landing-trust-kicker">Partners</p>
         <h2 class="landing-trust-title">Accelerating the athlete economy</h2>
         <div class="partner-logos-wrap">
           <ul class="partner-logos" aria-hidden="true">
@@ -413,7 +413,7 @@
         <span class="data-engine-pill data-engine-pill--odi">1. Performance · ODI</span>
         <span class="data-engine-pill data-engine-pill--t20i">1. Performance · T20I</span>
         <span class="data-engine-pill data-engine-pill--social">2. Social &amp; Fan Signal</span>
-        <span class="data-engine-pill data-engine-pill--brand">3. Brand Matching</span>
+        <span class="data-engine-pill data-engine-pill--brand">3. Partner Matching</span>
       </div>
       <div class="data-table-wrap">
         <table class="data-table" id="data-table">
@@ -421,7 +421,7 @@
           <tbody id="data-table-body"></tbody>
         </table>
       </div>
-      <p class="data-footnote" id="data-footnote">Performance Score = POM impact (38%) + team win rate (32%) + availability (30%). Social Score = performance + POM visibility + star recognition. Brand Fit = (Perf + Social) / 20. Source: IPL 2026 match CSV via scoring engine.</p>
+      <p class="data-footnote" id="data-footnote">Performance Score = POM impact (38%) + team win rate (32%) + availability (30%). Social Score = performance + POM visibility + star recognition. Partner Fit = (Perf + Social) / 20. Source: IPL 2026 match CSV via scoring engine.</p>
     </div>
   </section>
 
@@ -566,7 +566,7 @@
             <div id="athlete-managed-by-agency-wrap" class="managed-by-agency-wrap" hidden>
               <input type="search" id="athlete-managed-by-input" class="managed-by-other-input" placeholder="Search registered agency…" autocomplete="off" />
               <div id="athlete-managed-by-results" class="managed-by-agency-results" role="listbox" hidden></div>
-              <p class="form-hint">Pick from brands / agencies created on the platform. The agency or admin must approve before you join their portfolio.</p>
+              <p class="form-hint">Pick from partners / agencies created on the platform. The agency or admin must approve before you join their portfolio.</p>
               <p class="form-hint" id="athlete-managed-by-note" hidden></p>
             </div>
           </div>
@@ -804,7 +804,7 @@
           </div>
           <div class="stat-card">
             <span class="stat-value">7</span>
-            <span class="stat-label">Brand shortlists</span>
+            <span class="stat-label">Partner shortlists</span>
           </div>
           <div class="stat-card">
             <span class="stat-value">3</span>
@@ -1041,7 +1041,7 @@
   <section id="screen-athlete-requests" class="screen journey-screen">
     <div class="screen-inner dashboard-screen">
       <h1>Sponsorship Requests</h1>
-      <p class="screen-desc">Proposals sent to you by brands and agencies. If you’re managed by an agency, the same request is shared with them. Accept, negotiate, or reject each request.</p>
+      <p class="screen-desc">Proposals sent to you by partners and agencies. If you’re managed by an agency, the same request is shared with them. Accept, negotiate, or reject each request.</p>
 
       <section class="dashboard-section athlete-panel">
         <div class="athlete-panel-head">
@@ -1097,8 +1097,8 @@
 
   <section id="screen-athlete-services" class="screen journey-screen">
     <div class="screen-inner dashboard-screen">
-      <h1>Brand Partners</h1>
-      <p class="screen-desc">Partner brands and services for athletes — performance tech, insurance, fitness, scouting and more. Express interest and the ADC team will connect you.</p>
+      <h1>Partners</h1>
+      <p class="screen-desc">Partner services for athletes — performance tech, insurance, fitness, scouting and more. Express interest and the ADC team will connect you.</p>
       <div class="admin-tabs service-filters" id="athlete-services-filters" role="tablist" aria-label="Partner categories"></div>
       <div class="service-grid" id="athlete-services-grid"></div>
     </div>
@@ -1256,7 +1256,7 @@
                 <option>Sponsored posts / Reels</option>
                 <option>Product reviews</option>
                 <option>Event coverage</option>
-                <option>Brand ambassadorship</option>
+                <option>Partner ambassadorship</option>
                 <option>All of the above</option>
               </select>
             </div>
@@ -1293,7 +1293,7 @@
         </div>
         <div class="stat-card">
           <span class="stat-value">4</span>
-          <span class="stat-label">Brand shortlists</span>
+          <span class="stat-label">Partner shortlists</span>
         </div>
         <div class="stat-card">
           <span class="stat-value">2</span>
@@ -1301,10 +1301,10 @@
         </div>
       </div>
       <div class="dashboard-section">
-        <h2>Recent brand interest</h2>
+        <h2>Recent partner interest</h2>
         <ul class="inquiry-list">
           <li>
-            <strong>Brand A</strong> – Collaboration inquiry
+            <strong>Partner A</strong> – Collaboration inquiry
             <span class="badge">Under review</span>
           </li>
           <li>
@@ -1322,18 +1322,18 @@
 
   <section id="screen-creator-requests" class="screen journey-screen">
     <div class="screen-inner dashboard-screen">
-      <h1>Brand Requests</h1>
-      <p class="screen-desc">Collaboration and sponsored-content briefs sent to you by brands. Accept, negotiate, or reject.</p>
+      <h1>Partner Requests</h1>
+      <p class="screen-desc">Collaboration and sponsored-content briefs sent to you by partners. Accept, negotiate, or reject.</p>
       <div class="requests-list" id="creator-requests-list" data-role="creator"></div>
     </div>
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════ -->
-  <!-- BRAND JOURNEY -->
+  <!-- PARTNER / AGENCY JOURNEY -->
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <section id="screen-brand-register" class="screen journey-screen">
     <div class="screen-inner form-screen">
-      <h1>Brand / Agency Registration</h1>
+      <h1>Partner / Agency Registration</h1>
       <p class="screen-desc">Company verification and subscription. Max 3 users per account in MVP. Once created, your agency can be tagged by athletes under Managed by.</p>
       <form class="proto-form" id="form-brand-register">
         <div class="form-row">
@@ -1348,7 +1348,7 @@
           <label>Account type</label>
           <div class="button-group" id="brand-register-type">
             <button type="button" class="btn-secondary is-selected" data-account-type="agency">Agency</button>
-            <button type="button" class="btn-secondary" data-account-type="brand">Brand</button>
+            <button type="button" class="btn-secondary" data-account-type="brand">Partner</button>
           </div>
         </div>
         <div class="form-row">
@@ -1396,7 +1396,7 @@
     <div class="screen-inner dashboard-screen brand-dashboard">
       <div class="brand-dashboard-header">
         <div>
-          <h1>Agency dashboard</h1>
+          <h1>Partner / Agency dashboard</h1>
           <p class="screen-desc" id="brand-dashboard-subtitle">Manage your athlete portfolio. Add athletes via request — approval from the athlete or admin required.</p>
         </div>
         <button type="button" class="btn-primary" id="brand-portfolio-add-btn">+ Add athlete</button>
@@ -1544,7 +1544,7 @@
       <div class="athlete-profile-score-stack brand-profile-score-row" id="brand-profile-stats">
         <div class="athlete-score-chip completeness">
           <strong id="pv-fit">—</strong>
-          <span>Brand fit</span>
+          <span>Partner fit</span>
         </div>
         <div class="athlete-score-chip">
           <strong id="pv-perf">—</strong>
@@ -1655,7 +1655,7 @@
             <input type="text" id="proposal-athlete" value="" readonly class="readonly" placeholder="Select an athlete from Campaign Agent" />
           </div>
           <div>
-            <label>Brand / campaign name</label>
+            <label>Partner / campaign name</label>
             <input type="text" id="proposal-brand" placeholder="e.g. Energy Drink Co. · IPL 2026" />
           </div>
         </div>
@@ -1879,14 +1879,14 @@
       </div>
       <div class="form-actions">
         <button type="button" class="btn-secondary" data-next="admin-login">← Back</button>
-        <button type="button" class="btn-primary" data-next="admin-brand-governance">Brand governance →</button>
+        <button type="button" class="btn-primary" data-next="admin-brand-governance">Partner governance →</button>
       </div>
     </div>
   </section>
 
   <section id="screen-admin-brand-governance" class="screen journey-screen">
     <div class="screen-inner dashboard-screen">
-      <h1>Brand governance</h1>
+      <h1>Partner governance</h1>
       <p class="screen-desc">Verify companies, approve agency portfolio requests, monitor spam, manage plans.</p>
       <div class="admin-tabs" id="admin-brand-tabs">
         <button type="button" class="tab active" data-admin-brand-tab="companies">Companies</button>
@@ -1908,7 +1908,7 @@
             </thead>
             <tbody id="admin-companies-tbody">
               <tr>
-                <td>Brand A</td>
+                <td>Partner A</td>
                 <td>Pro</td>
                 <td><span class="badge success">Active</span></td>
                 <td><button type="button" class="btn-sm btn-outline">Manage</button></td>
@@ -1973,7 +1973,7 @@
         </div>
         <div class="stat-card">
           <span class="stat-value">142</span>
-          <span class="stat-label">Active brands</span>
+          <span class="stat-label">Active partners</span>
         </div>
         <div class="stat-card">
           <span class="stat-value">1,840</span>
@@ -1988,7 +1988,7 @@
         <span>📊 Revenue & conversion charts</span>
       </div>
       <div class="form-actions">
-        <button type="button" class="btn-secondary" data-next="admin-brand-governance">← Brand gov</button>
+        <button type="button" class="btn-secondary" data-next="admin-brand-governance">← Partner gov</button>
         <button type="button" class="btn-primary" data-nav="landing">Exit to home</button>
       </div>
     </div>
@@ -2018,7 +2018,7 @@
           </label>
           <label class="demo-field">
             <span>Purpose of demo</span>
-            <textarea id="demo-purpose" name="purpose" rows="3" required placeholder="e.g. Brand sponsorship discovery, federation data partnership…"></textarea>
+            <textarea id="demo-purpose" name="purpose" rows="3" required placeholder="e.g. Partner sponsorship discovery, federation data partnership…"></textarea>
           </label>
           <button type="submit" class="demo-modal-submit">Submit</button>
         </form>
@@ -2033,10 +2033,10 @@
 
   <script src="sport-events-data.js?v=2026-09-30e"></script>
   <script src="multisport-data.js?v=2026-09-30e"></script>
-  <script src="data.js?v=2026-10-01a"></script>
+  <script src="data.js?v=2026-10-10a"></script>
   <script src="cricsheet-stats.js"></script>
   <script src="ipl-assistant.js"></script>
-  <script src="app.js?v=2026-10-02b"></script>
+  <script src="app.js?v=2026-10-10a"></script>
   <script src="demo-request.js?v=2026-09-05f"></script>
   <script>
   (function () {
@@ -2154,7 +2154,7 @@
                 '<div><h4>#' + (a.rank || '') + ' ' + a.name + '</h4><p>' + (a.league || a.sport) + ' · ' + (a.teamShort || a.team) + ' · ' + a.role + (a.verified ? ' · Verified' : '') + '</p></div>' +
               '</div>' +
               '<div class="ai-expanded-section"><h5>IPL 2026 performance</h5><p>' + a.matches + ' matches · ' + a.pom + ' Player-of-Match awards · ' + a.winRate + '% team win rate when selected. AI performance score: ' + a.perf + '.</p></div>' +
-              '<div class="ai-expanded-section"><h5>Brand & social reach</h5><p>Social score ' + a.social + ' based on POM visibility and franchise recognition. Strong fit for ' + (a.teamShort || 'IPL') + '-aligned campaigns in ' + (a.region || 'PAN India') + '.</p></div>' +
+              '<div class="ai-expanded-section"><h5>Partner & social reach</h5><p>Social score ' + a.social + ' based on POM visibility and franchise recognition. Strong fit for ' + (a.teamShort || 'IPL') + '-aligned campaigns in ' + (a.region || 'PAN India') + '.</p></div>' +
               '<button type="button" class="btn-primary btn-view-full-profile">View full profile</button>';
             overlay.hidden = false;
             document.body.classList.add('ai-overlay-open');
