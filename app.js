@@ -4725,14 +4725,18 @@
       if (role && role.dashboardDesc) subEl.textContent = (agency && agency.name ? agency.name + ' · ' : '') + role.dashboardDesc;
       else if (agency) subEl.textContent = agency.name + ' · Add athletes to your portfolio.';
     }
-    if (addBtn) addBtn.textContent = isCoach ? '+ Create athlete' : '+ Add athlete';
+    var canAddAthlete = roleId === 'coach' || roleId === 'athlete-manager';
+    if (addBtn) {
+      addBtn.hidden = !canAddAthlete;
+      addBtn.textContent = isCoach ? '+ Create athlete' : '+ Add athlete';
+    }
     if (headingEl) headingEl.textContent = isCoach ? 'My athletes' : 'Athlete portfolio';
     if (portLabelEl) portLabelEl.textContent = isCoach ? 'Athletes coached' : 'Players in portfolio';
     if (receivedStat) receivedStat.hidden = isCoach;
     if (sentStat) sentStat.hidden = isCoach;
     if (attendanceStat) attendanceStat.hidden = !isCoach;
     if (paymentsStat) paymentsStat.hidden = !isCoach;
-    if (reqSection) reqSection.hidden = isCoach;
+    if (reqSection) reqSection.hidden = isCoach || !canAddAthlete;
     if (trackSection) trackSection.hidden = !isCoach;
 
     if (isCoach) {
@@ -4780,7 +4784,9 @@
 
     if (listEl) {
       if (!ids.length) {
-        listEl.innerHTML = '<div class="requests-empty">No athletes in your portfolio yet. Click <strong>+ Add athlete</strong> to search and send a request.</div>';
+        listEl.innerHTML = canAddAthlete
+          ? '<div class="requests-empty">No athletes in your portfolio yet. Click <strong>+ Add athlete</strong> to search and send a request.</div>'
+          : '<div class="requests-empty">No athletes in your portfolio yet.</div>';
       } else {
         listEl.innerHTML = ids.map(function (id) {
           var a = window.ADC_DATA.getAthleteById(id);
@@ -4812,7 +4818,9 @@
       addBtn.setAttribute('data-bound', '1');
       addBtn.addEventListener('click', function () {
         var role = getPartnerRole();
-        if (role && role.id === 'coach') openCoachCreateAthleteModal();
+        var roleId = role ? role.id : '';
+        if (roleId !== 'coach' && roleId !== 'athlete-manager') return;
+        if (roleId === 'coach') openCoachCreateAthleteModal();
         else openPortfolioAddModal();
       });
     }
